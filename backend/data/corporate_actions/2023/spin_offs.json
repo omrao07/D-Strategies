@@ -1,0 +1,24 @@
+{
+  "year": 2023,
+  "spin_offs": [
+    {
+      "parent_company": "Novartis",
+      "spin_off_company": "Sandoz Group AG",
+      "announcement_date": "2023-09-25",
+      "effective_date": "2023-10-04",
+      "ratio": "1 share of Sandoz for 5 shares of Novartis",
+      "type": "100% Spin-off / dividend-in-kind",
+      "notes": "Novartis completed the spin-off of its Generics & Biosimilars business via a dividend in kind. :contentReference[oaicite:0]{index=0}"
+    },
+    {
+      "parent_company": "Johnson & Johnson",
+      "spin_off_company": "Kenvue",
+      "announcement_date": "2023-05-04",
+      "effective_date": "2023-05-04",
+      "ratio": null,
+      "type": "Spin-off (consumer health business)",
+      "notes": "J&J spun off its consumer health business into Kenvue in May 2023."
+    }
+    /* you can add more entries here */
+  ]
+}

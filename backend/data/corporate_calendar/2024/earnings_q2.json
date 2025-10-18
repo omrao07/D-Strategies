@@ -1,0 +1,70 @@
+{
+  "calendar_quarter": "Q2",
+  "calendar_year": null,
+  "earnings": [
+    {
+      "company": "Sample Company A",
+      "ticker": "AAAA",
+      "exchange": "NYSE",
+      "fiscal_quarter": "Q1 FYXXXX",
+      "fiscal_year": null,
+      "announcement_date": "YYYY-MM-DD",
+      "announcement_time": "BMO",
+      "eps_consensus": null,
+      "eps_actual": null,
+      "revenue_consensus": null,
+      "revenue_actual": null,
+      "surprise_eps_pct": null,
+      "surprise_revenue_pct": null,
+      "guidance": {
+        "eps_next_q": null,
+        "revenue_next_q": null,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": null,
+        "timezone": "America/New_York",
+        "dial_in": null,
+        "webcast_url": null,
+        "slides_url": null,
+        "press_release_url": null
+      },
+      "notes": "Template row — replace with actual earnings data."
+    },
+    {
+      "company": "Sample Company B",
+      "ticker": "BBBB",
+      "exchange": "NSE",
+      "fiscal_quarter": "Q4 FYXXXX",
+      "fiscal_year": null,
+      "announcement_date": "YYYY-MM-DD",
+      "announcement_time": "AMC",
+      "eps_consensus": null,
+      "eps_actual": null,
+      "revenue_consensus": null,
+      "revenue_actual": null,
+      "surprise_eps_pct": null,
+      "surprise_revenue_pct": null,
+      "guidance": {
+        "eps_next_q": null,
+        "revenue_next_q": null,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": null,
+        "timezone": "Asia/Kolkata",
+        "dial_in": null,
+        "webcast_url": null,
+        "slides_url": null,
+        "press_release_url": null
+      },
+      "notes": null
+    }
+  ],
+  "conventions": {
+    "announcement_time_values": ["BMO", "AMC", "TAS", "Pre", "Post", "Intra"],
+    "currency_units": "Revenue in reported company currency; EPS in reported units."
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "year": 2024,
+  "splits": [
+    {
+      "company": "Chipotle Mexican Grill, Inc.",
+      "announcement_date": "2024-03-19",
+      "ex_date": "2024-06-26",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "50:1",
+      "type": "Forward split",
+      "notes": "Board approved 50-for-1 split, pending shareholder approval. :contentReference[oaicite:0]{index=0}"
+    },
+    {
+      "company": "MicroStrategy, Inc.",
+      "announcement_date": "2024-07-11",
+      "ex_date": "2024-08-08",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "10:1",
+      "type": "Forward split",
+      "notes": "10-for-1 split applied to both class A & class B shares. :contentReference[oaicite:1]{index=1}"
+    },
+    {
+      "company": "Medalist Diversified REIT, Inc.",
+      "announcement_date": "2024-07-02",
+      "ex_date": "2024-07-03",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "Reverse 1 for 10 + Forward 5 for 1",
+      "type": "Reverse + forward (combined adjustment)",
+      "notes": "Executed 1-for-10 reverse followed immediately by 5-for-1 forward on same date. :contentReference[oaicite:2]{index=2}"
+    },
+    {
+      "company": "Wipro Ltd.",
+      "announcement_date": null,
+      "ex_date": "2024-12-11",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "2:1",
+      "type": "Forward split",
+      "notes": "Split announced / applied for Wipro in 2024. :contentReference[oaicite:3]{index=3}"
+    },
+    {
+      "company": "Palo Alto Networks, Inc.",
+      "announcement_date": null,
+      "ex_date": "2024-12-16",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "2:1",
+      "type": "Forward split",
+      "notes": "Part of end-2024 split wave. :contentReference[oaicite:4]{index=4}"
+    },
+    {
+      "company": "Arista Networks, Inc.",
+      "announcement_date": null,
+      "ex_date": "2024-12-04",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "4:1",
+      "type": "Forward split",
+      "notes": "Projected 4-for-1 split in December 2024. :contentReference[oaicite:5]{index=5}"
+    },
+    {
+      "company": "Tractor Supply Co. (TSCO)",
+      "announcement_date": null,
+      "ex_date": "2024-12-20",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "5:1",
+      "type": "Forward split",
+      "notes": "5-for-1 split in December 2024. :contentReference[oaicite:6]{index=6}"
+    },
+    {
+      "company": "Palo Alto Networks, Inc.",
+      "announcement_date": null,
+      "ex_date": "2024-12-16",
+      "record_date": null,
+      "old_face_value": null,
+      "new_face_value": null,
+      "ratio": "2:1",
+      "type": "Forward split",
+      "notes": "Appears again in split listings. :contentReference[oaicite:7]{index=7}"
+    }
+  ]
+}

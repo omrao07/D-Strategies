@@ -1,0 +1,98 @@
+{
+  "fund": {
+    "name": "Jarvis Macro Fund",
+    "version": "1.0.0",
+    "description": "Configuration for the Jarvis Hedge Fund Engine",
+    "baseCurrency": "USD",
+    "timezone": "UTC"
+  },
+  "portfolio": {
+    "maxLeverage": 3.0,
+    "minCashPct": 0.05,
+    "maxConcentrationPct": 0.20,
+    "allowedAssetClasses": [
+      "equities",
+      "futures",
+      "commodities",
+      "fx",
+      "crypto",
+      "rates"
+    ],
+    "riskLimits": {
+      "varLimitPct": 0.02,
+      "cvarLimitPct": 0.03,
+      "maxDrawdownPct": 0.15
+    }
+  },
+  "execution": {
+    "defaultVenue": "SIM",
+    "slippageBps": 2,
+    "commissionBps": 1,
+    "orderTimeoutMs": 5000,
+    "maxOrdersPerSecond": 10
+  },
+  "data": {
+    "feeds": {
+      "live": "data/live-feed.ts",
+      "csv": "data/csv-feed.ts",
+      "http": "data/http-feed.ts"
+    },
+    "historyDir": "data/history",
+    "snapshotsDir": "data/snapshots"
+  },
+  "observability": {
+    "logger": {
+      "level": "info",
+      "redactKeys": ["password", "secret", "token", "apiKey"],
+      "file": "logs/fund.log"
+    },
+    "metrics": {
+      "enabled": true,
+      "port": 9464
+    },
+    "tracing": {
+      "enabled": true,
+      "sampler": "ratio",
+      "ratio": 0.1
+    },
+    "health": {
+      "httpPort": 8787,
+      "checks": ["uptime", "event_loop_lag", "memory"]
+    },
+    "slo": {
+      "availabilityTarget": 0.995,
+      "latencyTargetMs": 200
+    }
+  },
+  "security": {
+    "rbac": {
+      "roles": ["admin", "trader", "viewer"],
+      "policiesFile": "security/rbac.ts"
+    },
+    "secrets": {
+      "provider": "env", 
+      "requiredKeys": ["DB_URL", "REDIS_URL", "API_KEY"]
+    },
+    "codeSigning": {
+      "required": true,
+      "policyFile": "policies/code-signing.md"
+    }
+  },
+  "scheduling": {
+    "tasksFile": "sched/tasks.ts",
+    "watchdog": {
+      "enabled": true,
+      "intervalMs": 10000,
+      "maxMissedBeats": 3
+    },
+    "retryPolicy": {
+      "maxRetries": 5,
+      "backoffMs": 1000,
+      "jitter": true
+    }
+  },
+  "reports": {
+    "formats": ["html", "md", "csv"],
+    "dir": "reports"
+  }
+}

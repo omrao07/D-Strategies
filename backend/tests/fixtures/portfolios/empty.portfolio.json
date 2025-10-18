@@ -1,0 +1,16 @@
+{
+  "portfolioId": "empty-001",
+  "asOf": "2025-10-15T00:00:00Z",
+  "capital": 0,
+  "positions": [],
+  "risk": {
+    "VaR95": 0,
+    "CVaR95": 0,
+    "maxDrawdown": 0,
+    "leverage": 0
+  },
+  "metadata": {
+    "owner": "test-user",
+    "description": "Empty portfolio with no positions"
+  }
+}

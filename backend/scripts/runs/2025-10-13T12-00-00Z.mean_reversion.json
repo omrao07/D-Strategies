@@ -1,0 +1,98 @@
+{
+  "runId": "2025-10-13T12-meanreversion",
+  "createdAt": "2025-10-13T12:00:00Z",
+  "strategy": "Mean Reversion",
+  "universe": "US Equities (sample)",
+  "config": {
+    "engine": { "mode": "dev", "scheduler": { "loopIntervalMs": 500 } },
+    "broker": { "type": "paper", "accountId": "HF-DEV-LOCAL" },
+    "risk": { "limits": { "maxGross": 1.5, "maxSingle": 0.1 } },
+    "strategy": { "name": "Mean Reversion", "riskBudget": 0.05 }
+  },
+  "metrics": {
+    "sharpe": 0.95,
+    "sortino": 1.30,
+    "vol": 0.115,
+    "maxDrawdown": -0.065,
+    "cagr": 0.105,
+    "winRate": 0.52,
+    "trades": 38
+  },
+  "positions": [
+    { "symbol": "AMZN", "quantity": 10, "price": 132.40, "value": 1324 },
+    { "symbol": "TSLA", "quantity": -20, "price": 250.00, "value": -5000 },
+    { "symbol": "MSFT", "quantity": 15, "price": 320.00, "value": 4800 }
+  ],
+  "trades": [
+    { "ts": "2025-10-13T12:00:02Z", "action": "SELL", "symbol": "TSLA", "qty": 20, "price": 250.00 },
+    { "ts": "2025-10-13T12:00:03Z", "action": "BUY", "symbol": "AMZN", "qty": 10, "price": 132.40 }
+  ],
+  "snapshots": {
+    "full": {
+      "meta": {
+        "ts": 1760356800000,
+        "asOf": "2025-10-13T12:00:05Z",
+        "strategy": "Mean Reversion",
+        "runId": "2025-10-13T12-meanreversion"
+      },
+      "positions": [
+        { "symbol": "AMZN", "quantity": 10, "price": 132.40, "value": 1324 },
+        { "symbol": "TSLA", "quantity": -20, "price": 250.00, "value": -5000 },
+        { "symbol": "MSFT", "quantity": 15, "price": 320.00, "value": 4800 }
+      ],
+      "totalValue": 97124,
+      "cash": 87000,
+      "pnl": 800,
+      "weights": {
+        "AMZN": 0.01324,
+        "TSLA": -0.05000,
+        "MSFT": 0.04800
+      },
+      "risk": {
+        "grossExposure": 11124,
+        "netExposure": 1124,
+        "leverage": 1.1,
+        "concentration": 0.05,
+        "longCount": 2,
+        "shortCount": 1
+      }
+    },
+    "partial": {
+      "meta": {
+        "ts": 1760356800000,
+        "asOf": "2025-10-13T12:00:05Z",
+        "baseTs": 1760356800000,
+        "strategy": "Mean Reversion",
+        "runId": "2025-10-13T12-meanreversion"
+      },
+      "cashDelta": -200,
+      "pnlDelta": 120,
+      "prevTotal": 100000,
+      "newTotal": 100920,
+      "changes": [
+        {
+          "kind": "open",
+          "symbol": "AMZN",
+          "prevQty": 0,
+          "newQty": 10,
+          "qtyDelta": 10,
+          "prevValue": 0,
+          "newValue": 1324,
+          "valueDelta": 1324,
+          "price": 132.40
+        },
+        {
+          "kind": "close",
+          "symbol": "TSLA",
+          "prevQty": 20,
+          "newQty": 0,
+          "qtyDelta": -20,
+          "prevValue": 5000,
+          "newValue": 0,
+          "valueDelta": -5000,
+          "price": 250.00
+        }
+      ]
+    }
+  }
+}

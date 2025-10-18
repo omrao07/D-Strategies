@@ -1,0 +1,38 @@
+{
+  "snapshotId": "snap-001",
+  "asOf": "2025-10-15T12:00:00Z",
+  "portfolio": {
+    "capital": "one million",
+    "positions": [
+      {
+        "symbol": "AAPL",
+        "quantity": 100,
+        "avgPrice": 170.5,
+        "marketValue": "INVALID"
+      },
+      {
+        "symbol": 12345,
+        "quantity": -50,
+        "avgPrice": -200,
+        "marketValue": -10000
+      },
+      {
+        "quantity": 20,
+        "avgPrice": 50
+        // missing "symbol"
+      }
+    ]
+  },
+  "risk": {
+    "VaR95": "NaN",
+    "CVaR95": null,
+    "maxDrawdown": "twenty percent",
+    "leverage": -2
+  },
+  "metadata": {
+    "generatedBy": "",
+    "timestamp": "yesterday",
+    "extraField": { "foo": "bar" }
+  }
+}
+// Note: This JSON file contains multiple intentional errors for testing purposes.

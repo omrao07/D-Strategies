@@ -1,0 +1,78 @@
+# 📊 Modelling Functions & Damodaran Bot
+
+This document describes the modelling layer in the Hedge Fund Terminal — how valuation, risk, and scenario models are integrated and how the **Damodaran Bot** operates.
+
+---
+
+## 🔹 Purpose
+
+The modelling module provides:
+
+- Valuation models for equities, credit, and commodities
+- Risk factor modelling (factor exposures, beta decomposition)
+- Scenario generation (macro shocks, regime shifts)
+- Integration with Damodaran datasets for fundamentals
+
+---
+
+## 🔹 Components
+
+### 1. Valuation Models
+
+- **DCF (Discounted Cash Flow)**  
+  Inputs: revenue growth, margins, WACC, terminal value  
+  Outputs: intrinsic value per share
+- **Multiples**  
+  PE, EV/EBITDA, P/B ratios vs sector peers
+- **Dividend Discount Model (DDM)**  
+  Forecasted dividends discounted at cost of equity
+- **Relative Valuation**  
+  Compare to Damodaran’s global industry datasets
+
+### 2. Risk Models
+
+- **Factor Risk Model**  
+  Exposures to market, size, value, momentum, quality, low vol
+- **Stress Tests**  
+  Apply macro shocks: rates +200bps, oil shock, recession scenario
+- **VaR / CVaR**  
+  Historical simulation and parametric
+
+### 3. Scenario Modelling
+
+- Macro-driven scenario paths for equity, FX, and credit
+- Monte Carlo simulations with fat-tail adjustments
+- Scenario library (recession, stagflation, tech boom, commodity spike)
+
+### 4. Damodaran Bot
+
+- **Data Loader** (`damodaran/loader.ts`):  
+  Pulls valuation data from Damodaran’s published datasets (equity risk premia, cost of capital, sector multiples).
+- **Models** (`damodaran/models.ts`):  
+  Converts raw CSV/XLS into normalized time series.
+- **Bot** (`damodaran/bot.ts`):  
+  Exposes a CLI + chat-like interface:
+  - “What is the implied equity risk premium for US in 2025?”
+  - “Compare EV/EBITDA multiples for US Tech vs Europe Tech.”
+  - “Give me a DCF of AAPL with 5% growth and 9% WACC.”
+
+---
+
+## 🔹 Integration
+
+- Modelling outputs are exposed via:
+  - **Reports** (`reporting/html.ts`, `reporting/md.ts`)  
+  - **Backtester** (factor-based strategies, scenario stress)  
+  - **CLI** (`backtester/cli.ts` commands: `models`, `damodaran`)  
+- All models log metadata in `state/reconcile.ts` and `runs/*`.
+
+---
+
+## 🔹 Example Usage
+
+```bash
+# Run Damodaran bot query
+node damodaran/bot.js "equity risk premium US 2025"
+
+# Generate valuation report for AAPL
+hf-terminal models valuate AAPL --method dcf --growth 5 --wacc 9

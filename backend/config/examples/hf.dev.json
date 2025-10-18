@@ -1,0 +1,85 @@
+{
+  "engine": {
+    "host": "127.0.0.1",
+    "port": 3000,
+    "mode": "dev",
+    "logLevel": "debug",
+    "scheduler": {
+      "loopIntervalMs": 500,
+      "timezone": "UTC"
+    }
+  },
+  "broker": {
+    "type": "paper",
+    "baseUrl": "http://localhost:8081",
+    "apiKey": "dev-demo-key",
+    "accountId": "HF-DEV-LOCAL"
+  },
+  "data": {
+    "feeds": {
+      "equities": {
+        "type": "csv",
+        "path": "./data/samples/equities/*.csv",
+        "frequency": "daily"
+      },
+      "fx": {
+        "type": "http",
+        "url": "https://api.exchangeratesapi.io/latest",
+        "frequency": "daily"
+      }
+    },
+    "transform": {
+      "normalize": true,
+      "fillMissing": "ffill"
+    }
+  },
+  "strategies": {
+    "registry": [
+      { "name": "alpha_momentum_dev", "path": "./examples/alpha/momentum.dev.js" },
+      { "name": "alpha_trend_following_dev", "path": "./examples/alpha/trend following.dev.js" }
+    ],
+    "defaultRiskBudget": 0.05
+  },
+  "risk": {
+    "limits": {
+      "maxGross": 1.5,
+      "maxSingle": 0.1,
+      "maxLeverage": 2.0,
+      "maxDrawdown": 0.2
+    },
+    "snapshots": {
+      "fullPath": "./reports/dev/snapshots/full",
+      "partialPath": "./reports/dev/snapshots/partial",
+      "frequency": "hourly"
+    }
+  },
+  "storage": {
+    "dir": "./storage/dev",
+    "kv": "memory",
+    "fsRepo": "./storage/dev/fs"
+  },
+  "reporting": {
+    "csv": "./reports/dev/csv",
+    "html": "./reports/dev/html",
+    "md": "./reports/dev/md"
+  },
+  "observability": {
+    "logger": {
+      "level": "debug",
+      "file": "./logs/dev.log"
+    },
+    "metrics": {
+      "enable": true,
+      "port": 9091
+    },
+    "tracing": {
+      "enable": false
+    }
+  },
+  "ml": {
+    "featureStore": "./ml/dev/features",
+    "strategyGen": {
+      "enabled": false
+    }
+  }
+}

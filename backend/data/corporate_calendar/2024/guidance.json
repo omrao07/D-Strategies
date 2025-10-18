@@ -1,0 +1,107 @@
+{
+  "year": 2024,
+  "guidance": [
+    {
+      "company": "Apple Inc.",
+      "ticker": "AAPL",
+      "exchange": "NASDAQ",
+      "announcement_date": "2024-05-02",
+      "fiscal_quarter": "Q2 FY2024",
+      "fiscal_year": 2024,
+      "guidance_type": "Quarterly",
+      "metrics": {
+        "revenue_next_q": {
+          "guidance": 83000.0,
+          "consensus": 83500.0,
+          "currency": "USD Mn"
+        },
+        "gross_margin_pct": {
+          "guidance": 45.0,
+          "consensus": 44.7,
+          "currency": "%"
+        }
+      },
+      "notes": "Apple guided revenue slightly below consensus but stronger margins."
+    },
+    {
+      "company": "Reliance Industries Ltd.",
+      "ticker": "RELIANCE",
+      "exchange": "NSE",
+      "announcement_date": "2024-04-19",
+      "fiscal_quarter": "Q4 FY2024",
+      "fiscal_year": 2024,
+      "guidance_type": "Full Year",
+      "metrics": {
+        "revenue_full_year": {
+          "guidance": 965000.0,
+          "consensus": 950000.0,
+          "currency": "INR Cr"
+        },
+        "ebitda_full_year": {
+          "guidance": 130000.0,
+          "consensus": 128500.0,
+          "currency": "INR Cr"
+        }
+      },
+      "notes": "Reliance projected double-digit growth across Jio and retail."
+    },
+    {
+      "company": "Tesla, Inc.",
+      "ticker": "TSLA",
+      "exchange": "NASDAQ",
+      "announcement_date": "2024-01-24",
+      "fiscal_quarter": "Q4 FY2023",
+      "fiscal_year": 2023,
+      "guidance_type": "Full Year",
+      "metrics": {
+        "deliveries_full_year": {
+          "guidance": 2000000,
+          "consensus": 1950000,
+          "currency": "Units"
+        },
+        "capex_full_year": {
+          "guidance": 8500.0,
+          "consensus": null,
+          "currency": "USD Mn"
+        }
+      },
+      "notes": "Tesla guided for 2M deliveries in 2024, up from 1.8M in 2023."
+    },
+    {
+      "company": "Microsoft Corp.",
+      "ticker": "MSFT",
+      "exchange": "NASDAQ",
+      "announcement_date": "2024-07-23",
+      "fiscal_quarter": "Q4 FY2024",
+      "fiscal_year": 2024,
+      "guidance_type": "Quarterly",
+      "metrics": {
+        "revenue_next_q": {
+          "guidance": 61900.0,
+          "consensus": 62000.0,
+          "currency": "USD Mn"
+        },
+        "eps_next_q": {
+          "guidance": 2.89,
+          "consensus": 2.87,
+          "currency": "USD"
+        }
+      },
+      "notes": "Microsoft guided inline revenue with slight EPS upside."
+    }
+  ],
+  "conventions": {
+    "guidance_type_values": ["Quarterly", "Full Year", "Multi-Year"],
+    "metric_key_examples": [
+      "revenue_next_q",
+      "revenue_full_year",
+      "eps_next_q",
+      "eps_full_year",
+      "gross_margin_pct",
+      "ebitda_full_year",
+      "deliveries_full_year",
+      "capex_full_year"
+    ],
+    "currency_note": "Monetary metrics use company reporting currency; % for margins; 'Units' for volumes."
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "year": 2024,
+  "spin_offs": [
+    {
+      "parent_company": "General Electric (GE)",
+      "spin_off_company": "GE Vernova",
+      "announcement_date": "2024-02-29",
+      "effective_date": "2024-04-02",
+      "ratio": null,
+      "type": "Spin-off / separation of energy business",
+      "notes": "GE approved spin-off of its energy business, forming GE Vernova. :contentReference[oaicite:0]{index=0}"
+    },
+    {
+      "parent_company": "Illumina, Inc.",
+      "spin_off_company": "GRAIL, Inc.",
+      "announcement_date": "2024-06-13",
+      "effective_date": "2024-06-24",
+      "ratio": "1 GRAIL share for 6 Illumina shares",
+      "type": "Spin-off / distribution",
+      "notes": "Illumina distributed ~85.5% of GRAIL to shareholders; each shareholder received one GRAIL share for every 6 Illumina shares. :contentReference[oaicite:1]{index=1}"
+    },
+    {
+      "parent_company": "TC Energy",
+      "spin_off_company": "South Bow Corporation (SOBO)",
+      "announcement_date": "2024-10-01",
+      "effective_date": "2024-10-02",
+      "ratio": null,
+      "type": "Spin-off / business separation",
+      "notes": "TC Energy completed spin-off of its liquids pipelines business (South Bow) with separate trading on TSX/NYSE. :contentReference[oaicite:2]{index=2}"
+    },
+    {
+      "parent_company": "3M",
+      "spin_off_company": "Solventum",
+      "announcement_date": "2024-04-01",
+      "effective_date": "2024-04-01",
+      "ratio": null,
+      "type": "Spin-off / carve-out of healthcare business",
+      "notes": "3M spun off its healthcare business into Solventum. :contentReference[oaicite:3]{index=3}"
+    },
+    {
+      "parent_company": "Vivendi",
+      "spin_off_company": "Canal+ / Havas / Louis Hachette Group (LHG)",
+      "announcement_date": "2024-07-22",
+      "effective_date": "2024-12-16",
+      "ratio": null,
+      "type": "Multi-spin / breakup into multiple public entities",
+      "notes": "Vivendi split into Canal+, Havas, and publishing arm LHG. :contentReference[oaicite:4]{index=4}"
+    }
+  ]
+}

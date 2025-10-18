@@ -1,0 +1,57 @@
+{
+  "ticker": "RELIANCE",
+  "corporate_actions": {
+    "dividends": [
+      {
+        "ex_date": "2024-08-19",
+        "amount_per_share": 10.0,
+        "record_date": "2024-08-19",
+        "payment_date": null,
+        "type": "Final"
+      },
+      {
+        "ex_date": "2023-08-21",
+        "amount_per_share": 9.0,
+        "record_date": "2023-08-21",
+        "payment_date": null,
+        "type": "Final"
+      }
+    ],
+    "bonus_issues": [
+      {
+        "ex_date": "2024-10-28",
+        "ratio": "1:1",
+        "record_date": "2024-10-28",
+        "notes": "Bonus shares issued in a 1 for 1 ratio. :contentReference[oaicite:0]{index=0}"
+      }
+    ],
+    "splits": [
+      {
+        "ex_date": "2024-10-28",
+        "ratio": "2:1",
+        "type": "Forward split",
+        "notes": "Reliance declared a 2:1 stock split in 2024. :contentReference[oaicite:1]{index=1}"
+      },
+      {
+        "ex_date": "2017-09-07",
+        "ratio": "2:1",
+        "type": "Forward split",
+        "notes": "Historical split in 2017. :contentReference[oaicite:2]{index=2}"
+      },
+      {
+        "ex_date": "2009-11-26",
+        "ratio": "2:1",
+        "type": "Forward split",
+        "notes": "Historical split in 2009. :contentReference[oaicite:3]{index=3}"
+      }
+    ],
+    "mergers_acquisitions": [
+      {
+        "target": "Walt Disney / Disney Star (media assets merger)",
+        "announcement_date": "2024-02-28",
+        "effective_date": "2024-11-14",
+        "notes": "Merger of Reliance’s media assets (Viacom18) with Disney Star. :contentReference[oaicite:4]{index=4}"
+      }
+    ]
+  }
+}

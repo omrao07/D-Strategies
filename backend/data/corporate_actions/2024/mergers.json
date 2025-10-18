@@ -1,0 +1,45 @@
+{
+  "year": 2024,
+  "mergers": [
+    {
+      "acquiring_company": "Reliance Industries / Viacom18",
+      "acquired_company": "Disney India / Disney Star",
+      "announcement_date": "2024-02-28",
+      "effective_date": "2024-11-14",
+      "share_swap_ratio": null,
+      "notes": "Merger of Reliance’s media assets (Viacom18) and Disney Star to form a consolidated media & entertainment entity. :contentReference[oaicite:0]{index=0}"
+    },
+    {
+      "acquiring_company": "Tata Group",
+      "acquired_company": "Vistara (merged into Air India)",
+      "announcement_date": null,
+      "effective_date":  "2024",
+      "share_swap_ratio": null,
+      "notes": "Tata merged its airline business: Air India and Vistara consolidation. :contentReference[oaicite:1]{index=1}"
+    },
+    {
+      "acquiring_company": "Torrent Pharmaceuticals",
+      "acquired_company": "JB Chemicals & Pharmaceuticals (majority stake)",
+      "announcement_date": null,
+      "effective_date": 2024,
+      "share_swap_ratio": null,
+      "notes": "Acquisition of majority stake in JB Chemicals & Pharma by Torrent. :contentReference[oaicite:2]{index=2}"
+    },
+    {
+      "acquiring_company": "Rentokil Initial",
+      "acquired_company": "HiCare (India)",
+      "announcement_date": "2024-04-02",
+      "effective_date": "2024-04-02",
+      "share_swap_ratio": null,
+      "notes": "Acquisition of India’s pest-control company HiCare by Rentokil. :contentReference[oaicite:3]{index=3}"
+    },
+    {
+      "acquiring_company": "Adani Transmission (via subsidiary)",
+      "acquired_company": "Essar’s Mahan-Sipat transmission assets",
+      "announcement_date": null,
+      "effective_date": "2024-05",
+      "share_swap_ratio": null,
+      "notes": "Adani’s transmission arm acquired Essar’s transmission assets (~Rs. 1,900 crore). :contentReference[oaicite:4]{index=4}"
+    }
+  ]
+}

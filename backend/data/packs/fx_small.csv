@@ -1,0 +1,168 @@
+// packs/fx-small.ts
+// Target file to generate: "packs/fx small.csv"
+// No imports. Provides: (1) sample CSV contents, (2) pure-TS CSV <-> JSON helpers, (3) simple validator.
+
+export type FxRow = {
+  date: string;      // ISO yyyy-mm-dd
+  pair: string;      // e.g., EURUSD, USDJPY, USDINR
+  spot: number;      // spot rate (quote per 1 base unit)
+  fwd_1m: number;    // 1-month forward outright
+  fwd_3m: number;    // 3-month forward outright
+  fwd_6m: number;    // 6-month forward outright
+  base_rate_bpa: number; // base currency interest (bps annualized)
+  quote_rate_bpa: number; // quote currency interest (bps annualized)
+};
+
+export const FX_SMALL_CSV_HEADER =
+  "date,pair,spot,fwd_1m,fwd_3m,fwd_6m,base_rate_bpa,quote_rate_bpa";
+
+// A compact, realistic sample you can write directly to "packs/fx small.csv".
+export const FX_SMALL_CSV = [
+  FX_SMALL_CSV_HEADER,
+  "2025-09-29,EURUSD,1.0812,1.0820,1.0841,1.0869,375,545",
+  "2025-09-29,USDJPY,149.62,149.85,150.27,150.91,540,20",
+  "2025-09-29,GBPUSD,1.2635,1.2646,1.2669,1.2704,465,545",
+  "2025-09-29,USDINR,83.17,83.27,83.52,83.94,545,690",
+  "2025-09-30,EURUSD,1.0789,1.0797,1.0818,1.0846,372,540",
+  "2025-09-30,USDJPY,150.11,150.33,150.76,151.41,540,25",
+  "2025-09-30,GBPUSD,1.2598,1.2609,1.2632,1.2667,460,540",
+  "2025-09-30,USDINR,83.24,83.34,83.59,84.01,545,690",
+  "2025-10-01,EURUSD,1.0802,1.0810,1.0831,1.0859,370,540",
+  "2025-10-01,USDJPY,149.05,149.27,149.69,150.33,540,25",
+  "2025-10-01,GBPUSD,1.2612,1.2623,1.2646,1.2681,460,540",
+  "2025-10-01,USDINR,83.11,83.21,83.46,83.88,545,690",
+  "2025-10-02,EURUSD,1.0816,1.0824,1.0845,1.0873,370,540",
+  "2025-10-02,USDJPY,148.72,148.94,149.36,150.00,540,25",
+  "2025-10-02,GBPUSD,1.2627,1.2638,1.2661,1.2696,460,540",
+  "2025-10-02,USDINR,83.05,83.15,83.40,83.82,545,690",
+  "2025-10-03,EURUSD,1.0794,1.0802,1.0823,1.0851,370,540",
+  "2025-10-03,USDJPY,149.38,149.60,150.02,150.66,540,25",
+  "2025-10-03,GBPUSD,1.2589,1.2600,1.2623,1.2658,460,540",
+  "2025-10-03,USDINR,83.28,83.38,83.63,84.05,545,690",
+].join("\n");
+
+// ---------- CSV <-> JSON (pure TS) ----------
+
+export function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+
+  const pushField = () => { row.push(field); field = ""; };
+  const pushRow = () => { rows.push(row); row = []; };
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } // escaped quote
+        else { inQuotes = false; }
+      } else {
+        field += ch;
+      }
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ",") pushField();
+      else if (ch === "\n" || ch === "\r") {
+        // handle CRLF/ LF
+        // finalize row only if we actually had content or previous fields
+        if (field.length || row.length) { pushField(); pushRow(); }
+        // skip paired \r\n
+        if (ch === "\r" && text[i + 1] === "\n") i++;
+      } else {
+        field += ch;
+      }
+    }
+  }
+  if (field.length || row.length) { pushField(); pushRow(); }
+  return rows;
+}
+
+export function csvToFxRows(csv: string): FxRow[] {
+  const matrix = parseCsv(csv).filter(r => r.length > 0);
+  if (matrix.length === 0) return [];
+  const header = matrix[0].map(h => h.trim());
+  const idx = (name: string) => header.indexOf(name);
+
+  const di = {
+    date: idx("date"),
+    pair: idx("pair"),
+    spot: idx("spot"),
+    fwd_1m: idx("fwd_1m"),
+    fwd_3m: idx("fwd_3m"),
+    fwd_6m: idx("fwd_6m"),
+    base_rate_bpa: idx("base_rate_bpa"),
+    quote_rate_bpa: idx("quote_rate_bpa"),
+  };
+
+  const required = Object.entries(di).every(([, v]) => v >= 0);
+  if (!required) {
+    throw new Error("CSV header missing required columns.");
+  }
+
+  const out: FxRow[] = [];
+  for (let r = 1; r < matrix.length; r++) {
+    const row = matrix[r];
+    if (!row || row.length === 0) continue;
+    out.push({
+      date: row[di.date]?.trim(),
+      pair: row[di.pair]?.trim(),
+      spot: Number(row[di.spot]),
+      fwd_1m: Number(row[di.fwd_1m]),
+      fwd_3m: Number(row[di.fwd_3m]),
+      fwd_6m: Number(row[di.fwd_6m]),
+      base_rate_bpa: Number(row[di.base_rate_bpa]),
+      quote_rate_bpa: Number(row[di.quote_rate_bpa]),
+    });
+  }
+  return out;
+}
+
+export function fxRowsToCsv(rows: FxRow[]): string {
+  const head = FX_SMALL_CSV_HEADER;
+  const body = rows.map(r => [
+    r.date, r.pair,
+    num(r.spot), num(r.fwd_1m), num(r.fwd_3m), num(r.fwd_6m),
+    int(r.base_rate_bpa), int(r.quote_rate_bpa),
+  ].join(","));
+  return [head, ...body].join("\n");
+}
+
+function num(x: number): string {
+  return Number.isFinite(x) ? String(x) : "";
+}
+function int(x: number): string {
+  return Number.isFinite(x) ? String(Math.trunc(x)) : "";
+}
+
+// ---------- Basic validation ----------
+
+export function validateFxRows(rows: FxRow[]): string[] {
+  const errs: string[] = [];
+  const iso = /^\d{4}-\d{2}-\d{2}$/;
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (!iso.test(r.date)) errs.push(`Row ${i + 2}: bad date "${r.date}"`);
+    if (!r.pair || r.pair.length < 6) errs.push(`Row ${i + 2}: bad pair "${r.pair}"`);
+    if (!(r.spot > 0)) errs.push(`Row ${i + 2}: spot must be > 0`);
+    if (!(r.fwd_1m > 0) || !(r.fwd_3m > 0) || !(r.fwd_6m > 0)) {
+      errs.push(`Row ${i + 2}: forward outrights must be > 0`);
+    }
+    // simple no-arb sanity: forwards shouldn't deviate absurdly from spot
+    const maxDev = r.spot * 0.05; // 5% guardrail for a "small" pack
+    if (Math.abs(r.fwd_6m - r.spot) > maxDev) {
+      errs.push(`Row ${i + 2}: fwd_6m deviates >5% from spot`);
+    }
+    if (!Number.isFinite(r.base_rate_bpa) || !Number.isFinite(r.quote_rate_bpa)) {
+      errs.push(`Row ${i + 2}: rates must be finite bps`);
+    }
+  }
+  return errs;
+}
+
+// ---------- Convenience: get parsed sample ----------
+
+export function getSampleFxRows(): FxRow[] {
+  return csvToFxRows(FX_SMALL_CSV);
+}

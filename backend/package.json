@@ -1,0 +1,38 @@
+{
+  "name": "hedgefund-backend",
+  "version": "1.0.0",
+  "description": "Backend engine for the hedge fund project integrating global market data, weather, and satellite APIs.",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc --project tsconfig.json",
+    "health": "bash scripts/healthcheck.sh",
+    "integration": "bash scripts/start-integration.sh",
+    "init-env": "cp .env.example .env && echo '✅ Created .env from .env.example'",
+    "clean": "rm -rf dist",
+    "lint": "eslint 'src/**/*.{ts,js}'"
+  },
+  "dependencies": {
+    "axios": "^1.7.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.10",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@typescript-eslint/eslint-plugin": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "author": "Your Name <you@example.com>"
+}

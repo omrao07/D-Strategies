@@ -1,0 +1,112 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "method": "GET",
+      "handler": "handlers/home.index",
+      "description": "Root route with service info"
+    },
+    {
+      "path": "/health",
+      "method": "GET",
+      "handler": "observability/health.toJSON",
+      "description": "Health snapshot (JSON)"
+    },
+    {
+      "path": "/live",
+      "method": "GET",
+      "handler": "observability/health.isLive",
+      "description": "Liveness probe"
+    },
+    {
+      "path": "/ready",
+      "method": "GET",
+      "handler": "observability/health.isReady",
+      "description": "Readiness probe"
+    },
+    {
+      "path": "/metrics",
+      "method": "GET",
+      "handler": "observability/metrics.toPrometheus",
+      "description": "Prometheus metrics exposition"
+    },
+    {
+      "path": "/traces",
+      "method": "GET",
+      "handler": "observability/tracing.dump",
+      "description": "Recent trace spans (RingBufferExporter)"
+    },
+    {
+      "path": "/slo",
+      "method": "GET",
+      "handler": "observability/slo.summarize",
+      "description": "Current SLO summaries"
+    },
+    {
+      "path": "/data/upload",
+      "method": "POST",
+      "handler": "commands/data.upload",
+      "description": "Upload new CSV/JSON data"
+    },
+    {
+      "path": "/data/query",
+      "method": "POST",
+      "handler": "commands/data.query",
+      "description": "Query stored historical data"
+    },
+    {
+      "path": "/models/run",
+      "method": "POST",
+      "handler": "commands/models.run",
+      "description": "Run a backtest or live model"
+    },
+    {
+      "path": "/models/status",
+      "method": "GET",
+      "handler": "commands/models.status",
+      "description": "Check model execution status"
+    },
+    {
+      "path": "/portfolio",
+      "method": "GET",
+      "handler": "jarvis/portfolio-jarvis.overview",
+      "description": "Portfolio Jarvis insights"
+    },
+    {
+      "path": "/commodities/chains",
+      "method": "GET",
+      "handler": "commodities/chains.getAll",
+      "description": "Commodity futures chains"
+    },
+    {
+      "path": "/commodities/curves",
+      "method": "GET",
+      "handler": "commodities/curves.getAll",
+      "description": "Commodity forward curves"
+    },
+    {
+      "path": "/commodities/margin",
+      "method": "POST",
+      "handler": "commodities/margin.calc",
+      "description": "Margin calculator"
+    },
+    {
+      "path": "/reports/run",
+      "method": "POST",
+      "handler": "reports/html.runReport",
+      "description": "Generate HTML/MD/CSV reports"
+    },
+    {
+      "path": "/jarvis/explain",
+      "method": "POST",
+      "handler": "jarvis/explainers.explain",
+      "description": "Explain strategies or models"
+    },
+    {
+      "path": "/jarvis/stream",
+      "method": "GET",
+      "handler": "jarvis/stream.subscribe",
+      "description": "Stream Jarvis updates (SSE/WebSocket)"
+    }
+  ]
+}

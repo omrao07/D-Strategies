@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "strategyId": "mean-reversion",
+    "ts": "2025-10-10T01:00:01.521Z",
+    "symbol": "AAPL",
+    "side": "BUY",
+    "qty": 50,
+    "type": "MARKET",
+    "limitPrice": null,
+    "status": "FILLED",
+    "filledQty": 50,
+    "avgFillPrice": 180.25,
+    "broker": "paper",
+    "timeInForce": "GTC",
+    "notes": "entered on z-score signal"
+  },
+  {
+    "id": "2",
+    "strategyId": "trend-following",
+    "ts": "2025-10-10T01:00:03.211Z",
+    "symbol": "MSFT",
+    "side": "SELL",
+    "qty": 10,
+    "type": "MARKET",
+    "limitPrice": null,
+    "status": "FILLED",
+    "filledQty": 10,
+    "avgFillPrice": 330.00,
+    "broker": "paper",
+    "timeInForce": "GTC",
+    "notes": "fast<slow crossover"
+  },
+  {
+    "id": "3",
+    "strategyId": "mean-reversion",
+    "ts": "2025-10-10T01:15:15.100Z",
+    "symbol": "TSLA",
+    "side": "BUY",
+    "qty": 5,
+    "type": "LIMIT",
+    "limitPrice": 250.00,
+    "status": "PARTIAL",
+    "filledQty": 2,
+    "avgFillPrice": 249.90,
+    "broker": "paper",
+    "timeInForce": "DAY",
+    "notes": "limit order, 2 filled, 3 open"
+  }
+]

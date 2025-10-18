@@ -1,0 +1,229 @@
+<!doctype html>
+<!-- templates/index.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Toolkit Dashboard</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --panel: #11141a;
+      --muted: #8b96a9;
+      --text: #e7ecf4;
+      --accent: #5cc8ff;
+      --ok: #2dd4bf;
+      --warn: #f59e0b;
+      --fail: #ef4444;
+      --border: #1f2430;
+      --shadow: 0 6px 24px rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.2);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fb; --panel: #ffffff; --muted: #5b6472; --text: #0c1222;
+        --accent: #0ea5e9; --border: #e9edf3; --shadow: 0 6px 24px rgba(9,12,18,.05), 0 2px 6px rgba(9,12,18,.06);
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font: 15px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 80% -10%, rgba(92,200,255,.10), transparent 60%),
+                  radial-gradient(900px 500px at -10% 20%, rgba(45,212,191,.07), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 32px auto; padding: 0 16px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .logo {
+      width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #7c3aed);
+      box-shadow: var(--shadow); display:grid; place-items:center; color:#fff; font-weight:700;
+    }
+    .title { font-size: 22px; font-weight: 700; letter-spacing:.2px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 92%, transparent), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    @media (min-width: 760px) {
+      .span-4 { grid-column: span 4; }
+      .span-6 { grid-column: span 6; }
+      .span-8 { grid-column: span 8; }
+    }
+    .card h2 { margin: 0 0 12px; font-size: 16px; letter-spacing:.2px; }
+    .muted { color: var(--muted); }
+    .row { display:flex; flex-wrap: wrap; gap:8px; align-items:center; }
+    .btn {
+      appearance: none; border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel), black 2%);
+      color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;
+      font-weight: 600; letter-spacing:.2px;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn.primary { background: linear-gradient(180deg, color-mix(in oklab, var(--accent), white 10%), var(--accent)); color:#06222f; border-color: color-mix(in oklab, var(--accent), black 20%); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre {
+      margin: 0; padding: 12px; border-radius: 12px; overflow:auto; background: color-mix(in oklab, var(--panel), black 3%);
+      border: 1px dashed var(--border);
+    }
+    .pill { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); background: color-mix(in oklab, var(--panel), black 3%); }
+    .ok { color: var(--ok); } .warn { color: var(--warn); } .fail { color: var(--fail); }
+    .list { display:grid; gap:10px; }
+    .input, textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel), black 3%); color: var(--text);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .footer { margin-top: 22px; color: var(--muted); font-size: 13px; text-align:center; }
+    .kvs { display:grid; grid-template-columns: 160px 1fr; gap: 6px 10px; }
+    .small { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">★</div>
+        <div>
+          <div class="title">Toolkit Dashboard</div>
+          <div class="muted small">Static UI for your local server & commands</div>
+        </div>
+      </div>
+      <div class="row">
+        <a class="btn" href="/health" target="_blank">/health</a>
+        <a class="btn" href="/metrics" target="_blank">/metrics</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Quick Status -->
+      <section class="card span-4">
+        <h2>Quick Status</h2>
+        <div class="list">
+          <div class="row">
+            <button class="btn primary" id="btnPing">Ping</button>
+            <span id="statusDot" class="pill muted">idle</span>
+          </div>
+          <div class="kvs">
+            <div class="muted">Uptime</div><div id="uptimeVal" class="small">–</div>
+            <div class="muted">Health</div><div id="healthVal" class="small">–</div>
+            <div class="muted">Last Ping</div><div id="lastPing" class="small">–</div>
+          </div>
+          <pre id="pingOut" class="small">Click Ping to query /health …</pre>
+        </div>
+      </section>
+
+      <!-- Echo tester -->
+      <section class="card span-8">
+        <h2>Echo Tester <span class="muted">(POST /echo)</span></h2>
+        <div class="list">
+          <textarea id="echoBody" spellcheck="false" placeholder='{"hello":"world"}'></textarea>
+          <div class="row">
+            <button class="btn primary" id="btnEcho">Send</button>
+            <label class="muted small"><input type="checkbox" id="pretty" checked /> pretty JSON</label>
+          </div>
+          <pre id="echoOut" class="small">Response will appear here…</pre>
+        </div>
+      </section>
+
+      <!-- Helpful Links -->
+      <section class="card span-6">
+        <h2>Routes & Tools</h2>
+        <ul class="list small">
+          <li>Health: <a href="/health" target="_blank">GET /health</a></li>
+          <li>Metrics: <a href="/metrics" target="_blank">GET /metrics</a></li>
+          <li>Echo: <code>POST /echo</code> (see panel)</li>
+        </ul>
+        <div class="muted small">Tip: start the server via <code>serve start --static ./templates</code> to host this page.</div>
+      </section>
+
+      <!-- Environment -->
+      <section class="card span-6">
+        <h2>Environment</h2>
+        <div class="kvs small">
+          <div class="muted">User Agent</div><div id="ua">–</div>
+          <div class="muted">Time</div><div id="now">–</div>
+          <div class="muted">Timezone</div><div id="tz">–</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">Made with plain HTML+JS. No external dependencies.</div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const pretty = (obj) => {
+      try { return JSON.stringify(obj, null, 2); } catch { return String(obj); }
+    };
+    const fmtUptime = (s) => {
+      s = Number(s) || 0;
+      const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60);
+      return [h ? h+"h" : null, m ? m+"m" : null, sec+"s"].filter(Boolean).join(" ");
+    };
+    const setDot = (status) => {
+      const el = $("statusDot");
+      el.classList.remove("ok","warn","fail");
+      if (status === "ok") { el.classList.add("ok"); el.textContent = "ok"; }
+      else if (status === "warn") { el.classList.add("warn"); el.textContent = "warn"; }
+      else if (status === "fail") { el.classList.add("fail"); el.textContent = "fail"; }
+      else { el.textContent = status; }
+    };
+
+    // Quick Status
+    $("btnPing").addEventListener("click", async () => {
+      setDot("…");
+      $("pingOut").textContent = "Fetching /health …";
+      try {
+        const r = await fetch("/health");
+        const j = await r.json();
+        $("uptimeVal").textContent = j.uptime != null ? fmtUptime(j.uptime) : "–";
+        $("healthVal").textContent = j.status || (r.ok ? "ok" : "fail");
+        setDot(j.status || (r.ok ? "ok" : "fail"));
+        $("lastPing").textContent = new Date().toLocaleString();
+        $("pingOut").textContent = pretty(j);
+      } catch (e) {
+        setDot("fail");
+        $("pingOut").textContent = String(e);
+      }
+    });
+
+    // Echo
+    $("btnEcho").addEventListener("click", async () => {
+      const raw = $("echoBody").value || "{}";
+      let body = {};
+      try { body = JSON.parse(raw); } catch { body = { value: raw }; }
+      $("echoOut").textContent = "POST /echo …";
+      try {
+        const r = await fetch("/echo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const data = await r.json();
+        $("echoOut").textContent = $("pretty").checked ? pretty(data) : JSON.stringify(data);
+      } catch (e) {
+        $("echoOut").textContent = "Error: " + e;
+      }
+    });
+
+    // Env panel
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    $("ua").textContent = navigator.userAgent;
+    $("tz").textContent = tz;
+    const tick = () => $("now").textContent = new Date().toLocaleString();
+    tick(); setInterval(tick, 1000);
+  </script>
+</body>
+</html>

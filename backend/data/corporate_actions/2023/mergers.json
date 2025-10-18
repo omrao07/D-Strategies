@@ -1,0 +1,30 @@
+{
+  "year": 2023,
+  "mergers": [
+    {
+      "acquiring_company": "HDFC Bank",
+      "acquired_company": "HDFC Limited",
+      "announcement_date": "2022-04-04",
+      "effective_date": "2023-07-17",
+      "share_swap_ratio": "42 shares of HDFC Bank for 25 shares of HDFC Ltd.",
+      "notes": "HDFC Ltd. merged into HDFC Bank as per amalgamation scheme" 
+    },
+    {
+      "acquiring_company": "Adani Enterprises (via AMG Media Networks)",
+      "acquired_company": "IANS India Pvt Ltd",
+      "announcement_date": "2023-12-15",
+      "effective_date": null,
+      "share_swap_ratio": null,
+      "notes": "Acquired 50.5% stake in IANS India Pvt Ltd" 
+    },
+    {
+      "acquiring_company": "Ambuja Cements (Adani Group)",
+      "acquired_company": "Sanghi Industries",
+      "announcement_date": "2023-08",
+      "effective_date": null,
+      "share_swap_ratio": null,
+      "notes": "Acquisition of majority stake — strengthens cement presence" 
+    }
+    /* more entries here */
+  ]
+}

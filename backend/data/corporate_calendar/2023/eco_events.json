@@ -1,0 +1,69 @@
+{
+  "year": 2023,
+  "eco_events": [
+    {
+      "event_name": "US Federal Reserve FOMC Meeting",
+      "region": "United States",
+      "date": "2023-03-22",
+      "time": "14:00",
+      "timezone": "America/New_York",
+      "event_type": "Central Bank Policy",
+      "actual": "Rate hike +25 bps",
+      "consensus": "+25 bps",
+      "previous": "+50 bps",
+      "impact": "High",
+      "notes": "Fed raised interest rates by 25 basis points to range 4.75–5.00%."
+    },
+    {
+      "event_name": "US Non-Farm Payrolls",
+      "region": "United States",
+      "date": "2023-05-05",
+      "time": "08:30",
+      "timezone": "America/New_York",
+      "event_type": "Employment",
+      "actual": 253000,
+      "consensus": 180000,
+      "previous": 165000,
+      "impact": "High",
+      "notes": "Stronger-than-expected NFP added volatility in equity and FX markets."
+    },
+    {
+      "event_name": "ECB Monetary Policy Decision",
+      "region": "Eurozone",
+      "date": "2023-09-14",
+      "time": "13:15",
+      "timezone": "Europe/Brussels",
+      "event_type": "Central Bank Policy",
+      "actual": "Rate hike +25 bps",
+      "consensus": "No change",
+      "previous": "+25 bps",
+      "impact": "High",
+      "notes": "ECB surprised markets with an additional hike."
+    },
+    {
+      "event_name": "India Union Budget 2023",
+      "region": "India",
+      "date": "2023-02-01",
+      "time": "11:00",
+      "timezone": "Asia/Kolkata",
+      "event_type": "Fiscal Policy",
+      "actual": "Budget presented by Finance Minister",
+      "consensus": null,
+      "previous": null,
+      "impact": "High",
+      "notes": "Key announcements: capex push, income tax revisions, fiscal deficit target."
+    }
+  ],
+  "conventions": {
+    "event_type_values": [
+      "Central Bank Policy",
+      "Inflation",
+      "Employment",
+      "GDP",
+      "Fiscal Policy",
+      "Trade",
+      "Other"
+    ],
+    "impact_values": ["Low", "Medium", "High"]
+  }
+}

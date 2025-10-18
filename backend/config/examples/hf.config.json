@@ -1,0 +1,95 @@
+{
+  "engine": {
+    "host": "127.0.0.1",
+    "port": 4000,
+    "mode": "simulation",
+    "logLevel": "info",
+    "scheduler": {
+      "loopIntervalMs": 1000,
+      "timezone": "UTC"
+    }
+  },
+  "broker": {
+    "type": "paper",
+    "baseUrl": "https://paper-broker.local",
+    "apiKey": "demo-key-123",
+    "accountId": "HF-DEMO-01"
+  },
+  "data": {
+    "feeds": {
+      "equities": {
+        "type": "csv",
+        "path": "./data/equities/*.csv",
+        "frequency": "daily"
+      },
+      "fx": {
+        "type": "http",
+        "url": "https://api.exchangeratesapi.io/latest",
+        "frequency": "daily"
+      },
+      "futures": {
+        "type": "live",
+        "provider": "bloomberg",
+        "symbols": ["CL", "GC", "ES"]
+      }
+    },
+    "transform": {
+      "normalize": true,
+      "fillMissing": "ffill"
+    }
+  },
+  "strategies": {
+    "registry": [
+      { "name": "alpha_momentum", "path": "./strategies/alpha/momentum.strategy.mjs" },
+      { "name": "alpha_trend_following", "path": "./strategies/alpha/trend_following.strategy.mjs" },
+      { "name": "mean_reversion", "path": "./examples/mean reversion.js" }
+    ],
+    "defaultRiskBudget": 0.1
+  },
+  "risk": {
+    "limits": {
+      "maxGross": 3.0,
+      "maxSingle": 0.2,
+      "maxLeverage": 5.0,
+      "maxDrawdown": 0.15
+    },
+    "snapshots": {
+      "fullPath": "./reports/snapshots/full",
+      "partialPath": "./reports/snapshots/partial",
+      "frequency": "daily"
+    }
+  },
+  "storage": {
+    "dir": "./storage",
+    "kv": "leveldb",
+    "fsRepo": "./storage/fs"
+  },
+  "reporting": {
+    "csv": "./reports/csv",
+    "html": "./reports/html",
+    "md": "./reports/md"
+  },
+  "observability": {
+    "logger": {
+      "level": "info",
+      "file": "./logs/hf.log"
+    },
+    "metrics": {
+      "enable": true,
+      "port": 9090
+    },
+    "tracing": {
+      "enable": true,
+      "sampler": "probabilistic",
+      "rate": 0.1
+    }
+  },
+  "ml": {
+    "featureStore": "./ml/features",
+    "strategyGen": {
+      "enabled": true,
+      "outDir": "./strategies/generated",
+      "ensemble": "average"
+    }
+  }
+}

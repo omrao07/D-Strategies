@@ -1,0 +1,46 @@
+{
+  "year": 2024,
+  "dividends": [
+    {
+      "company": "Abbott India Ltd.",
+      "announcement_date": "2024-05-xx",
+      "ex_date": "2024-06-xx",
+      "record_date": null,
+      "payment_date": null,
+      "dividend_per_share": 4.75,
+      "type": "Final",
+      "notes": "Declared 4.75 per share final dividend" 
+    },
+    {
+      "company": "Akzo Nobel India",
+      "announcement_date": "2024-05-xx",
+      "ex_date": "2024-06-xx",
+      "record_date": null,
+      "payment_date": null,
+      "dividend_per_share": 3.00,
+      "type": "Final",
+      "notes": null
+    },
+    {
+      "company": "Kirl. Brothers",
+      "announcement_date": "2024-05-xx",
+      "ex_date": "2024-06-xx",
+      "record_date": null,
+      "payment_date": null,
+      "dividend_per_share": 3.50,
+      "type": "Final",
+      "notes": null
+    },
+    {
+      "company": "Mafatlal Industries",
+      "announcement_date": "2024-05-xx",
+      "ex_date": "2024-06-xx",
+      "record_date": null,
+      "payment_date": null,
+      "dividend_per_share": 0.50,
+      "type": "Final",
+      "notes": null
+    }
+    /* add more entries here */
+  ]
+}

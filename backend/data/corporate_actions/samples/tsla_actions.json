@@ -1,0 +1,40 @@
+{
+  "ticker": "TSLA",
+  "corporate_actions": {
+    "dividends": [
+      {
+        "ex_date": null,
+        "amount_per_share": 0.0,
+        "record_date": null,
+        "payment_date": null,
+        "type": "None / no dividend history"
+      }
+    ],
+    "splits": [
+      {
+        "announcement_date": "2020-08-11",
+        "ex_date": "2020-08-31",
+        "record_date": "2020-08-21",
+        "ratio": "5:1",
+        "type": "Forward / subdivision",
+        "notes": "Each stockholder of record on August 21, 2020 will receive four additional shares for each then-held share. :contentReference[oaicite:0]{index=0}"
+      },
+      {
+        "announcement_date": "2022-08-05",
+        "ex_date": "2022-08-25",
+        "record_date": "2022-08-17",
+        "ratio": "3:1",
+        "type": "Forward / subdivision",
+        "notes": "Each stockholder of record on August 17, 2022 will receive two additional shares for each then-held share. :contentReference[oaicite:1]{index=1}"
+      }
+    ],
+    "mergers_acquisitions": [
+      {
+        "target": null,
+        "announcement_date": null,
+        "effective_date": null,
+        "notes": "No major public M&A event listed in this sample"
+      }
+    ]
+  }
+}

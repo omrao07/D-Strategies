@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Service Level Objectives Schema",
+  "type": "object",
+  "properties": {
+    "uptimeTarget": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Target uptime percentage (0.0–1.0). Example: 0.999 = 99.9% uptime."
+    },
+    "latencyMs": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum acceptable request latency in milliseconds."
+    },
+    "errorRate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Optional maximum acceptable error rate (0.0–1.0)."
+    },
+    "throughput": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional minimum number of requests per second the system should handle."
+    }
+  },
+  "required": ["uptimeTarget", "latencyMs"],
+  "additionalProperties": false
+}

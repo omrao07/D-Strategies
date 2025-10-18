@@ -1,0 +1,77 @@
+{
+  "ticker": "AAPL",
+  "corporate_actions": {
+    "dividends": [
+      {
+        "ex_date": "2024-02-09",
+        "amount_per_share": 0.24,
+        "record_date": "2024-02-12",
+        "payment_date": "2024-02-15",
+        "type": "Regular"
+      },
+      {
+        "ex_date": "2024-05-10",
+        "amount_per_share": 0.25,
+        "record_date": "2024-05-13",
+        "payment_date": "2024-05-16",
+        "type": "Regular"
+      },
+      {
+        "ex_date": "2024-08-12",
+        "amount_per_share": 0.25,
+        "record_date": "2024-08-15",
+        "payment_date": "2024-08-15",
+        "type": "Regular"
+      },
+      {
+        "ex_date": "2024-11-08",
+        "amount_per_share": 0.25,
+        "record_date": "2024-11-11",
+        "payment_date": "2024-11-14",
+        "type": "Regular"
+      }
+    ],
+    "splits": [
+      {
+        "ex_date": "2020-08-31",
+        "announcement_date": "2020-07-30",
+        "ratio": "4:1",
+        "type": "Forward / subdivision"
+      },
+      {
+        "ex_date": "2014-06-09",
+        "announcement_date": "2014-04-23",
+        "ratio": "7:1",
+        "type": "Forward / subdivision"
+      },
+      {
+        "ex_date": "2005-02-28",
+        "ratio": "2:1",
+        "type": "Forward / subdivision"
+      },
+      {
+        "ex_date": "2000-06-21",
+        "ratio": "2:1",
+        "type": "Forward / subdivision"
+      },
+      {
+        "ex_date": "1987-06-16",
+        "ratio": "2:1",
+        "type": "Forward / subdivision"
+      }
+    ],
+    "mergers_acquisitions": [
+      {
+        "target": "Beats Electronics",
+        "announcement_date": "2014-08-01",
+        "notes": "Apple acquired Beats for ~$3B." 
+      },
+      {
+        "target": "Shazam",
+        "announcement_date": "2018-12-11",
+        "notes": "Apple acquired Shazam to integrate audio recognition technology." 
+      }
+      /* More acquisitions can go here based on Apple’s M&A history. */
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "calendar_quarter": "Q1",
+  "calendar_year": 2024,
+  "earnings": [
+    {
+      "company": "Apple Inc.",
+      "ticker": "AAPL",
+      "exchange": "NASDAQ",
+      "fiscal_quarter": "Q1 FY2024",
+      "fiscal_year": 2024,
+      "announcement_date": "2024-02-01",
+      "announcement_time": "AMC",
+      "eps_consensus": 2.10,
+      "eps_actual": 2.18,
+      "revenue_consensus": 118000.0,
+      "revenue_actual": 119600.0,
+      "surprise_eps_pct": 3.81,
+      "surprise_revenue_pct": 1.36,
+      "guidance": {
+        "eps_next_q": 1.50,
+        "revenue_next_q": 95000.0,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": "2024-02-01T17:00:00",
+        "timezone": "America/New_York",
+        "dial_in": "+1-888-000-0000",
+        "webcast_url": "https://example.com/apple/webcast",
+        "slides_url": "https://example.com/apple/slides.pdf",
+        "press_release_url": "https://example.com/apple/press"
+      },
+      "notes": "Apple Q1 FY24 earnings beat on EPS and revenue."
+    },
+    {
+      "company": "Reliance Industries Ltd.",
+      "ticker": "RELIANCE",
+      "exchange": "NSE",
+      "fiscal_quarter": "Q3 FY2024",
+      "fiscal_year": 2024,
+      "announcement_date": "2024-01-19",
+      "announcement_time": "TAS",
+      "eps_consensus": 34.2,
+      "eps_actual": 33.8,
+      "revenue_consensus": 255000.0,
+      "revenue_actual": 252400.0,
+      "surprise_eps_pct": -1.17,
+      "surprise_revenue_pct": -1.02,
+      "guidance": {
+        "eps_next_q": null,
+        "revenue_next_q": null,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": "2024-01-19T19:00:00",
+        "timezone": "Asia/Kolkata",
+        "dial_in": "+91-22-00000000",
+        "webcast_url": "https://example.com/reliance/webcast",
+        "slides_url": null,
+        "press_release_url": "https://example.com/reliance/press"
+      },
+      "notes": "Reliance Q3 FY24 results slightly below expectations."
+    },
+    {
+      "company": "Tesla, Inc.",
+      "ticker": "TSLA",
+      "exchange": "NASDAQ",
+      "fiscal_quarter": "Q4 FY2023",
+      "fiscal_year": 2023,
+      "announcement_date": "2024-01-24",
+      "announcement_time": "AMC",
+      "eps_consensus": 1.12,
+      "eps_actual": 1.05,
+      "revenue_consensus": 24500.0,
+      "revenue_actual": 24280.0,
+      "surprise_eps_pct": -6.25,
+      "surprise_revenue_pct": -0.90,
+      "guidance": {
+        "eps_next_q": 1.15,
+        "revenue_next_q": 25000.0,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": "2024-01-24T17:30:00",
+        "timezone": "America/New_York",
+        "dial_in": "+1-800-000-0000",
+        "webcast_url": "https://example.com/tesla/webcast",
+        "slides_url": "https://example.com/tesla/slides.pdf",
+        "press_release_url": "https://example.com/tesla/press"
+      },
+      "notes": "Tesla Q4 FY23 earnings missed EPS consensus slightly."
+    }
+  ],
+  "conventions": {
+    "announcement_time_values": ["BMO", "AMC", "TAS", "Pre", "Post", "Intra"],
+    "currency_units": "Revenue in reported company currency; EPS in reported units."
+  }
+}

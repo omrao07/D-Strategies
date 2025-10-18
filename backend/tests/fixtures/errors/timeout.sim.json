@@ -1,0 +1,24 @@
+{
+  "simulationId": "sim-timeout-001",
+  "endpoint": "/api/marketdata/stream",
+  "request": {
+    "symbol": "BTCUSD",
+    "frequency": "tick",
+    "timeoutMs": "five_thousand",
+    "retryPolicy": {
+      "maxRetries": -3,
+      "backoff": "linear",
+      "intervalMs": null
+    }
+  },
+  "expectedResponse": {
+    "status": "TIMEOUT",
+    "latencyMs": "NaN",
+    "data": []
+  },
+  "meta": {
+    "createdAt": "not-a-timestamp",
+    "createdBy": 12345,
+    "notes": ["simulating a timeout", {"invalid": "object-in-array"}]
+  }
+}

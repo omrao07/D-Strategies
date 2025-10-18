@@ -1,0 +1,50 @@
+{
+  "a11y": {
+    "standards": {
+      "wcagVersion": "2.1",
+      "conformanceLevel": "AA",
+      "ariaRequired": true,
+      "keyboardNavigation": true,
+      "colorContrastMin": 4.5
+    },
+    "checks": {
+      "imagesAlt": true,
+      "headingsHierarchy": true,
+      "landmarks": true,
+      "labels": true,
+      "focusVisible": true,
+      "skipLinks": true,
+      "semanticHtml": true,
+      "dynamicUpdatesAnnounced": true
+    },
+    "reports": {
+      "dir": "a11y/reports",
+      "formats": ["md", "html", "json"]
+    },
+    "audit": {
+      "schedule": "weekly",
+      "tools": ["axe-core", "pa11y"],
+      "reportFile": "a11y/audit-report.md"
+    },
+    "roles": {
+      "owner": "Accessibility Champion",
+      "reviewers": ["QA", "Design", "Frontend"]
+    },
+    "exemptions": {
+      "thirdParty": [
+        "Embedded trading charts",
+        "External authentication widgets"
+      ],
+      "legacy": [
+        "Reports generated before 2024-01"
+      ]
+    },
+    "policies": {
+      "incidentResponse": "policies/incident-response.md",
+      "checklist": "a11y/checklist.md"
+    }
+  }
+}
+
+
+   

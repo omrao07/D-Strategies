@@ -1,0 +1,130 @@
+{
+ 
+  "version": 1,
+  "env": "dev",
+
+  "engine": {
+    "mode": "backtest",               // "live" | "paper" | "backtest"
+    "timezone": "UTC",
+    "baseCurrency": "USD",
+    "tickIntervalMs": 250,            // base scheduler tick
+    "maxConcurrency": 8,
+    "retry": {
+      "maxAttempts": 3,
+      "backoffMs": 1000
+    }
+  },
+
+  "data": {
+    "defaultFeed": "demo",
+    "feeds": {
+      "demo": {
+        "type": "demo",
+        "symbols": ["AAPL", "MSFT", "TSLA", "SPY"],
+        "bars": 500,
+        "intervalSec": 60,
+        "seed": 42
+      },
+      "rest": {
+        "type": "rest",
+        "baseUrl": "https://api.example.com/v1",
+        "auth": {
+          "apiKey": "API_KEY_HERE"
+        },
+        "rateLimit": {
+          "requestsPerMinute": 60
+        }
+      },
+      "sql": {
+        "type": "sql",
+        "driver": "sqlite",
+        "path": "data/demo.sqlite",
+        "tables": {
+          "bars": "bars",
+          "ticks": "ticks"
+        }
+      }
+    }
+  },
+
+  "strategies": {
+    "manifest": "strategies/manifest.json",
+    "defaultParams": {
+      "capital": 100000,
+      "riskPerTradePct": 1.0,
+      "maxPositions": 10
+    },
+    "overrides": {
+      "mean-reversion": {
+        "lookback": 20,
+        "entryZ": -2,
+        "exitZ": 0
+      },
+      "trend-following": {
+        "fast": 10,
+        "slow": 50,
+        "stopPct": 0.05
+      }
+    }
+  },
+
+  "risk": {
+    "var": {
+      "horizonDays": 1,
+      "confidence": 0.99,
+      "lookbackDays": 250
+    },
+    "stress": {
+      "scenariosPath": "risk/scenarios.json"
+    }
+  },
+
+  "logging": {
+    "level": "info",                   // "debug" | "info" | "warn" | "error"
+    "eventsPath": "logging/events.log",
+    "rotate": {
+      "maxSizeMB": 10,
+      "maxFiles": 5
+    }
+  },
+
+  "persistence": {
+    "repo": {
+      "type": "fs",
+      "path": "persistence/state.json"
+    },
+    "snapshots": {
+      "path": "persistence/snapshots/",
+      "rotateKeep": 10
+    }
+  },
+
+  "scheduler": {
+    "jobs": [
+      {
+        "id": "heartbeat",
+        "everyMs": 60000,
+        "immediate": true
+      },
+      {
+        "id": "snapshot",
+        "everyMs": 300000
+      }
+    ]
+  },
+
+  "health": {
+    "checks": [
+      {
+        "id": "data-feed",
+        "intervalMs": 30000,
+        "timeoutMs": 5000
+      },
+      {
+        "id": "broker",
+        "intervalMs": 60000,
+        "timeoutMs": 5000
+      }
+    ]
+  }
+}

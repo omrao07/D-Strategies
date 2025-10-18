@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Run Report — 2025-10-10 00:00</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin:0; background:#0b0f18; color:#e8eefc; }
+  header { background:#111728; padding:1rem; position:sticky; top:0; }
+  h1 { margin:0; font-size:20px; }
+  .sub { color:#9fb2d8; font-size:13px; }
+  .grid { display:grid; grid-template-columns: 1fr; gap:16px; padding:1rem; max-width:1200px; margin:auto; }
+  @media(min-width:1000px){ .grid { grid-template-columns:1.2fr 1fr; } }
+  .card { background:#16213b; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:1rem; }
+  .card h2 { margin-top:0; font-size:16px; }
+  pre { background:#0f1524; padding:0.5rem; border-radius:8px; max-height:250px; overflow:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  th { text-align:left; color:#9fb2d8; }
+  tbody tr:hover { background:rgba(255,255,255,0.05); }
+  img { max-width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.1); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Run Report — 2025-10-10 00:00</h1>
+  <div class="sub">Data from <code>outputs/runs/2025-10-10_00-00-00</code></div>
+</header>
+
+<main class="grid">
+  <section class="card">
+    <h2>Overview</h2>
+    <div id="kpis">Loading…</div>
+    <h2>Equity Curve</h2>
+    <img src="../outputs/runs/2025-10-10_00-00-00/artifacts/equity.png" alt="Equity Curve" />
+    <h2>Drawdown</h2>
+    <img src="../outputs/runs/2025-10-10_00-00-00/artifacts/drawdowns.png" alt="Drawdowns" />
+  </section>
+
+  <section class="card">
+    <h2>Final Positions</h2>
+    <div id="positions">Loading…</div>
+    <h2>Recent Trades</h2>
+    <div id="trades">Loading…</div>
+  </section>
+
+  <section class="card" style="grid-column:1/-1">
+    <h2>Factor Exposures (latest)</h2>
+    <div id="factors">Loading…</div>
+  </section>
+
+  <section class="card" style="grid-column:1/-1">
+    <h2>Logs (tail)</h2>
+    <pre id="logs">Loading…</pre>
+  </section>
+</main>
+
+<script>
+async function fetchJSON(path){ try{const r=await fetch(path); if(!r.ok)return null; return await r.json()}catch{return null} }
+async function fetchText(path){ try{const r=await fetch(path); if(!r.ok)return null; return await r.text()}catch{return null} }
+function renderTable(el,rows,cols){ if(!rows||!rows.length){el.textContent="(none)";return} let html="<table><thead><tr>"+cols.map(c=>`<th>${c}</th>`).join("")+"</tr></thead><tbody>"; rows.forEach(r=>{ html+="<tr>"+cols.map(c=>`<td>${r[c]}</td>`).join("")+"</tr>" }); html+="</tbody></table>"; el.innerHTML=html }
+
+(async function(){
+  // KPIs
+  const summary=await fetchJSON("../outputs/runs/2025-10-10_00-00-00/summary.json")
+  if(summary){
+    document.getElementById("kpis").innerHTML = `
+      <table>
+        <tr><th>Start Equity</th><td>${summary.startEquity}</td></tr>
+        <tr><th>End Equity</th><td>${summary.endEquity}</td></tr>
+        <tr><th>Return</th><td>${(summary.return*100).toFixed(2)}%</td></tr>
+        <tr><th>Max Drawdown</th><td>${(summary.mdd*100).toFixed(2)}%</td></tr>
+        <tr><th>Sharpe</th><td>${summary.sharpe}</td></tr>
+        <tr><th>Trades</th><td>${summary.trades}</td></tr>
+      </table>`
+  }
+
+  // Positions
+  const positions=await fetchJSON("../outputs/runs/2025-10-10_00-00-00/positions.json")
+  if(positions){ renderTable(document.getElementById("positions"), positions, ["symbol","quantity","price","marketValue","unrealizedPnl"]) }
+
+  // Trades (last 20)
+  const trades=await fetchJSON("../outputs/runs/2025-10-10_00-00-00/trades.json")
+  if(trades){ renderTable(document.getElementById("trades"), trades.slice(-20).reverse(), ["ts","symbol","side","qty","price","pnl"]) }
+
+  // Factor exposures
+  const exposures=await fetchText("../outputs/factor exposures/exposures.csv")
+  if(exposures){
+    const rows=exposures.trim().split(/\r?\n/).map(l=>l.split(","))
+    const hdr=rows[0]; const body=rows.slice(1)
+    renderTable(document.getElementById("factors"), body.map(r=>Object.fromEntries(r.map((v,i)=>[hdr[i],v]))), hdr)
+  }
+
+  // Logs
+  const logs=await fetchText("../outputs/runs/2025-10-10_00-00-00/logs.txt")
+  if(logs){ document.getElementById("logs").textContent = logs.split(/\r?\n/).slice(-200).join("\n") }
+})()
+</script>
+</body>
+</html>

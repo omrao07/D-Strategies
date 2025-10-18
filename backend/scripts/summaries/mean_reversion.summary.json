@@ -1,0 +1,26 @@
+{
+  "strategy": "Mean Reversion",
+  "runId": "2025-10-13T12-meanreversion",
+  "createdAt": "2025-10-13T12:00:00Z",
+  "metrics": {
+    "sharpe": 0.95,
+    "sortino": 1.30,
+    "vol": 0.115,
+    "maxDrawdown": -0.065,
+    "cagr": 0.105,
+    "winRate": 0.52,
+    "trades": 38
+  },
+  "portfolio": {
+    "totalValue": 97124,
+    "cash": 87000,
+    "netExposure": 1124,
+    "grossExposure": 11124,
+    "leverage": 1.10,
+    "concentration": 0.05,
+    "longCount": 2,
+    "shortCount": 1
+  },
+  "latestSnapshot": "runs/2025-10-13T12-meanreversion/snapshots/full.json",
+  "equityCurve": "runs/2025-10-13T12-meanreversion/equity.svg"
+}

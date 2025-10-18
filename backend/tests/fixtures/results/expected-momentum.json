@@ -1,0 +1,35 @@
+{
+  "strategyId": "momentum-001",
+  "asOf": "2025-10-15T12:00:00Z",
+  "parameters": {
+    "lookback": 60,
+    "holdingPeriod": 20,
+    "capital": 100000
+  },
+  "performance": {
+    "cumulativeReturn": 0.305,
+    "annualizedReturn": 0.182,
+    "annualizedVolatility": 0.155,
+    "sharpeRatio": 1.17,
+    "sortinoRatio": 1.45,
+    "maxDrawdown": 0.12
+  },
+  "trades": {
+    "count": 85,
+    "winRate": 0.62,
+    "avgWin": 0.018,
+    "avgLoss": -0.012,
+    "avgHoldingPeriodDays": 20
+  },
+  "equityCurve": [
+    { "date": "2025-01-01", "equity": 100000 },
+    { "date": "2025-03-01", "equity": 104500 },
+    { "date": "2025-06-01", "equity": 111000 },
+    { "date": "2025-09-01", "equity": 122000 },
+    { "date": "2025-10-01", "equity": 130500 }
+  ],
+  "metadata": {
+    "dataSource": "synthetic-sample",
+    "notes": "Expected outcome for unit testing momentum strategy implementation"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "name": "MultiStrategyConfig",
+  "version": "1.0",
+  "description": "Configuration file for running multiple trading strategies together.",
+  "global": {
+    "capital": 1000000,
+    "baseCurrency": "USD",
+    "riskLimits": {
+      "maxVaR": 0.05,
+      "maxLeverage": 3,
+      "maxDrawdown": 0.20
+    },
+    "execution": {
+      "slippageBps": 2,
+      "commissionPerTrade": 0.0005,
+      "maxOrdersPerMinute": 50
+    }
+  },
+  "strategies": [
+    {
+      "id": "strat1",
+      "name": "Momentum_US_Equities",
+      "type": "momentum",
+      "universe": ["AAPL", "MSFT", "AMZN", "GOOGL"],
+      "lookback": 60,
+      "holdingPeriod": 20,
+      "positionSizing": {
+        "method": "volatilityTargeting",
+        "targetVol": 0.15,
+        "maxWeight": 0.10
+      },
+      "riskControls": {
+        "stopLoss": 0.08,
+        "takeProfit": 0.20
+      }
+    },
+    {
+      "id": "strat2",
+      "name": "StatArb_Pairs",
+      "type": "statisticalArbitrage",
+      "pairs": [
+        ["XOM", "CVX"],
+        ["JPM", "BAC"]
+      ],
+      "lookback": 120,
+      "entryZscore": 2.0,
+      "exitZscore": 0.5,
+      "capitalAllocation": 0.20
+    },
+    {
+      "id": "strat3",
+      "name": "FX_Carry",
+      "type": "carryTrade",
+      "universe": ["USDJPY", "EURUSD", "AUDUSD"],
+      "rebalanceFrequency": "monthly",
+      "capitalAllocation": 0.25,
+      "riskControls": {
+        "maxPositionPerPair": 0.15,
+        "hedgeWithDXY": true
+      }
+    }
+  ],
+  "reporting": {
+    "outputDir": "./reports",
+    "formats": ["csv", "json", "html"],
+    "frequency": "daily"
+  }
+}

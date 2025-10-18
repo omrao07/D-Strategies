@@ -1,0 +1,24 @@
+{
+  "requestId": 12345,
+  "endpoint": "/api/orders/create",
+  "payload": {
+    "symbol": "",
+    "quantity": "ten",
+    "price": -100,
+    "side": "BUYSELL",
+    "timeInForce": "GTC",
+    "orderType": "market-limit",
+    "extraField": "notAllowed"
+  },
+  "headers": {
+    "Authorization": "Bearer ",
+    "Content-Type": "text/plain"
+  },
+  "meta": {
+    "timestamp": "not-a-date",
+    "clientVersion": null,
+    "retry": "yes"
+  },
+  "trailingComma": true
+}
+// Note: This JSON file contains multiple intentional errors for testing purposes.

@@ -1,0 +1,40 @@
+{
+  "name": "FaultyConfig",
+  "version": "1.0",
+  "description": "This configuration file is intentionally faulty for testing error handling.",
+  "settings": {
+    "enableFeatureX": "yes",
+    "retryAttempts": "three", 
+    "maxRetries": "five",
+    "timeout": -30,
+    "logLevel": "VERBOSE",
+    "nestedConfig": {
+      "subOptionA": 123,
+      "subOptionB": null,
+      "subOptionC": "undefined",
+      "subOptionD": [1, 2, 3, "four", {"bad": "object"}]
+    }
+  },
+  "servers": [
+    {
+      "host": "localhost",
+      "port": "eighty",
+      "ssl": "yes"
+    },
+    {
+      "host": "192.168.1.1"
+      // missing port and ssl
+    }
+  ],
+  "users": [
+    { "id": 1, "name": "Alice", "role": "admin" },
+    { "id": "two", "name": 123, "permissions": ["read", "write", 99] },
+    { "id": 3, "name": "Charlie" }
+  ],
+  "thresholds": {
+    "low": 0.1,
+    "medium": "0.5",
+    "high": "high"
+  },
+  "misc": "This trailing comma will break JSON"
+}

@@ -1,0 +1,411 @@
+<!-- reports/latest.html
+A single-file, zero-dependency report that points at your "latest" run artifacts.
+
+How it works
+- Assumes your repo has the structure we discussed:
+  outputs/
+    runs/
+      latest/                 (symlink to the newest run folder)
+        config.json
+        summary.json
+        trades.json
+        orders.json
+        positions.json
+        pnl.json
+        risk.json
+        logs.txt
+        artifacts/
+          equity.png
+          drawdowns.png
+    curves/
+      latest/                 (optional symlink to timestamped folder)
+        equity/portfolio-equity.csv
+        equity/strategy1-equity.csv
+        equity/strategy2-equity.csv
+      ... or (Option B) flat files like:
+        latest-portfolio-equity.csv, latest-strategy1-equity.csv, ...
+    charts/
+      latest/
+        equity/portfolio-equity.png
+        equity/strategy1-equity.png
+        equity/strategy2-equity.png
+        drawdowns/portfolio-dd.png
+    benchmarks/
+      sp500.csv, nasdaq.csv, btc.csv
+    drawdown/
+      portfolio-dd.csv
+      strategy1-dd.csv
+    factor exposures/
+      exposures.csv
+
+Open this file in a browser. If you're using local files, some browsers restrict fetch()
+from file:// URLs. If you hit issues, run a tiny static server:
+  python3 -m http.server 8080
+Then visit: http://localhost:8080/reports/latest.html
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Latest Run — Report</title>
+<style>
+  :root {
+    --bg: #0b0f18;
+    --panel: #111728;
+    --panel-2: #0f1524;
+    --text: #e8eefc;
+    --muted: #9fb2d8;
+    --accent: #5aa9ff;
+    --accent-2: #7cdeff;
+    --good: #2ecc71;
+    --bad: #ff5c7a;
+    --warn: #ffb84d;
+    --grid: rgba(255,255,255,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--text);
+    background: linear-gradient(180deg, #0b0f18 0%, #0b0f18 40%, #0a0e16 100%);
+  }
+  header {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--grid);
+    background: linear-gradient(180deg, #0c1222 0%, var(--panel) 100%);
+    position: sticky; top: 0; z-index: 10;
+  }
+  header .wrap { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  h1 { font-size: 20px; margin: 0; font-weight: 700; letter-spacing: 0.2px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .grid { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 1fr; gap: 16px; padding: 0 16px; }
+  @media (min-width: 1100px) { .grid { grid-template-columns: 1.2fr 1fr; } }
+  .card {
+    background: radial-gradient(1000px 500px at 0% -10%, #16213b50 0%, transparent 50%) , var(--panel);
+    border: 1px solid var(--grid);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 { margin: 0 0 10px; font-size: 16px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+  .kpi { background: var(--panel-2); border: 1px solid var(--grid); border-radius: 10px; padding: 10px; }
+  .kpi .label { color: var(--muted); font-size: 12px; }
+  .kpi .value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+  .kpi .delta { font-size: 12px; margin-top: 2px; }
+  .delta.up { color: var(--good); }
+  .delta.down { color: var(--bad); }
+  .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--grid); color: var(--muted); font-size: 12px; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tab { cursor: pointer; padding: 6px 10px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--grid); font-size: 12px; color: var(--muted); }
+  .tab.active { background: #192544; color: var(--text); border-color: #27407a; }
+  .imgwrap { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--grid); background: #0a0e16; }
+  .imgwrap img { width: 100%; display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px; border-bottom: 1px solid var(--grid); text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  tbody tr:hover { background: rgba(255,255,255,0.04); }
+  .footer { color: var(--muted); font-size: 12px; text-align: center; margin: 30px 0 40px; }
+  .error { color: var(--bad); font-size: 13px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.09), rgba(255,255,255,0.05)); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Latest Run Report</h1>
+    <div class="sub" id="run-meta">Loading run metadata…</div>
+    <span class="pill"><span>Base</span><span class="mono" id="base-ccy">—</span></span>
+    <span class="pill"><span>Mode</span><span class="mono" id="mode">—</span></span>
+    <span class="pill"><span>Timestamp</span><span class="mono" id="ts">—</span></span>
+    <span class="pill"><span>Run folder</span><span class="mono"><a id="run-link" href="../outputs/runs/latest/">open</a></span></span>
+  </div>
+</header>
+
+<main class="grid">
+  <!-- Left column -->
+  <section class="card">
+    <h2>Overview</h2>
+    <div class="kpis" id="kpis">
+      <div class="kpi"><div class="label">Start Equity</div><div class="value mono" id="startEq" >—</div></div>
+      <div class="kpi"><div class="label">End Equity</div><div class="value mono" id="endEq"   >—</div><div class="delta" id="endEqDelta"></div></div>
+      <div class="kpi"><div class="label">Return</div><div class="value mono" id="ret"     >—</div></div>
+      <div class="kpi"><div class="label">Max Drawdown</div><div class="value mono" id="mdd"    >—</div></div>
+      <div class="kpi"><div class="label">Sharpe</div><div class="value mono" id="sharpe"  >—</div></div>
+      <div class="kpi"><div class="label">Trades</div><div class="value mono" id="trades"  >—</div></div>
+      <div class="kpi"><div class="label">Win Rate</div><div class="value mono" id="winrate">—</div></div>
+      <div class="kpi"><div class="label">Avg Trade PnL</div><div class="value mono" id="avgpnl">—</div></div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="tabs">
+      <button class="tab active" data-img="eq-portfolio">Portfolio</button>
+      <button class="tab" data-img="eq-strat1">Strategy 1</button>
+      <button class="tab" data-img="eq-strat2">Strategy 2</button>
+      <button class="tab" data-img="dd-portfolio">Drawdown</button>
+    </div>
+    <div class="imgwrap">
+      <!-- Prefer charts/latest/... if you maintain those; otherwise this falls back to runs/latest/artifacts -->
+      <img id="eq-portfolio" src="../outputs/charts/latest/equity/portfolio-equity.png" alt="Portfolio Equity" onerror="fallbackChart(this, 'equity.png')" />
+      <img id="eq-strat1"    src="../outputs/charts/latest/equity/strategy1-equity.png" alt="Strategy1 Equity" style="display:none" onerror="hideIfMissing(this)" />
+      <img id="eq-strat2"    src="../outputs/charts/latest/equity/strategy2-equity.png" alt="Strategy2 Equity" style="display:none" onerror="hideIfMissing(this)" />
+      <img id="dd-portfolio" src="../outputs/charts/latest/drawdowns/portfolio-dd.png"  alt="Portfolio Drawdown" style="display:none" onerror="fallbackChart(this, 'drawdowns.png')" />
+    </div>
+  </section>
+
+  <!-- Right column -->
+  <section class="card">
+    <h2>Positions (Final)</h2>
+    <div id="positions-wrap" class="skeleton" style="height:180px;"></div>
+    <div style="height:14px"></div>
+    <h2>Recent Trades</h2>
+    <div id="trades-wrap" class="skeleton" style="height:220px;"></div>
+  </section>
+
+  <!-- Full width -->
+  <section class="card" style="grid-column: 1 / -1;">
+    <h2>Factor Exposures</h2>
+    <div class="sub">From <code>outputs/factor exposures/exposures.csv</code> (long format). Filters to latest date.</div>
+    <div id="factors-wrap" class="skeleton" style="height:200px;"></div>
+  </section>
+
+  <section class="card" style="grid-column: 1 / -1;">
+    <h2>Logs</h2>
+    <div class="sub">Tail of <code>outputs/runs/latest/logs.txt</code> (last ~200 lines)</div>
+    <pre id="logs" class="mono" style="white-space: pre-wrap; background: var(--panel-2); border: 1px solid var(--grid); padding: 10px; border-radius: 10px; max-height: 280px; overflow: auto;">Loading…</pre>
+  </section>
+</main>
+
+<div class="footer">
+  Generated by <span class="mono">reports/latest.html</span>. Data paths rely on <span class="mono">outputs/runs/latest</span> and optional <span class="mono">outputs/charts/latest</span>, <span class="mono">outputs/curves/latest</span>.
+</div>
+
+<script>
+  // ---------- Utilities ----------
+  const $ = (sel) => document.querySelector(sel)
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel))
+  function fmtNum(n, d=2) { if (n === null || n === undefined || Number.isNaN(n)) return "—"; return Number(n).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }) }
+  function pct(x, d=2){ return (x === null || x === undefined) ? "—" : (x*100).toFixed(d) + "%" }
+  function signClass(x){ return x > 0 ? "up" : x < 0 ? "down" : "" }
+
+  // Robust CSV parser for simple numeric/text fields (no external deps)
+  function parseCSV(text) {
+    const rows = []
+    let i=0, field="", row=[], inQ=false
+    function pushField(){ row.push(field); field="" }
+    function pushRow(){ rows.push(row); row=[] }
+    while(i<text.length){
+      const c=text[i]
+      if(inQ){
+        if(c=='"' && text[i+1]=='"'){ field+='"'; i+=2; continue }
+        if(c=='"'){ inQ=false; i++; continue }
+        field+=c; i++; continue
+      } else {
+        if(c=='"'){ inQ=true; i++; continue }
+        if(c==','){ pushField(); i++; continue }
+        if(c=='\n'){ pushField(); pushRow(); i++; continue }
+        if(c=='\r'){ i++; continue }
+        field+=c; i++
+      }
+    }
+    if(field.length || row.length) { pushField(); pushRow() }
+    if(!rows.length) return []
+    const headers = rows[0].map(h => h.trim())
+    return rows.slice(1).filter(r => r.length===headers.length && r.some(x=>x.trim()!=="")).map(r=>{
+      const obj={}
+      headers.forEach((h,idx)=>{ obj[h]=r[idx] })
+      return obj
+    })
+  }
+
+  async function safeFetch(path) {
+    try {
+      const res = await fetch(path)
+      if(!res.ok) throw new Error(res.status + " " + res.statusText)
+      const txt = await res.text()
+      return { ok:true, text: txt }
+    } catch (e) {
+      return { ok:false, error: e?.message || String(e) }
+    }
+  }
+
+  // ---------- Tabs (chart switcher) ----------
+  $$(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      $$(".tab").forEach(b => b.classList.remove("active"))
+      btn.classList.add("active")
+      const target = btn.dataset.img
+      ;["eq-portfolio","eq-strat1","eq-strat2","dd-portfolio"].forEach(id=>{
+        const el = document.getElementById(id)
+        if(!el) return
+        el.style.display = (id === target) ? "" : "none"
+      })
+    })
+  })
+
+  // Fallback for charts: if charts/latest not present, try runs/latest/artifacts/*.png
+  function fallbackChart(imgEl, artifactName){
+    imgEl.onerror = null
+    imgEl.src = "../outputs/runs/latest/artifacts/" + artifactName
+  }
+  function hideIfMissing(imgEl){
+    imgEl.onerror = null
+    imgEl.style.display = "none"
+  }
+
+  // ---------- Load run summary & populate KPIs ----------
+  async function loadSummary() {
+    // summary.json is optional. If missing, derive from equity CSV.
+    // Expected summary.json shape (example):
+    // { baseCurrency:"USD", mode:"backtest", ts:"2025-10-10_01-00-00",
+    //   startEquity:100000, endEquity:103000, return:0.03, mdd:-0.02, sharpe:1.25,
+    //   trades:120, winRate:0.54, avgTradePnl:25.3 }
+    const s = await safeFetch("../outputs/runs/latest/summary.json")
+    if (s.ok) {
+      try {
+        const j = JSON.parse(s.text)
+        $("#base-ccy").textContent = j.baseCurrency || "—"
+        $("#mode").textContent = j.mode || "—"
+        $("#ts").textContent = j.ts || "—"
+        $("#run-meta").textContent = "Run " + (j.ts || "")
+        $("#startEq").textContent = fmtNum(j.startEquity)
+        $("#endEq").textContent = fmtNum(j.endEquity)
+        const delta = (j.endEquity - j.startEquity)
+        $("#endEqDelta").textContent = (isFinite(delta) ? (delta>0?"+":"") + fmtNum(delta) : ""); $("#endEqDelta").className = "delta " + signClass(delta)
+        $("#ret").textContent = pct(j.return)
+        $("#mdd").textContent = pct(j.mdd)
+        $("#sharpe").textContent = fmtNum(j.sharpe, 2)
+        $("#trades").textContent = fmtNum(j.trades, 0)
+        $("#winrate").textContent = pct(j.winRate)
+        $("#avgpnl").textContent = fmtNum(j.avgTradePnl, 2)
+        return
+      } catch {}
+    }
+    // Fallback: derive from portfolio-equity.csv (latest)
+    const e1 = await safeFetch("../outputs/curves/latest/equity/portfolio-equity.csv")
+    const e2 = e1.ok ? e1 : await safeFetch("../outputs/curves/latest-portfolio-equity.csv")
+    if (e2.ok) {
+      const rows = parseCSV(e2.text)
+      if (rows.length) {
+        const first = Number(rows[0].equity), last = Number(rows[rows.length-1].equity)
+        const ret = isFinite(first) && isFinite(last) ? (last/first - 1) : null
+        $("#startEq").textContent = fmtNum(first)
+        $("#endEq").textContent = fmtNum(last)
+        const delta = (isFinite(first) && isFinite(last)) ? (last-first) : null
+        $("#endEqDelta").textContent = delta==null ? "" : (delta>0?"+":"") + fmtNum(delta)
+        $("#endEqDelta").className = "delta " + signClass(delta||0)
+        $("#ret").textContent = ret==null ? "—" : pct(ret)
+        $("#mdd").textContent = "—"
+        $("#sharpe").textContent = "—"
+        $("#trades").textContent = "—"
+        $("#winrate").textContent = "—"
+        $("#avgpnl").textContent = "—"
+        $("#run-meta").textContent = "Latest run (derived from curves)"
+      }
+    }
+  }
+
+  // ---------- Positions table ----------
+  function renderTable(el, rows, cols, opts={}) {
+    if (!rows || !rows.length) { el.innerHTML = '<div class="error">No data.</div>'; return }
+    const thead = '<thead><tr>' + cols.map(c=>`<th>${c.label || c.key}</th>`).join("") + '</tr></thead>'
+    const tbody = '<tbody>' + rows.map(r=>{
+      return '<tr>' + cols.map(c=>{
+        const v = r[c.key]
+        return `<td class="${c.class||''}">${c.format ? c.format(v, r) : v}</td>`
+      }).join("") + '</tr>'
+    }).join("") + '</tbody>'
+    el.classList.remove("skeleton")
+    el.innerHTML = `<div style="overflow:auto; max-height:${opts.maxHeight||260}px"><table>${thead}${tbody}</table></div>`
+  }
+
+  async function loadPositions() {
+    const wrap = $("#positions-wrap")
+    const res = await safeFetch("../outputs/runs/latest/positions.json")
+    if (!res.ok) { wrap.classList.remove("skeleton"); wrap.innerHTML = '<div class="error">positions.json missing.</div>'; return }
+    try {
+      const rows = JSON.parse(res.text)
+      rows.sort((a,b)=>Math.abs(b.marketValue||0)-Math.abs(a.marketValue||0))
+      const cols = [
+        { key:"symbol", label:"Symbol" },
+        { key:"quantity", label:"Qty", class:"mono", format:(v)=>fmtNum(v,0) },
+        { key:"price", label:"Price", class:"mono", format:(v)=>fmtNum(v,2) },
+        { key:"marketValue", label:"Notional", class:"mono", format:(v)=>fmtNum(v,2) },
+        { key:"unrealizedPnl", label:"uPnL", class:"mono", format:(v)=> (v>=0?'<span style="color:var(--good)">'+fmtNum(v,2)+'</span>':'<span style="color:var(--bad)">'+fmtNum(v,2)+'</span>') },
+        { key:"currency", label:"CCY" },
+      ]
+      renderTable(wrap, rows, cols, { maxHeight: 260 })
+    } catch {
+      wrap.classList.remove("skeleton"); wrap.innerHTML = '<div class="error">Failed to parse positions.json</div>'
+    }
+  }
+
+  async function loadTrades() {
+    const wrap = $("#trades-wrap")
+    const res = await safeFetch("../outputs/runs/latest/trades.json")
+    if (!res.ok) { wrap.classList.remove("skeleton"); wrap.innerHTML = '<div class="error">trades.json missing.</div>'; return }
+    try {
+      const rows = JSON.parse(res.text)
+      rows.sort((a,b)=> (b.ts||"").localeCompare(a.ts||""))
+      const recent = rows.slice(0, 50)
+      const cols = [
+        { key:"ts", label:"Time", class:"mono" },
+        { key:"symbol", label:"Symbol" },
+        { key:"side", label:"Side" },
+        { key:"qty", label:"Qty", class:"mono", format:(v)=>fmtNum(v,0) },
+        { key:"price", label:"Price", class:"mono", format:(v)=>fmtNum(v,2) },
+        { key:"pnl", label:"PnL", class:"mono", format:(v)=> v==null? "": (v>=0?'<span style="color:var(--good)">'+fmtNum(v,2)+'</span>':'<span style="color:var(--bad)">'+fmtNum(v,2)+'</span>') },
+      ]
+      renderTable(wrap, recent, cols, { maxHeight: 260 })
+    } catch {
+      wrap.classList.remove("skeleton"); wrap.innerHTML = '<div class="error">Failed to parse trades.json</div>'
+    }
+  }
+
+  // ---------- Factor exposures (latest date) ----------
+  async function loadFactors() {
+    const wrap = $("#factors-wrap")
+    const res = await safeFetch("../outputs/factor exposures/exposures.csv")
+    if (!res.ok) { wrap.classList.remove("skeleton"); wrap.innerHTML = '<div class="error">exposures.csv missing.</div>'; return }
+    const rows = parseCSV(res.text)
+    if (!rows.length) { wrap.classList.remove("skeleton"); wrap.innerHTML = '<div class="error">No factor rows.</div>'; return }
+    // pick latest date across rows
+    rows.sort((a,b)=> String(a.date).localeCompare(String(b.date)))
+    const latest = rows[rows.length-1]?.date
+    const subset = rows.filter(r=>r.date===latest)
+    // dynamic factor columns (skip metadata cols)
+    const factorCols = Object.keys(subset[0]).filter(k=>!["date","entity","entity_type"].includes(k))
+    const cols = [
+      { key:"entity", label:"Entity" },
+      ...factorCols.map(k => ({ key:k, label:k, class:"mono", format:(v)=>fmtNum(Number(v), 3) }))
+    ]
+    renderTable(wrap, subset, cols, { maxHeight: 240 })
+  }
+
+  // ---------- Logs ----------
+  async function loadLogs() {
+    const el = $("#logs")
+    const r = await safeFetch("../outputs/runs/latest/logs.txt")
+    if (!r.ok) { el.textContent = "logs.txt missing."; return }
+    const lines = r.text.split(/\r?\n/)
+    const tail = lines.slice(-200).join("\n")
+    el.textContent = tail
+  }
+
+  // ---------- Boot ----------
+  ;(async function boot(){
+    // set run link
+    const runLink = document.getElementById("run-link")
+    if (runLink) runLink.href = "../outputs/runs/latest/"
+    await Promise.all([loadSummary(), loadPositions(), loadTrades(), loadFactors(), loadLogs()])
+  })()
+</script>
+</body>
+</html>

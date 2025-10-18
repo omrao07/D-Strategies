@@ -1,0 +1,98 @@
+{
+  "runId": "2025-10-13T12-momentum",
+  "createdAt": "2025-10-13T12:00:00Z",
+  "strategy": "Momentum",
+  "universe": "US Equities (sample)",
+  "config": {
+    "engine": { "mode": "dev", "scheduler": { "loopIntervalMs": 500 } },
+    "broker": { "type": "paper", "accountId": "HF-DEV-LOCAL" },
+    "risk": { "limits": { "maxGross": 1.5, "maxSingle": 0.1 } },
+    "strategy": { "name": "Momentum", "riskBudget": 0.05 }
+  },
+  "metrics": {
+    "sharpe": 1.32,
+    "sortino": 1.95,
+    "vol": 0.122,
+    "maxDrawdown": -0.078,
+    "cagr": 0.142,
+    "winRate": 0.56,
+    "trades": 42
+  },
+  "positions": [
+    { "symbol": "AAPL", "quantity": 100, "price": 145.23, "value": 14523 },
+    { "symbol": "MSFT", "quantity": -50, "price": 320.50, "value": -16025 },
+    { "symbol": "GLD", "quantity": 20, "price": 190.00, "value": 3800 }
+  ],
+  "trades": [
+    { "ts": "2025-10-13T12:00:02Z", "action": "BUY", "symbol": "AAPL", "qty": 100, "price": 145.23 },
+    { "ts": "2025-10-13T12:00:03Z", "action": "SELL", "symbol": "MSFT", "qty": 50, "price": 320.50 }
+  ],
+  "snapshots": {
+    "full": {
+      "meta": {
+        "ts": 1760356805000,
+        "asOf": "2025-10-13T12:00:05Z",
+        "strategy": "Momentum",
+        "runId": "2025-10-13T12-momentum"
+      },
+      "positions": [
+        { "symbol": "AAPL", "quantity": 100, "price": 145.23, "value": 14523 },
+        { "symbol": "MSFT", "quantity": -50, "price": 320.50, "value": -16025 },
+        { "symbol": "GLD", "quantity": 20, "price": 190.00, "value": 3800 }
+      ],
+      "totalValue": 93298,
+      "cash": 85000,
+      "pnl": 1250,
+      "weights": {
+        "AAPL": 0.1556,
+        "MSFT": -0.1717,
+        "GLD": 0.0407
+      },
+      "risk": {
+        "grossExposure": 34348,
+        "netExposure": 3298,
+        "leverage": 0.3682,
+        "concentration": 0.1717,
+        "longCount": 2,
+        "shortCount": 1
+      }
+    },
+    "partial": {
+      "meta": {
+        "ts": 1760356805000,
+        "asOf": "2025-10-13T12:00:05Z",
+        "baseTs": 1760356800000,
+        "strategy": "Momentum",
+        "runId": "2025-10-13T12-momentum"
+      },
+      "cashDelta": -500,
+      "pnlDelta": 250,
+      "prevTotal": 100000,
+      "newTotal": 100750,
+      "changes": [
+        {
+          "kind": "open",
+          "symbol": "AAPL",
+          "prevQty": 0,
+          "newQty": 100,
+          "qtyDelta": 100,
+          "prevValue": 0,
+          "newValue": 14523,
+          "valueDelta": 14523,
+          "price": 145.23
+        },
+        {
+          "kind": "close",
+          "symbol": "MSFT",
+          "prevQty": 50,
+          "newQty": 0,
+          "qtyDelta": -50,
+          "prevValue": 16025,
+          "newValue": 0,
+          "valueDelta": -16025,
+          "price": 320.50
+        }
+      ]
+    }
+  }
+}

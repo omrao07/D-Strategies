@@ -1,0 +1,426 @@
+<!doctype html>
+<!-- templates/run.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HTTP Runner</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --panel: #11141a;
+      --muted: #8b96a9;
+      --text: #e7ecf4;
+      --accent: #5cc8ff;
+      --ok: #2dd4bf;
+      --warn: #f59e0b;
+      --fail: #ef4444;
+      --border: #1f2430;
+      --shadow: 0 6px 24px rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.2);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fb; --panel: #ffffff; --muted: #5b6472; --text: #0c1222;
+        --accent: #0ea5e9; --border: #e9edf3; --shadow: 0 6px 24px rgba(9,12,18,.05), 0 2px 6px rgba(9,12,18,.06);
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font: 15px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background: radial-gradient(1200px 600px at 80% -10%, rgba(92,200,255,.10), transparent 60%),
+                  radial-gradient(900px 500px at -10% 20%, rgba(45,212,191,.07), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+    }
+    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 28px auto; padding: 0 16px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 16px; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #7c3aed); box-shadow: var(--shadow); display:grid; place-items:center; color:#fff; font-weight:700; }
+    .title { font-size: 22px; font-weight: 700; letter-spacing:.2px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    .grid { display:grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 92%, transparent), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; box-shadow: var(--shadow);
+    }
+    @media (min-width: 760px) { .span-4{grid-column:span 4} .span-6{grid-column:span 6} .span-8{grid-column:span 8} }
+    .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .btn {
+      appearance:none; border:1px solid var(--border);
+      background: color-mix(in oklab, var(--panel), black 2%);
+      color: var(--text); padding: 8px 12px; border-radius: 10px; cursor:pointer; font-weight:600; letter-spacing:.2px;
+    }
+    .btn:hover { transform: translateY(-1px); } .btn:active { transform: translateY(0); }
+    .btn.primary { background: linear-gradient(180deg, color-mix(in oklab, var(--accent), white 10%), var(--accent)); color:#06222f; border-color: color-mix(in oklab, var(--accent), black 20%); }
+    select, input[type="text"], input[type="url"], textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel), black 3%); color: var(--text);
+    }
+    label { display:block; }
+    textarea { min-height: 140px; resize: vertical; }
+    .pill { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); background: color-mix(in oklab, var(--panel), black 3%); }
+    .ok { color: var(--ok); } .warn { color: var(--warn); } .fail { color: var(--fail); }
+    pre {
+      margin: 0; padding: 12px; border-radius: 12px; overflow:auto; background: color-mix(in oklab, var(--panel), black 3%);
+      border: 1px dashed var(--border); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+    .kvs { display:grid; grid-template-columns: 160px 1fr; gap: 6px 10px; }
+    .split { display:grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 900px) { .split { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">↗</div>
+        <div>
+          <div class="title">HTTP Runner</div>
+          <div class="muted small">Fire requests at your local server (pairs with <code>serve</code>)</div>
+        </div>
+      </div>
+      <div class="row small">
+        <a class="btn" href="/templates/index.html">Dashboard</a>
+        <a class="btn" href="/health" target="_blank">/health</a>
+        <a class="btn" href="/metrics" target="_blank">/metrics</a>
+      </div>
+    </header>
+
+    <!-- Request Builder -->
+    <section class="card">
+      <h2>Request</h2>
+      <div class="row">
+        <select id="method" style="max-width:140px">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>PATCH</option>
+          <option>DELETE</option>
+          <option>HEAD</option>
+          <option>OPTIONS</option>
+        </select>
+        <input id="url" type="url" placeholder="http://localhost:8080/health" />
+        <button class="btn primary" id="sendBtn">Send</button>
+        <span class="pill" id="statusBadge">idle</span>
+      </div>
+
+      <div class="grid" style="margin-top:12px">
+        <div class="span-6">
+          <h3 class="small muted" style="margin:0 0 6px">Query Params</h3>
+          <div id="qpList"></div>
+          <div class="row small"><button class="btn" id="addQP">+ add param</button></div>
+        </div>
+        <div class="span-6">
+          <h3 class="small muted" style="margin:0 0 6px">Headers</h3>
+          <div id="hdrList"></div>
+          <div class="row small"><button class="btn" id="addHdr">+ add header</button></div>
+        </div>
+      </div>
+
+      <div id="bodyWrap" style="margin-top:12px">
+        <div class="row" style="justify-content:space-between">
+          <h3 class="small muted" style="margin:0">Body (JSON)</h3>
+          <label class="small muted"><input type="checkbox" id="pretty" checked/> pretty JSON</label>
+        </div>
+        <textarea id="body" spellcheck="false" placeholder='{"hello":"world"}'></textarea>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="copyCurl">Copy as cURL</button>
+        <button class="btn" id="savePreset">Save Preset</button>
+        <select id="presets" style="max-width:260px"></select>
+        <button class="btn" id="loadPreset">Load</button>
+        <button class="btn" id="deletePreset">Delete</button>
+      </div>
+    </section>
+
+    <!-- Response -->
+    <section class="card">
+      <h2>Response</h2>
+      <div class="kvs small">
+        <div class="muted">Status</div><div id="resStatus">–</div>
+        <div class="muted">Time</div><div id="resTime">–</div>
+        <div class="muted">Size</div><div id="resSize">–</div>
+      </div>
+      <div class="split" style="margin-top:12px">
+        <div>
+          <h3 class="small muted" style="margin:0 0 6px">Headers</h3>
+          <table id="resHeaders"><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div>
+          <h3 class="small muted" style="margin:0 0 6px">Body</h3>
+          <pre id="resBody" class="small">Send a request to see the response…</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section class="card">
+      <h2>History</h2>
+      <table id="history"><thead><tr><th>Method</th><th>URL</th><th>Status</th><th>Time</th><th></th></tr></thead><tbody></tbody></table>
+      <div class="row small" style="margin-top:8px"><button class="btn" id="clearHistory">Clear history</button></div>
+    </section>
+
+    <div class="muted small" style="margin-top:12px;text-align:center">Tip: start your server with <code>serve start --port 8080 --static ./templates</code> and open <code>/templates/run.html</code>.</div>
+  </div>
+
+  <template id="kvRow">
+    <div class="row" style="gap:6px; margin:6px 0">
+      <input type="text" class="k" placeholder="key" style="max-width:260px" />
+      <input type="text" class="v" placeholder="value" />
+      <button class="btn remove">✕</button>
+    </div>
+  </template>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const tplRow = () => document.getElementById('kvRow').content.cloneNode(true);
+
+    const MethodsWithBody = new Set(["POST","PUT","PATCH","DELETE"]);
+
+    const state = {
+      qp: [], headers: [],
+      history: JSON.parse(localStorage.getItem("http.history") || "[]"),
+      presets: JSON.parse(localStorage.getItem("http.presets") || "{}"),
+    };
+
+    // ---- UI builders ----
+    function addKV(container, arr, key="", val="") {
+      const frag = tplRow();
+      const row = frag.querySelector('.row');
+      const ki = frag.querySelector('.k');
+      const vi = frag.querySelector('.v');
+      const rm = frag.querySelector('.remove');
+      ki.value = key; vi.value = val;
+      rm.addEventListener('click', () => { container.removeChild(row); syncArray(container, arr); });
+      ki.addEventListener('input', () => syncArray(container, arr));
+      vi.addEventListener('input', () => syncArray(container, arr));
+      container.appendChild(row);
+      syncArray(container, arr);
+    }
+    function syncArray(container, arr) {
+      const rows = Array.from(container.querySelectorAll('.row'));
+      arr.length = 0;
+      for (const r of rows) {
+        const k = r.querySelector('.k').value.trim();
+        const v = r.querySelector('.v').value;
+        if (k) arr.push([k, v]);
+      }
+    }
+    function rebuild(container, arr) {
+      container.innerHTML = "";
+      for (const [k,v] of arr) addKV(container, arr, k, v);
+    }
+
+    // ---- Presets ----
+    function refreshPresets() {
+      const sel = $('presets');
+      sel.innerHTML = "";
+      const entries = Object.entries(state.presets);
+      if (!entries.length) { const o = document.createElement('option'); o.textContent = "(no presets)"; sel.appendChild(o); return; }
+      for (const [name] of entries) {
+        const o = document.createElement('option'); o.value = name; o.textContent = name; sel.appendChild(o);
+      }
+    }
+    function savePreset() {
+      const name = prompt("Preset name:");
+      if (!name) return;
+      state.presets[name] = collectRequest();
+      localStorage.setItem("http.presets", JSON.stringify(state.presets));
+      refreshPresets();
+    }
+    function loadPreset() {
+      const name = $('presets').value;
+      const p = state.presets[name]; if (!p) return;
+      applyRequest(p);
+    }
+    function deletePreset() {
+      const name = $('presets').value;
+      if (!state.presets[name]) return;
+      if (!confirm(`Delete preset "${name}"?`)) return;
+      delete state.presets[name];
+      localStorage.setItem("http.presets", JSON.stringify(state.presets));
+      refreshPresets();
+    }
+
+    // ---- History ----
+    function pushHistory(item) {
+      state.history.unshift(item);
+      state.history = state.history.slice(0, 50);
+      localStorage.setItem("http.history", JSON.stringify(state.history));
+      renderHistory();
+    }
+    function renderHistory() {
+      const tb = $('history').querySelector('tbody');
+      tb.innerHTML = "";
+      for (const [i, it] of state.history.entries()) {
+        const tr = document.createElement('tr');
+        const statusClass = it.status >= 200 && it.status < 300 ? "ok" : (it.status ? "warn" : "fail");
+        tr.innerHTML = `<td>${it.method}</td><td class="small" title="${it.url}">${it.url}</td><td class="${statusClass}">${it.status || "ERR"}</td><td>${it.time}ms</td><td><button class="btn small">Load</button></td>`;
+        tr.querySelector('button').addEventListener('click', () => applyRequest(it.request));
+        tb.appendChild(tr);
+      }
+    }
+    $('clearHistory').addEventListener('click', () => {
+      if (!confirm("Clear history?")) return;
+      state.history = [];
+      localStorage.removeItem("http.history");
+      renderHistory();
+    });
+
+    // ---- Request collection / apply ----
+    function collectRequest() {
+      syncArray($('qpList'), state.qp);
+      syncArray($('hdrList'), state.headers);
+      return {
+        method: $('method').value,
+        url: $('url').value,
+        qp: state.qp.slice(),
+        headers: state.headers.slice(),
+        body: $('body').value,
+        pretty: $('pretty').checked,
+      };
+    }
+    function applyRequest(req) {
+      $('method').value = req.method || "GET";
+      $('url').value = req.url || "";
+      $('body').value = req.body || "";
+      $('pretty').checked = !!req.pretty;
+      state.qp = req.qp ? req.qp.slice() : [];
+      state.headers = req.headers ? req.headers.slice() : [];
+      rebuild($('qpList'), state.qp);
+      rebuild($('hdrList'), state.headers);
+      toggleBody();
+    }
+
+    // ---- Body toggle ----
+    function toggleBody() {
+      const show = MethodsWithBody.has($('method').value);
+      $('bodyWrap').style.display = show ? "block" : "none";
+    }
+    $('method').addEventListener('change', toggleBody);
+
+    // ---- Send ----
+    $('sendBtn').addEventListener('click', send);
+    async function send() {
+      const req = collectRequest();
+      setBadge("…", "muted");
+      try {
+        // build URL with query params
+        const u = new URL(req.url, window.location.origin);
+        for (const [k,v] of req.qp) u.searchParams.set(k, v);
+        // headers
+        const hdrs = {};
+        for (const [k,v] of req.headers) { if (k) hdrs[k] = v; }
+        // body
+        let body = undefined;
+        if (MethodsWithBody.has(req.method)) {
+          if (!hdrs["Content-Type"]) hdrs["Content-Type"] = "application/json";
+          body = req.body ? req.body : "{}";
+        }
+        const t0 = performance.now();
+        const r = await fetch(u.toString(), { method: req.method, headers: hdrs, body });
+        const t1 = performance.now();
+        const time = Math.round(t1 - t0);
+
+        const text = await r.text();
+        const size = (new Blob([text])).size;
+        renderResponse(r, text, time, size, req.pretty);
+        setBadge(String(r.status), r.ok ? "ok" : (r.status >= 400 ? "fail" : "warn"));
+
+        pushHistory({
+          method: req.method, url: u.toString(), status: r.status, time,
+          request: req
+        });
+      } catch (e) {
+        renderResponse(null, String(e), 0, 0, req.pretty);
+        setBadge("ERR", "fail");
+        pushHistory({ method: req.method, url: req.url, status: 0, time: 0, request: req });
+      }
+    }
+
+    function renderResponse(resp, bodyText, timeMs, sizeBytes, pretty) {
+      $('resTime').textContent = timeMs ? `${timeMs} ms` : "–";
+      $('resSize').textContent = sizeBytes ? `${sizeBytes} B` : "–";
+      if (resp) {
+        $('resStatus').textContent = `${resp.status} ${resp.statusText}`;
+        const tb = $('resHeaders').querySelector('tbody');
+        tb.innerHTML = "";
+        resp.headers.forEach((v, k) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td class="small">${k}</td><td class="small">${v}</td>`;
+          tb.appendChild(tr);
+        });
+      } else {
+        $('resStatus').textContent = "ERROR";
+        $('resHeaders').querySelector('tbody').innerHTML = "";
+      }
+      // try JSON pretty
+      let out = bodyText;
+      try {
+        const json = JSON.parse(bodyText);
+        out = pretty ? JSON.stringify(json, null, 2) : JSON.stringify(json);
+      } catch { /* keep raw text */ }
+      $('resBody').textContent = out;
+    }
+
+    function setBadge(text, cls) {
+      const b = $('statusBadge'); b.textContent = text;
+      b.classList.remove("ok","warn","fail");
+      if (cls) b.classList.add(cls);
+    }
+
+    // ---- cURL ----
+    $('copyCurl').addEventListener('click', () => {
+      const req = collectRequest();
+      const url = new URL(req.url, window.location.origin);
+      for (const [k,v] of req.qp) url.searchParams.set(k, v);
+      const parts = [`curl -i -X ${req.method} '${url.toString().replace(/'/g,"'\\''")}'`];
+      for (const [k,v] of req.headers) {
+        if (!k) continue;
+        parts.push(`-H '${k}: ${String(v).replace(/'/g,"'\\''")}'`);
+      }
+      if (MethodsWithBody.has(req.method) && req.body) {
+        parts.push(`--data '${req.body.replace(/'/g,"'\\''")}'`);
+      }
+      const cmd = parts.join(' ');
+      navigator.clipboard?.writeText(cmd);
+      setBadge("copied", "ok");
+      setTimeout(() => setBadge("idle"), 900);
+    });
+
+    // ---- add/remove rows ----
+    $('addQP').addEventListener('click', () => addKV($('qpList'), state.qp));
+    $('addHdr').addEventListener('click', () => addKV($('hdrList'), state.headers));
+
+    // ---- presets buttons ----
+    $('savePreset').addEventListener('click', savePreset);
+    $('loadPreset').addEventListener('click', loadPreset);
+    $('deletePreset').addEventListener('click', deletePreset);
+
+    // ---- init ----
+    applyRequest({
+      method: "GET",
+      url: location.origin + "/health",
+      qp: [],
+      headers: [],
+      body: "",
+      pretty: true,
+    });
+    refreshPresets();
+    renderHistory();
+  </script>
+</body>
+</html>
+<!doctype html>
+<!-- templates/index.html -->
+<html lang="en">
+<head>  

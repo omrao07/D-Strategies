@@ -1,0 +1,107 @@
+{
+  
+  "version": 1,
+  "env": "dev",
+
+  "defaultBroker": "paper",
+
+  "brokers": {
+    "paper": {
+      "type": "paper",
+      "baseCurrency": "USD",
+      "startingCash": 1000000,
+      "latencyMs": 50,
+      "fillModel": {
+        "mode": "mid",             // "mid" | "touch" | "last"
+        "slippageBps": 1.5,
+        "partialFills": false
+      },
+      "constraints": {
+        "maxLeverage": 5,
+        "maxPositionNotional": 250000,
+        "maxOrderNotional": 100000
+      }
+    },
+
+    "alpaca": {
+      "type": "alpaca",
+      "paper": true,
+      "keyId": "ALPACA_KEY_ID_HERE",
+      "secretKey": "ALPACA_SECRET_KEY_HERE",
+      "baseUrl": "https://paper-api.alpaca.markets",
+      "dataUrl": "https://data.alpaca.markets/v2",
+      "rateLimits": {
+        "ordersPerMinute": 200,
+        "quotesPerMinute": 1200
+      },
+      "account": {
+        "baseCurrency": "USD"
+      }
+    },
+
+    "ibkr": {
+      "type": "ibkr",
+      "gateway": {
+        "host": "127.0.0.1",
+        "port": 7497,
+        "clientId": 7,
+        "tls": false
+      },
+      "account": {
+        "baseCurrency": "USD"
+      },
+      "marketData": {
+        "snapshot": false,
+        "whatToShow": "TRADES"
+      }
+    },
+
+    "kite": {
+      "type": "kite",
+      "apiKey": "KITE_API_KEY_HERE",
+      "accessToken": "KITE_ACCESS_TOKEN_HERE",
+      "root": "https://api.kite.trade",
+      "wsRoot": "wss://ws.kite.trade",
+      "exchange": "NSE",
+      "product": "MIS",
+      "variety": "regular",
+      "account": {
+        "baseCurrency": "INR"
+      }
+    }
+  },
+
+  "routing": {
+    "equities": "alpaca",
+    "futures": "ibkr",
+    "crypto": "alpaca",
+    "indices": "paper",
+    "default": "paper"
+  },
+
+  "riskDefaults": {
+    "maxLeverage": 2,
+    "maxPositions": 20,
+    "maxSinglePositionWeight": 0.15,
+    "maxOrderNotional": 50000,
+    "slippageBps": 2.0
+  },
+
+  "symbols": {
+    "watchlist": ["AAPL", "MSFT", "TSLA", "SPY", "NIFTY-50", "BTCUSD"],
+    "lotSizes": {
+      "AAPL": 1,
+      "MSFT": 1,
+      "TSLA": 1,
+      "SPY": 1,
+      "NIFTY-50": 1,
+      "BTCUSD": 0.0001
+    }
+  },
+
+  "persistence": {
+    "ordersPath": "persistence/logs/orders.json",
+    "tradesPath": "persistence/logs/trades.json",
+    "positionsPath": "persistence/logs/positions.json"
+  }
+}

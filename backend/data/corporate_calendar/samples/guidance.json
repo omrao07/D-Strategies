@@ -1,0 +1,85 @@
+{
+  "sample": true,
+  "guidance": [
+    {
+      "company": "SampleTech Inc.",
+      "ticker": "STEC",
+      "exchange": "NASDAQ",
+      "announcement_date": "2024-01-25",
+      "fiscal_quarter": "Q1 FY2024",
+      "fiscal_year": 2024,
+      "guidance_type": "Quarterly",
+      "metrics": {
+        "revenue_next_q": {
+          "guidance": 5400.0,
+          "consensus": 5300.0,
+          "currency": "USD Mn"
+        },
+        "eps_next_q": {
+          "guidance": 1.25,
+          "consensus": 1.20,
+          "currency": "USD"
+        }
+      },
+      "notes": "Company guided slightly above consensus for both revenue and EPS."
+    },
+    {
+      "company": "GlobalAuto Ltd.",
+      "ticker": "GALT",
+      "exchange": "NSE",
+      "announcement_date": "2024-04-15",
+      "fiscal_quarter": "Q4 FY2024",
+      "fiscal_year": 2024,
+      "guidance_type": "Full Year",
+      "metrics": {
+        "revenue_full_year": {
+          "guidance": 120000.0,
+          "consensus": 118500.0,
+          "currency": "INR Cr"
+        },
+        "ebitda_full_year": {
+          "guidance": 18500.0,
+          "consensus": 18200.0,
+          "currency": "INR Cr"
+        }
+      },
+      "notes": "Management expects robust growth in passenger EV sales."
+    },
+    {
+      "company": "CleanEnergy Corp.",
+      "ticker": "CENE",
+      "exchange": "NYSE",
+      "announcement_date": "2024-07-10",
+      "fiscal_quarter": "Q2 FY2024",
+      "fiscal_year": 2024,
+      "guidance_type": "Multi-Year",
+      "metrics": {
+        "capex_full_year": {
+          "guidance": 7000.0,
+          "consensus": null,
+          "currency": "USD Mn"
+        },
+        "deliveries_full_year": {
+          "guidance": 120000,
+          "consensus": 115000,
+          "currency": "Units"
+        }
+      },
+      "notes": "Capex investment to expand solar panel production capacity."
+    }
+  ],
+  "conventions": {
+    "guidance_type_values": ["Quarterly", "Full Year", "Multi-Year"],
+    "metric_key_examples": [
+      "revenue_next_q",
+      "eps_next_q",
+      "revenue_full_year",
+      "eps_full_year",
+      "gross_margin_pct",
+      "ebitda_full_year",
+      "capex_full_year",
+      "deliveries_full_year"
+    ],
+    "currency_note": "Monetary metrics use company reporting currency; % for margins; 'Units' for production or deliveries."
+  }
+}

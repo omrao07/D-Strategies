@@ -1,0 +1,70 @@
+{
+  "sample": true,
+  "eco_events": [
+    {
+      "event_name": "US Federal Reserve FOMC Meeting",
+      "region": "United States",
+      "date": "2024-09-18",
+      "time": "14:00",
+      "timezone": "America/New_York",
+      "event_type": "Central Bank Policy",
+      "actual": "Rate cut -25 bps",
+      "consensus": "-25 bps",
+      "previous": "5.25% - 5.50%",
+      "impact": "High",
+      "notes": "Fed began rate-cutting cycle after inflation cooled."
+    },
+    {
+      "event_name": "US Non-Farm Payrolls",
+      "region": "United States",
+      "date": "2024-07-05",
+      "time": "08:30",
+      "timezone": "America/New_York",
+      "event_type": "Employment",
+      "actual": 206000,
+      "consensus": 190000,
+      "previous": 218000,
+      "impact": "High",
+      "notes": "Jobs report came in above consensus; unemployment stable."
+    },
+    {
+      "event_name": "India Union Budget",
+      "region": "India",
+      "date": "2024-02-01",
+      "time": "11:00",
+      "timezone": "Asia/Kolkata",
+      "event_type": "Fiscal Policy",
+      "actual": "Budget announced with 5.1% fiscal deficit target",
+      "consensus": null,
+      "previous": null,
+      "impact": "High",
+      "notes": "Major infrastructure allocations and tax changes."
+    },
+    {
+      "event_name": "China Q2 GDP Release",
+      "region": "China",
+      "date": "2024-07-15",
+      "time": "10:00",
+      "timezone": "Asia/Shanghai",
+      "event_type": "GDP",
+      "actual": "4.7% YoY",
+      "consensus": "5.0% YoY",
+      "previous": "5.3% YoY",
+      "impact": "High",
+      "notes": "Weaker than expected growth raised global concerns."
+    }
+  ],
+  "conventions": {
+    "event_type_values": [
+      "Central Bank Policy",
+      "Inflation",
+      "Employment",
+      "GDP",
+      "Fiscal Policy",
+      "Trade",
+      "Other"
+    ],
+    "impact_values": ["Low", "Medium", "High"],
+    "timezone_note": "Times should be reported in local time zone of event region."
+  }
+}

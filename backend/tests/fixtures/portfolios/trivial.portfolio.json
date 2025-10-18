@@ -1,0 +1,23 @@
+{
+  "portfolioId": "trivial-001",
+  "asOf": "2025-10-15T12:00:00Z",
+  "capital": 1000,
+  "positions": [
+    {
+      "symbol": "AAPL",
+      "quantity": 1,
+      "avgPrice": 100,
+      "marketValue": 100
+    }
+  ],
+  "risk": {
+    "VaR95": 0,
+    "CVaR95": 0,
+    "maxDrawdown": 0,
+    "leverage": 0
+  },
+  "metadata": {
+    "owner": "demo-user",
+    "description": "Trivial single-position portfolio"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "runId": "risk-metrics-001",
+  "asOf": "2025-10-15T12:00:00Z",
+  "inputs": {
+    "returns": "synthetic-sample",
+    "confidenceLevels": [0.95, 0.99],
+    "lookback": 250
+  },
+  "metrics": {
+    "volatility": 0.145,
+    "downsideDeviation": 0.110,
+    "sharpeRatio": 0.92,
+    "sortinoRatio": 1.21,
+    "maxDrawdown": 0.175,
+    "VaR95": -0.025,
+    "VaR99": -0.040,
+    "CVaR95": -0.033,
+    "CVaR99": -0.052,
+    "beta": 1.05,
+    "alpha": 0.012,
+    "trackingError": 0.08,
+    "informationRatio": 0.15
+  },
+  "equityCurve": [
+    { "date": "2025-01-01", "equity": 100000 },
+    { "date": "2025-04-01", "equity": 104800 },
+    { "date": "2025-07-01", "equity": 109500 },
+    { "date": "2025-10-01", "equity": 114500 }
+  ],
+  "metadata": {
+    "source": "unit-test",
+    "notes": "Expected reference values for risk metrics validation"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "runId": "2025-10-10_01-00-00",
+  "timestamp": "2025-10-10T01:59:59Z",
+  "baseCurrency": "USD",
+
+  "exposures": {
+    "gross": 21500.00,
+    "net": 6800.00,
+    "cash": 90987.50,
+    "equity": 103000.00,
+    "leverage": 0.21
+  },
+
+  "var": {
+    "method": "historical",
+    "horizonDays": 1,
+    "confidence": 0.99,
+    "lookbackDays": 250,
+    "value": -2500.00,
+    "valuePct": -0.0243
+  },
+
+  "stressTests": [
+    {
+      "scenario": "2008-crisis",
+      "shockPct": -0.25,
+      "equityImpact": -22000.00,
+      "equityImpactPct": -0.21
+    },
+    {
+      "scenario": "COVID-2020",
+      "shockPct": -0.15,
+      "equityImpact": -14000.00,
+      "equityImpactPct": -0.14
+    }
+  ],
+
+  "factorExposures": {
+    "MKT": 0.85,
+    "SMB": -0.10,
+    "HML": 0.05,
+    "MOM": 0.12,
+    "QUAL": 0.08,
+    "LOWVOL": -0.06
+  },
+
+  "concentration": {
+    "largestPosition": {
+      "symbol": "AAPL",
+      "weightPct": 0.097,
+      "notional": 10000.00
+    },
+    "top5WeightPct": 0.22
+  },
+
+  "limits": {
+    "maxLeverage": 2.0,
+    "maxPositionWeight": 0.15,
+    "maxDrawdownPct": 0.20
+  },
+
+  "status": "OK"
+}

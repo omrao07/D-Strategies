@@ -1,0 +1,100 @@
+{
+  "calendar_quarter": "Q1",
+  "calendar_year": 2023,
+  "earnings": [
+    {
+      "company": "Company Name",
+      "ticker": "XXXX",
+      "exchange": "NSE/BSE/NASDAQ/NYSE",
+      "fiscal_quarter": "Q4 FY2022",
+      "fiscal_year": 2022,
+      "announcement_date": "2023-01-15",
+      "announcement_time": "BMO", 
+      "eps_consensus": null,
+      "eps_actual": null,
+      "revenue_consensus": null,
+      "revenue_actual": null,
+      "surprise_eps_pct": null,
+      "surprise_revenue_pct": null,
+      "guidance": {
+        "eps_next_q": null,
+        "revenue_next_q": null,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": "2023-01-15T18:30:00",
+        "timezone": "Asia/Kolkata",
+        "dial_in": null,
+        "webcast_url": null,
+        "slides_url": null,
+        "press_release_url": null
+      },
+      "notes": null
+    },
+    {
+      "company": "Company Name 2",
+      "ticker": "YYYY",
+      "exchange": "NSE",
+      "fiscal_quarter": "Q3 FY2023",
+      "fiscal_year": 2023,
+      "announcement_date": "2023-02-07",
+      "announcement_time": "AMC",
+      "eps_consensus": 12.4,
+      "eps_actual": 13.1,
+      "revenue_consensus": 24500.0,
+      "revenue_actual": 25120.0,
+      "surprise_eps_pct": 5.65,
+      "surprise_revenue_pct": 2.53,
+      "guidance": {
+        "eps_next_q": 11.8,
+        "revenue_next_q": 23900.0,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": "2023-02-07T20:00:00",
+        "timezone": "Asia/Kolkata",
+        "dial_in": "+91-000-000-0000",
+        "webcast_url": "https://example.com/webcast",
+        "slides_url": "https://example.com/slides.pdf",
+        "press_release_url": "https://example.com/press"
+      },
+      "notes": "Sample populated row. Replace with real values."
+    },
+    {
+      "company": "Company Name 3",
+      "ticker": "ZZZZ",
+      "exchange": "NASDAQ",
+      "fiscal_quarter": "Q1 FY2023",
+      "fiscal_year": 2023,
+      "announcement_date": "2023-03-28",
+      "announcement_time": "TAS",
+      "eps_consensus": null,
+      "eps_actual": null,
+      "revenue_consensus": null,
+      "revenue_actual": null,
+      "surprise_eps_pct": null,
+      "surprise_revenue_pct": null,
+      "guidance": {
+        "eps_next_q": null,
+        "revenue_next_q": null,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": null,
+        "timezone": "America/New_York",
+        "dial_in": null,
+        "webcast_url": null,
+        "slides_url": null,
+        "press_release_url": null
+      },
+      "notes": "TAS = time after session (post-close) if exact time unknown."
+    }
+  ],
+  "conventions": {
+    "announcement_time_values": ["BMO", "AMC", "TAS", "Pre", "Post", "Intra"],
+    "currency_units": "Revenue in same currency per company; EPS in reported units."
+  }
+}

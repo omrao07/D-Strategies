@@ -1,0 +1,49 @@
+{
+  "portfolioId": "stress-001",
+  "asOf": "2025-10-15T12:00:00Z",
+  "capital": 1000000,
+  "positions": [
+    {
+      "symbol": "AAPL",
+      "quantity": 1000000000,
+      "avgPrice": 0.0001,
+      "marketValue": 100000
+    },
+    {
+      "symbol": "TSLA",
+      "quantity": -500,
+      "avgPrice": 1200,
+      "marketValue": -600000
+    },
+    {
+      "symbol": "BTCUSD",
+      "quantity": 5,
+      "avgPrice": 70000,
+      "marketValue": 300000,
+      "leverage": 50
+    },
+    {
+      "symbol": "GME",
+      "quantity": 100,
+      "avgPrice": "INVALID",
+      "marketValue": 20000
+    },
+    {
+      "symbol": "",
+      "quantity": 10,
+      "avgPrice": 100,
+      "marketValue": 1000
+    }
+  ],
+  "risk": {
+    "VaR95": "NaN",
+    "CVaR95": 999999999,
+    "maxDrawdown": -0.25,
+    "leverage": 1000
+  },
+  "metadata": {
+    "owner": null,
+    "description": "Stress portfolio with extreme and invalid values",
+    "tags": ["test", 123, {"bad": "object"}]
+  }
+}

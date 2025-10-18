@@ -1,0 +1,38 @@
+{
+  "strategyId": "mean-reversion-001",
+  "asOf": "2025-10-15T12:00:00Z",
+  "parameters": {
+    "lookback": 20,
+    "entryZscore": -2.0,
+    "exitZscore": 0.0,
+    "capital": 100000
+  },
+  "performance": {
+    "cumulativeReturn": 0.1525,
+    "annualizedReturn": 0.095,
+    "annualizedVolatility": 0.12,
+    "sharpeRatio": 0.79,
+    "sortinoRatio": 1.05,
+    "maxDrawdown": 0.08
+  },
+  "trades": {
+    "count": 120,
+    "winRate": 0.56,
+    "avgWin": 0.012,
+    "avgLoss": -0.009,
+    "avgHoldingPeriodDays": 5
+  },
+  "equityCurve": [
+    { "date": "2025-01-01", "equity": 100000 },
+    { "date": "2025-02-01", "equity": 101200 },
+    { "date": "2025-03-01", "equity": 103500 },
+    { "date": "2025-06-01", "equity": 108000 },
+    { "date": "2025-09-01", "equity": 112500 },
+    { "date": "2025-10-01", "equity": 115250 }
+  ],
+  "metadata": {
+    "dataSource": "synthetic-sample",
+    "notes": "Expected outcome for unit testing mean reversion strategy implementation"
+  }
+}
+// Note: This JSON file contains expected results for a mean reversion strategy test case.

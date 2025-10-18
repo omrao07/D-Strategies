@@ -1,0 +1,49 @@
+{
+  "name": "Arbitrage Strategies Manifest",
+  "version": "1.0.0",
+  "description": "Registry of all implemented trading strategies with metadata.",
+  "strategies": [
+    {
+      "id": "macro-carry",
+      "name": "Currency Carry Trade",
+      "category": "macro",
+      "description": "Exploits interest rate differentials between currencies.",
+      "enabled": true
+    },
+    {
+      "id": "macro-ratearb",
+      "name": "Interest Rate Arbitrage",
+      "category": "macro",
+      "description": "Takes positions across bond futures to capture mispricing in interest rate curves.",
+      "enabled": true
+    },
+    {
+      "id": "riskarb-statarb",
+      "name": "Statistical Arbitrage",
+      "category": "risk-arb",
+      "description": "Uses historical mean-reversion and correlation breakdowns to find pricing inefficiencies.",
+      "enabled": true
+    },
+    {
+      "id": "styles-trend",
+      "name": "Trend Following",
+      "category": "style",
+      "description": "Captures momentum by trading in the direction of established market trends.",
+      "enabled": true
+    },
+    {
+      "id": "styles-carry",
+      "name": "Carry Strategy",
+      "category": "style",
+      "description": "Earns returns by holding higher-yielding assets funded by lower-yielding ones.",
+      "enabled": true
+    },
+    {
+      "id": "specials-mergerarb",
+      "name": "Merger Arbitrage",
+      "category": "special",
+      "description": "Profits from price discrepancies before and after corporate merger events.",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "year": 2023,
+  "dividends": [
+    {
+      "company": "Gillette India Limited",
+      "isin": null,
+      "announcement_date": "2023-11-22",
+      "ex_date": null,
+      "record_date": "2023-11-28",
+      "payment_date": null,
+      "dividend_per_share": null,
+      "type": "Final",
+      "notes": "Book closure Nov 22 to Nov 28 inclusive" 
+    },
+    {
+      "company": "IIFL Wealth & Asset Management",
+      "isin": null,
+      "announcement_date": "2023-07-20",
+      "ex_date": "2023-07-28",
+      "record_date": null,
+      "payment_date": null,
+      "dividend_per_share": null,
+      "type": "2nd Interim",
+      "notes": null
+    },
+    {
+      "company": "IIFL Wealth & Asset Management",
+      "isin": null,
+      "announcement_date": "2023-05-04",
+      "ex_date": "2023-05-12",
+      "record_date": null,
+      "payment_date": null,
+      "dividend_per_share": null,
+      "type": "1st Interim",
+      "notes": null
+    }
+    /* add more entries here */
+  ]
+}

@@ -1,0 +1,3 @@
+strategy,runId,createdAt,sharpe,sortino,vol,maxDrawdown,cagr,winRate,trades,totalValue,cash,netExposure,grossExposure,leverage
+Momentum,2025-10-13T12-momentum,2025-10-13T12:00:00Z,1.32,1.95,0.122,-0.078,0.142,0.56,42,93298,85000,3298,34348,0.3682
+Mean Reversion,2025-10-13T12-meanreversion,2025-10-13T12:00:00Z,0.95,1.30,0.115,-0.065,0.105,0.52,38,97124,87000,1124,11124,1.1000

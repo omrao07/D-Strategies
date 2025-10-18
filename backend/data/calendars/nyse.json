@@ -1,0 +1,33 @@
+{
+  "exchange": "NYSE",
+  "timezone": "America/New_York",
+  "trading_days": [
+    {
+      "date": "2025-10-07",
+      "session": "Normal",
+      "open_time": "09:30",
+      "close_time": "16:00",
+      "holiday": false
+    },
+    {
+      "date": "2025-10-13",
+      "session": "Holiday",
+      "holiday_reason": "Columbus Day",
+      "holiday": true
+    },
+    {
+      "date": "2025-11-27",
+      "session": "Holiday",
+      "holiday_reason": "Thanksgiving Day",
+      "holiday": true
+    },
+    {
+      "date": "2025-11-28",
+      "session": "Shortened",
+      "open_time": "09:30",
+      "close_time": "13:00",
+      "holiday": false
+    }
+  ],
+  "notes": "Times in EST/EDT depending on daylight savings. No trading on weekends. NYSE also observes Good Friday, Christmas, New Year's Day, Independence Day, Labor Day, Memorial Day, Martin Luther King Jr. Day, Presidents Day, and Juneteenth."
+}

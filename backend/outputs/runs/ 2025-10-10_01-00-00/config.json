@@ -1,0 +1,73 @@
+{
+  "runId": "2025-10-10_01-00-00",
+  "timestamp": "2025-10-10T01:00:00Z",
+  "mode": "backtest",
+  "env": "dev",
+  "baseCurrency": "USD",
+
+  "engine": {
+    "tickIntervalMs": 250,
+    "maxConcurrency": 8,
+    "timezone": "UTC"
+  },
+
+  "broker": {
+    "default": "paper",
+    "settings": {
+      "type": "paper",
+      "startingCash": 1000000,
+      "latencyMs": 50
+    }
+  },
+
+  "data": {
+    "feed": "demo",
+    "symbols": ["AAPL", "MSFT", "TSLA", "SPY"],
+    "intervalSec": 60,
+    "bars": 500
+  },
+
+  "strategies": [
+    {
+      "id": "mean-reversion",
+      "params": {
+        "lookback": 20,
+        "entryZ": -2,
+        "exitZ": 0,
+        "capital": 50000
+      }
+    },
+    {
+      "id": "trend-following",
+      "params": {
+        "fast": 10,
+        "slow": 50,
+        "stopPct": 0.05,
+        "capital": 50000
+      }
+    }
+  ],
+
+  "risk": {
+    "maxLeverage": 2,
+    "maxPositions": 20,
+    "maxSinglePositionWeight": 0.15,
+    "var": {
+      "horizonDays": 1,
+      "confidence": 0.99,
+      "lookbackDays": 250
+    }
+  },
+
+  "persistence": {
+    "ordersPath": "outputs/runs/2025-10-10_01-00-00/orders.json",
+    "tradesPath": "outputs/runs/2025-10-10_01-00-00/trades.json",
+    "positionsPath": "outputs/runs/2025-10-10_01-00-00/positions.json"
+  },
+
+  "reporting": {
+    "curvesPath": "outputs/curves/2025-10-10_01-00-00/",
+    "chartsPath": "outputs/charts/2025-10-10_01-00-00/",
+    "reportPath": "reports/run-2025-10-10--01-00-00.html"
+  }
+}

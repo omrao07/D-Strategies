@@ -1,0 +1,27 @@
+{
+  "exchange": "MCX",
+  "timezone": "Asia/Kolkata",
+  "trading_days": [
+    {
+      "date": "2025-10-07",
+      "session": "Normal",
+      "open_time": "09:00",
+      "close_time": "23:30",
+      "holiday": false
+    },
+    {
+      "date": "2025-10-08",
+      "session": "Holiday",
+      "holiday_reason": "Dussehra",
+      "holiday": true
+    },
+    {
+      "date": "2025-10-09",
+      "session": "Normal",
+      "open_time": "09:00",
+      "close_time": "23:30",
+      "holiday": false
+    }
+  ],
+  "notes": "Times in IST (Indian Standard Time). Trading sessions may differ for agricultural commodities."
+}

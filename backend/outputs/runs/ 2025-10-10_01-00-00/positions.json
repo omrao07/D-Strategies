@@ -1,0 +1,44 @@
+[
+  {
+    "symbol": "AAPL",
+    "quantity": 50,
+    "avgEntry": 180.25,
+    "price": 200.00,
+    "marketValue": 10000.00,
+    "unrealizedPnl": 987.50,
+    "realizedPnl": 0.00,
+    "currency": "USD",
+    "side": "LONG",
+    "leverage": 0.10,
+    "lastUpdate": "2025-10-10T01:59:59Z",
+    "tags": ["mean-reversion"]
+  },
+  {
+    "symbol": "MSFT",
+    "quantity": -10,
+    "avgEntry": 330.00,
+    "price": 320.00,
+    "marketValue": -3200.00,
+    "unrealizedPnl": 100.00,
+    "realizedPnl": 0.00,
+    "currency": "USD",
+    "side": "SHORT",
+    "leverage": 0.03,
+    "lastUpdate": "2025-10-10T01:59:59Z",
+    "tags": ["trend-following"]
+  },
+  {
+    "symbol": "TSLA",
+    "quantity": 2,
+    "avgEntry": 249.90,
+    "price": 250.10,
+    "marketValue": 500.20,
+    "unrealizedPnl": 0.40,
+    "realizedPnl": 0.00,
+    "currency": "USD",
+    "side": "LONG",
+    "leverage": 0.005,
+    "lastUpdate": "2025-10-10T01:59:59Z",
+    "tags": ["mean-reversion"]
+  }
+]

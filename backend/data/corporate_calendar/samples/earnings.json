@@ -1,0 +1,65 @@
+{
+  "ticker": "SAMPLE",
+  "company": "Sample Corporation",
+  "exchange": "NYSE",
+  "earnings": [
+    {
+      "fiscal_quarter": "Q1 FY2024",
+      "fiscal_year": 2024,
+      "announcement_date": "2024-01-25",
+      "announcement_time": "AMC",
+      "eps_consensus": 1.25,
+      "eps_actual": 1.32,
+      "revenue_consensus": 15400.0,
+      "revenue_actual": 15720.0,
+      "surprise_eps_pct": 5.6,
+      "surprise_revenue_pct": 2.1,
+      "guidance": {
+        "eps_next_q": 1.28,
+        "revenue_next_q": 16000.0,
+        "eps_full_year": 5.20,
+        "revenue_full_year": 63500.0
+      },
+      "call_details": {
+        "call_datetime_local": "2024-01-25T17:00:00",
+        "timezone": "America/New_York",
+        "dial_in": "+1-800-000-0000",
+        "webcast_url": "https://example.com/sample/webcast",
+        "slides_url": "https://example.com/sample/slides.pdf",
+        "press_release_url": "https://example.com/sample/press"
+      },
+      "notes": "Beat expectations on both EPS and revenue."
+    },
+    {
+      "fiscal_quarter": "Q2 FY2024",
+      "fiscal_year": 2024,
+      "announcement_date": "2024-04-24",
+      "announcement_time": "BMO",
+      "eps_consensus": 1.40,
+      "eps_actual": 1.38,
+      "revenue_consensus": 16250.0,
+      "revenue_actual": 16100.0,
+      "surprise_eps_pct": -1.4,
+      "surprise_revenue_pct": -0.9,
+      "guidance": {
+        "eps_next_q": 1.42,
+        "revenue_next_q": 16300.0,
+        "eps_full_year": null,
+        "revenue_full_year": null
+      },
+      "call_details": {
+        "call_datetime_local": "2024-04-24T08:00:00",
+        "timezone": "America/New_York",
+        "dial_in": "+1-800-111-1111",
+        "webcast_url": "https://example.com/sample/q2/webcast",
+        "slides_url": null,
+        "press_release_url": "https://example.com/sample/q2/press"
+      },
+      "notes": "Small miss on EPS and revenue."
+    }
+  ],
+  "conventions": {
+    "announcement_time_values": ["BMO", "AMC", "TAS", "Pre", "Post", "Intra"],
+    "currency_units": "Revenue in company’s reporting currency; EPS in reported units"
+  }
+}

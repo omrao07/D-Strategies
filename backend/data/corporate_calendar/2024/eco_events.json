@@ -1,0 +1,82 @@
+{
+  "year": 2024,
+  "eco_events": [
+    {
+      "event_name": "US Federal Reserve FOMC Meeting",
+      "region": "United States",
+      "date": "2024-06-12",
+      "time": "14:00",
+      "timezone": "America/New_York",
+      "event_type": "Central Bank Policy",
+      "actual": "Rate unchanged (5.25% - 5.50%)",
+      "consensus": "No change",
+      "previous": "5.25% - 5.50%",
+      "impact": "High",
+      "notes": "Fed held rates steady; markets focused on updated dot-plot projections."
+    },
+    {
+      "event_name": "ECB Monetary Policy Decision",
+      "region": "Eurozone",
+      "date": "2024-09-12",
+      "time": "13:15",
+      "timezone": "Europe/Brussels",
+      "event_type": "Central Bank Policy",
+      "actual": "Rate cut -25 bps",
+      "consensus": "-25 bps",
+      "previous": "4.25%",
+      "impact": "High",
+      "notes": "ECB began easing cycle with a 25 bps cut."
+    },
+    {
+      "event_name": "US Non-Farm Payrolls",
+      "region": "United States",
+      "date": "2024-07-05",
+      "time": "08:30",
+      "timezone": "America/New_York",
+      "event_type": "Employment",
+      "actual": 206000,
+      "consensus": 190000,
+      "previous": 218000,
+      "impact": "High",
+      "notes": "Job growth slightly above expectations; unemployment rate steady at 3.8%."
+    },
+    {
+      "event_name": "India Union Budget 2024",
+      "region": "India",
+      "date": "2024-02-01",
+      "time": "11:00",
+      "timezone": "Asia/Kolkata",
+      "event_type": "Fiscal Policy",
+      "actual": "Budget presented by Finance Minister",
+      "consensus": null,
+      "previous": null,
+      "impact": "High",
+      "notes": "Focused on infrastructure push and fiscal consolidation; fiscal deficit target at 5.1% of GDP."
+    },
+    {
+      "event_name": "China Q2 GDP Release",
+      "region": "China",
+      "date": "2024-07-15",
+      "time": "10:00",
+      "timezone": "Asia/Shanghai",
+      "event_type": "GDP",
+      "actual": "4.7% YoY",
+      "consensus": "5.0% YoY",
+      "previous": "5.3% YoY",
+      "impact": "High",
+      "notes": "Weaker than expected growth raised concerns about China’s recovery momentum."
+    }
+  ],
+  "conventions": {
+    "event_type_values": [
+      "Central Bank Policy",
+      "Inflation",
+      "Employment",
+      "GDP",
+      "Fiscal Policy",
+      "Trade",
+      "Other"
+    ],
+    "impact_values": ["Low", "Medium", "High"]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Feeds Configuration Schema",
+  "type": "object",
+  "properties": {
+    "http": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "url": { "type": "string", "format": "uri" },
+        "timeoutMs": { "type": "integer", "minimum": 100 },
+        "retry": {
+          "type": "object",
+          "properties": {
+            "maxRetries": { "type": "integer", "minimum": 0 },
+            "backoffMs": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["maxRetries", "backoffMs"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["enabled", "url", "timeoutMs"],
+      "additionalProperties": false
+    },
+    "csv": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "path": { "type": "string" }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    },
+    "demo": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["http", "csv", "demo"],
+  "additionalProperties": false
+}

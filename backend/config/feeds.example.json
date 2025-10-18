@@ -1,0 +1,84 @@
+{
+ 
+  "version": 1,
+  "env": "dev",
+  "defaultFeed": "demo",
+  "feeds": {
+    "demo": {
+      "type": "demo",
+      "symbols": ["AAPL", "MSFT", "TSLA", "SPY"],
+      "bars": 500,
+      "intervalSec": 60,
+      "seed": 42,
+      "priceDecimals": 2
+    },
+    "rest-us": {
+      "type": "rest",
+      "baseUrl": "https://api.example.com/v1",
+      "auth": {
+        "apiKey": "YOUR_API_KEY"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "burst": 10
+      },
+      "endpoints": {
+        "ticks": "/ticks",
+        "bars": "/bars"
+      },
+      "query": {
+        "timezone": "UTC"
+      }
+    },
+    "parquet-local": {
+      "type": "parquet",
+      "paths": {
+        "bars": "data/bars/*.parquet",
+        "ticks": "data/ticks/*.parquet"
+      },
+      "symbols": ["AAPL", "MSFT", "TSLA", "SPY"],
+      "timezone": "UTC"
+    },
+    "sql-demo": {
+      "type": "sql",
+      "driver": "sqlite",
+      "connection": {
+        "filename": "data/demo.sqlite"
+      },
+      "tables": {
+        "bars": "bars",
+        "ticks": "ticks"
+      },
+      "schema": {
+        "bars": {
+          "ts": "ts",
+          "symbol": "symbol",
+          "open": "open",
+          "high": "high",
+          "low": "low",
+          "close": "close",
+          "volume": "volume"
+        },
+        "ticks": {
+          "ts": "ts",
+          "symbol": "symbol",
+          "price": "price",
+          "bid": "bid",
+          "ask": "ask",
+          "volume": "volume"
+        }
+      }
+    },
+    "ws-crypto": {
+      "type": "rest",
+      "baseUrl": "wss://stream.example-crypto.com",
+      "auth": {},
+      "mode": "websocket",
+      "symbols": ["BTCUSD", "ETHUSD"],
+      "subscriptions": {
+        "trades": true,
+        "quotes": true
+      }
+    }
+  }
+}

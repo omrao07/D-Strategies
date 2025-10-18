@@ -1,0 +1,47 @@
+{
+  "momentum": {
+    "description": "Strategies that exploit persistence in asset returns (winners keep winning, losers keep losing).",
+    "examples": ["alpha/momentum.js", "styles/momentum.ts"],
+    "tags": ["relative strength", "price ROC", "cross-sectional", "time-series"]
+  },
+  "trend": {
+    "description": "Trend-following strategies that capture medium-to-long term moves using moving averages, breakouts, and filters.",
+    "examples": ["alpha/trend following.js", "styles/trend.ts"],
+    "tags": ["moving average crossover", "donchian", "volatility breakout", "long-short"]
+  },
+  "meanReversion": {
+    "description": "Strategies that bet on price reversal after short-term extremes or dislocations.",
+    "examples": ["examples/mean reversion.js", "styles/reversal.ts"],
+    "tags": ["pairs trading", "stat arb", "z-score", "short-term bounce"]
+  },
+  "macro": {
+    "description": "Strategies driven by macroeconomic indicators, central bank tone, rates, and FX/carry.",
+    "examples": ["macro/currencycarry.ts", "macro/ratearb.ts"],
+    "tags": ["interest rate differential", "currency carry", "macro trends"]
+  },
+  "riskArb": {
+    "description": "Event-driven strategies exploiting corporate events, mergers, and relative value.",
+    "examples": ["specials/mergerarb.ts", "specials/eventdriven.ts"],
+    "tags": ["merger arb", "spinoffs", "relative value", "dispersion"]
+  },
+  "options": {
+    "description": "Strategies using options greeks, spreads, volatility surfaces.",
+    "examples": ["options/strategies.js", "options/greeks.ts"],
+    "tags": ["covered call", "straddle", "vol arb", "delta hedging"]
+  },
+  "commodities": {
+    "description": "Curve and spread-based strategies in energy, metals, and agriculture.",
+    "examples": ["futures/curve.ts", "futures/spreads.ts"],
+    "tags": ["curve steepener", "crack spread", "calendar spread"]
+  },
+  "factors": {
+    "description": "Equity factor models (size, value, momentum, quality, low vol).",
+    "examples": ["factors/value.ts", "factors/momentum.ts"],
+    "tags": ["Fama-French", "smart beta", "cross-sectional"]
+  },
+  "ml": {
+    "description": "Machine learning based strategies that adapt or generate new signals dynamically.",
+    "examples": ["jobs/sweet params.ts"],
+    "tags": ["neural nets", "regression", "adaptive signals", "AI strategy creation"]
+  }
+}

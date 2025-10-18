@@ -1,0 +1,90 @@
+{
+  "year": 2023,
+  "guidance": [
+    {
+      "company": "Apple Inc.",
+      "ticker": "AAPL",
+      "exchange": "NASDAQ",
+      "announcement_date": "2023-02-02",
+      "fiscal_quarter": "Q2 FY2023",
+      "fiscal_year": 2023,
+      "guidance_type": "Quarterly",
+      "metrics": {
+        "revenue_next_q": {
+          "guidance": 94000.0,
+          "consensus": 95000.0,
+          "currency": "USD"
+        },
+        "gross_margin_pct": {
+          "guidance": 44.0,
+          "consensus": 43.5,
+          "currency": "%"
+        },
+        "eps_next_q": {
+          "guidance": 1.35,
+          "consensus": 1.38,
+          "currency": "USD"
+        }
+      },
+      "notes": "Apple guided revenue slightly below consensus but stronger margins."
+    },
+    {
+      "company": "Reliance Industries Ltd.",
+      "ticker": "RELIANCE",
+      "exchange": "NSE",
+      "announcement_date": "2023-04-21",
+      "fiscal_quarter": "Q4 FY2023",
+      "fiscal_year": 2023,
+      "guidance_type": "Full Year",
+      "metrics": {
+        "revenue_full_year": {
+          "guidance": 890000.0,
+          "consensus": 880000.0,
+          "currency": "INR Cr"
+        },
+        "ebitda_full_year": {
+          "guidance": 125000.0,
+          "consensus": 124500.0,
+          "currency": "INR Cr"
+        }
+      },
+      "notes": "Management projected strong FY24 revenue growth driven by retail & Jio."
+    },
+    {
+      "company": "Tesla, Inc.",
+      "ticker": "TSLA",
+      "exchange": "NASDAQ",
+      "announcement_date": "2023-01-25",
+      "fiscal_quarter": "Q1 FY2023",
+      "fiscal_year": 2023,
+      "guidance_type": "Full Year",
+      "metrics": {
+        "deliveries_full_year": {
+          "guidance": 1800000,
+          "consensus": 1700000,
+          "currency": "Units"
+        },
+        "capex_full_year": {
+          "guidance": 7000.0,
+          "consensus": null,
+          "currency": "USD Mn"
+        }
+      },
+      "notes": "Tesla guided for ~1.8M vehicle deliveries in 2023."
+    }
+  ],
+  "conventions": {
+    "guidance_type_values": ["Quarterly", "Full Year", "Multi-Year"],
+    "metric_key_examples": [
+      "revenue_next_q",
+      "revenue_full_year",
+      "eps_next_q",
+      "eps_full_year",
+      "gross_margin_pct",
+      "ebitda_full_year",
+      "deliveries_full_year",
+      "capex_full_year"
+    ],
+    "currency_note": "Monetary metrics use company reporting currency; % for margins; 'Units' for volumes."
+  }
+}

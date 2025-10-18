@@ -1,0 +1,42 @@
+{
+  "name": "DemoFeed",
+  "version": "1.0",
+  "description": "Demo market data feed with a small set of instruments and synthetic prices.",
+  "metadata": {
+    "source": "synthetic",
+    "timezone": "UTC",
+    "generatedAt": "2025-10-15T12:00:00Z"
+  },
+  "instruments": [
+    {
+      "symbol": "AAPL",
+      "type": "equity",
+      "currency": "USD",
+      "prices": [
+        { "date": "2025-10-01", "open": 170.5, "high": 172.0, "low": 169.8, "close": 171.2, "volume": 52340000 },
+        { "date": "2025-10-02", "open": 171.0, "high": 173.5, "low": 170.0, "close": 172.8, "volume": 48920000 },
+        { "date": "2025-10-03", "open": 172.5, "high": 174.0, "low": 171.5, "close": 173.7, "volume": 51280000 }
+      ]
+    },
+    {
+      "symbol": "EURUSD",
+      "type": "fx",
+      "currency": "USD",
+      "prices": [
+        { "date": "2025-10-01", "open": 1.1050, "high": 1.1100, "low": 1.1005, "close": 1.1075 },
+        { "date": "2025-10-02", "open": 1.1070, "high": 1.1120, "low": 1.1040, "close": 1.1105 },
+        { "date": "2025-10-03", "open": 1.1110, "high": 1.1155, "low": 1.1090, "close": 1.1130 }
+      ]
+    },
+    {
+      "symbol": "BTCUSD",
+      "type": "crypto",
+      "currency": "USD",
+      "prices": [
+        { "date": "2025-10-01", "open": 65000, "high": 65500, "low": 64000, "close": 64800, "volume": 1834 },
+        { "date": "2025-10-02", "open": 64800, "high": 66000, "low": 64500, "close": 65850, "volume": 1750 },
+        { "date": "2025-10-03", "open": 65900, "high": 66500, "low": 65500, "close": 66200, "volume": 1685 }
+      ]
+    }
+  ]
+}

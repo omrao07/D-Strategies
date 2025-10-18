@@ -1,0 +1,29 @@
+[2025-10-10 01:00:00.001] INFO  Engine initialized (mode=backtest, baseCurrency=USD, tickInterval=250ms)
+[2025-10-10 01:00:00.012] INFO  Data feed attached (type=demo, symbols=AAPL,MSFT,TSLA,SPY, bars=500, interval=60s)
+[2025-10-10 01:00:00.025] INFO  Broker attached (type=paper, startingCash=1000000 USD, latency=50ms)
+[2025-10-10 01:00:00.040] INFO  Strategy registered (id=mean-reversion, capital=50000)
+[2025-10-10 01:00:00.041] INFO  Strategy registered (id=trend-following, capital=50000)
+[2025-10-10 01:00:00.055] INFO  Risk manager online (maxLeverage=2, maxPositions=20, maxWeight=15%)
+
+[2025-10-10 01:00:01.500] DEBUG Feed tick: AAPL @ 180.25 (vol=1200)
+[2025-10-10 01:00:01.505] DEBUG Feed tick: MSFT @ 330.10 (vol=800)
+[2025-10-10 01:00:01.520] INFO  Strategy mean-reversion generated signal: BUY AAPL qty=50 @ 180.25
+[2025-10-10 01:00:01.521] INFO  Paper broker accepted order #1 (AAPL BUY 50 @ MKT)
+[2025-10-10 01:00:01.572] INFO  Paper broker filled order #1 (AAPL BUY 50 @ 180.25)
+[2025-10-10 01:00:01.573] INFO  Position updated: AAPL qty=50 avgPrice=180.25 notional=9012.50
+
+[2025-10-10 01:00:03.210] INFO  Strategy trend-following generated signal: SELL MSFT qty=10 @ 330.00
+[2025-10-10 01:00:03.211] INFO  Paper broker accepted order #2 (MSFT SELL 10 @ MKT)
+[2025-10-10 01:00:03.260] INFO  Paper broker filled order #2 (MSFT SELL 10 @ 330.00)
+[2025-10-10 01:00:03.261] INFO  Position updated: MSFT qty=-10 avgPrice=330.00 notional=-3300.00
+
+[2025-10-10 01:05:00.000] DEBUG Risk check OK (equity=100850, leverage=0.2x, positions=2)
+[2025-10-10 01:10:00.000] DEBUG Risk check OK (equity=101420, leverage=0.25x, positions=2)
+
+[2025-10-10 01:20:00.000] WARN  Drawdown -1.2% detected (peak=101420, equity=100200)
+[2025-10-10 01:30:00.000] INFO  Recovery: new equity high reached (equity=101900)
+
+[2025-10-10 01:59:59.999] INFO  Run completed (duration=60m, startEquity=100000, endEquity=103000)
+[2025-10-10 01:59:59.999] INFO  KPIs: return=+3.00%, maxDD=-1.90%, sharpe=1.25, trades=120, winRate=54%
+[2025-10-10 02:00:00.000] INFO  Snapshots saved (orders.json, trades.json, positions.json, pnl.json, risk.json)
+[2025-10-10 02:00:00.001] INFO  Report generated: reports/run-2025-10-10--01-00-00.html
