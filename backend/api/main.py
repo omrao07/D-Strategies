@@ -1,29 +1,47 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
-FastAPI service for backtests, calibration, and utilities.
+api/main.py
+-----------
+FastAPI service for running backtests, parameter calibration, and utilities.
+
+Run (local):
+    uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 """
 
+# ============================================================
+# PYTHONPATH FIX (CRITICAL FOR RENDER)
+# ============================================================
+import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parents[1]  # backend/
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+# ============================================================
+# Standard library
+# ============================================================
 from __future__ import annotations
-
 import io
 import os
+import json
 import time
 import uuid
 import logging
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# ============================================================
+# Third-party
+# ============================================================
 import pandas as pd
 from fastapi import FastAPI, UploadFile, File, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
 
-# ==============================================================================
-# REQUIRED INTERNAL IMPORTS (FIXED)
-# ==============================================================================
-
+# ============================================================
+# Internal imports (NOW RESOLVABLE)
+# ============================================================
 try:
     from orchestration.pipelines import Orchestrator
     from orchestration.utils import load_yaml_or_json, ensure_dir, setup_logging
@@ -33,29 +51,26 @@ except Exception as e:
         "Ensure backend/orchestration is a Python package and on PYTHONPATH."
     ) from e
 
-# Optional modules
 try:
     from calibrate import Calibrator, ParamSpace, TimeSeriesCV  # type: ignore
-    HAS_CALIBRATE = True
+    _HAS_CALIBRATE = True
 except Exception:
-    HAS_CALIBRATE = False
+    _HAS_CALIBRATE = False
 
 try:
     import prompts  # type: ignore
-    HAS_PROMPTS = True
+    _HAS_PROMPTS = True
 except Exception:
-    HAS_PROMPTS = False
+    _HAS_PROMPTS = False
 
-# ==============================================================================
-# APP SETUP
-# ==============================================================================
-
+# ============================================================
+# App & logging
+# ============================================================
 APP_VERSION = "0.2.0"
 RUNS_DIR = Path(os.getenv("RUNS_DIR", "runs")).resolve()
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
 RUNS_DIR.mkdir(parents=True, exist_ok=True)
-
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.INFO),
     format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
@@ -72,10 +87,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ==============================================================================
-# SCHEMAS
-# ==============================================================================
-
+# ============================================================
+# Schemas
+# ============================================================
 class InlineData(BaseModel):
     price_col: str = "price"
     timestamp_col: Optional[str] = None
@@ -89,21 +103,20 @@ class InlineData(BaseModel):
         elif self.columns and self.data:
             df = pd.DataFrame(self.data, columns=self.columns)
         else:
-            raise ValueError("Provide records or columns+data")
+            raise ValueError("Provide either records or columns+data")
 
         if self.price_col not in df.columns:
-            for alt in ("close", "px", "last"):
-                if alt in df.columns:
-                    df.rename(columns={alt: self.price_col}, inplace=True)
+            for c in ("close", "px", "last"):
+                if c in df.columns:
+                    df = df.rename(columns={c: self.price_col})
                     break
 
         if self.price_col not in df.columns:
-            raise ValueError("Missing price column")
+            raise ValueError(f"Missing price column: {self.price_col}")
 
         if self.timestamp_col and self.timestamp_col in df.columns:
             df[self.timestamp_col] = pd.to_datetime(df[self.timestamp_col])
-            df.set_index(self.timestamp_col, inplace=True)
-            df.sort_index(inplace=True)
+            df = df.set_index(self.timestamp_col).sort_index()
 
         return df
 
@@ -128,96 +141,69 @@ class BacktestResponse(BaseModel):
     manifest: Dict[str, Any]
 
 
-# ==============================================================================
-# HELPERS
-# ==============================================================================
-
-def new_run_dir(prefix: str) -> Path:
+# ============================================================
+# Helpers
+# ============================================================
+def _new_run_dir(prefix: str) -> Path:
     rid = uuid.uuid4().hex[:10]
-    path = RUNS_DIR / f"{prefix}_{rid}"
-    path.mkdir(parents=True, exist_ok=True)
-    setup_logging(path, LOG_LEVEL)
-    return path
+    d = RUNS_DIR / f"{prefix}_{rid}"
+    d.mkdir(parents=True, exist_ok=True)
+    setup_logging(d, LOG_LEVEL)
+    return d
 
 
-def resolve_cfg_reg(req: BacktestRequest):
-    cfg = req.config or (load_yaml_or_json(req.config_path) if req.config_path else None)
-    reg = req.registry or (load_yaml_or_json(req.registry_path) if req.registry_path else None)
-
-    if not cfg:
-        raise HTTPException(400, "Missing config")
-    if not reg:
-        raise HTTPException(400, "Missing registry")
-
+def _resolve_cfg(cfg_path, reg_path, cfg, reg):
+    cfg = cfg or (load_yaml_or_json(cfg_path) if cfg_path else None)
+    reg = reg or (load_yaml_or_json(reg_path) if reg_path else None)
+    if not cfg or not reg:
+        raise HTTPException(400, "Config and registry are required")
     return cfg, reg
 
 
-def resolve_data(req: BacktestRequest) -> pd.DataFrame:
-    if req.inline_data:
-        return req.inline_data.to_dataframe()
-
-    if req.csv_path:
-        df = pd.read_csv(req.csv_path)
-        for c in ("timestamp", "date", "datetime"):
-            if c in df.columns:
-                df[c] = pd.to_datetime(df[c])
-                df.set_index(c, inplace=True)
-                break
-        return df
-
-    raise HTTPException(400, "No data provided")
-
-
-# ==============================================================================
-# ROUTES
-# ==============================================================================
-
+# ============================================================
+# Routes
+# ============================================================
 @app.get("/health")
 def health():
     return {"status": "ok", "version": APP_VERSION}
 
 
 @app.post("/backtest", response_model=BacktestResponse)
-def run_backtest(req: BacktestRequest):
-    cfg, reg = resolve_cfg_reg(req)
-    df = resolve_data(req)
+def backtest(req: BacktestRequest):
+    cfg, reg = _resolve_cfg(req.config_path, req.registry_path, req.config, req.registry)
+    run_dir = Path(req.out_dir).resolve() if req.out_dir else _new_run_dir("bt")
 
-    out_dir = Path(req.out_dir) if req.out_dir else new_run_dir("bt")
+    if req.inline_data:
+        df = req.inline_data.to_dataframe()
+    elif req.csv_path:
+        df = pd.read_csv(req.csv_path)
+    else:
+        raise HTTPException(400, "No data provided")
 
-    orch = Orchestrator(
-        config=cfg,
-        registry=reg,
-        out_dir=out_dir,
-        mode="backtest",
-        paper=True,
-    )
-
-    result = orch.run_backtest(df)
+    orch = Orchestrator(config=cfg, registry=reg, out_dir=run_dir, mode="backtest", paper=True)
+    res = orch.run_backtest(df)
 
     return BacktestResponse(
-        run_id=result["manifest"]["run_id"],
-        history_path=result["history_path"],
-        manifest=result["manifest"],
+        run_id=res["manifest"]["run_id"],
+        history_path=res["history_path"],
+        manifest=res["manifest"],
     )
 
 
-@app.post("/upload/csv")
-async def upload_csv(file: UploadFile = File(...)):
-    content = await file.read()
-    df = pd.read_csv(io.BytesIO(content))
-    path = RUNS_DIR / f"upload_{uuid.uuid4().hex[:8]}.csv"
-    df.to_csv(path, index=False)
-    return {"path": str(path), "rows": len(df)}
+@app.post("/echo")
+def echo(payload: Dict[str, Any]):
+    return {"received": payload, "ts": time.time()}
 
 
-# ==============================================================================
-# ENTRYPOINT
-# ==============================================================================
-
+# ============================================================
+# Entrypoint
+# ============================================================
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "api.main:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", "8000")),
+        reload=False,
     )
