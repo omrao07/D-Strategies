@@ -22,7 +22,6 @@ if str(BASE_DIR) not in sys.path:
 # ============================================================
 # Standard library
 # ============================================================
-from __future__ import annotations
 import io
 import os
 import json
