@@ -1,7 +1,7 @@
 id: GLB-0053
 firm: Global
 name: Nikkei Vol Curve Trade (IN)
-description: Worldwide diversified strategy in Vol/Options — region: IN.
+description:Worldwide diversified strategy in Vol/Options — region: IN.
 discipline: Quant
 family: Vol/Options
 region: IN

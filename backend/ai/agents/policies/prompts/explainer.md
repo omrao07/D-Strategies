@@ -6,6 +6,7 @@ It provides **transparent, human-readable justifications** for signals, strategi
 ---
 
 ## 🎯 Purpose
+
 - Bridge the **“black-box” gap** between advanced models and human oversight.  
 - Ensure every trade has a **traceable rationale** and can be explained in plain English.  
 - Generate narratives that enhance **compliance, trust, and investor confidence**.  
@@ -13,6 +14,7 @@ It provides **transparent, human-readable justifications** for signals, strategi
 ---
 
 ## 🧩 Capabilities
+
 - **Trade Explainability**
   - Consumes trade events (`trade_explainability.py`, `pnl_xray.py`).
   - Explains why a trade was triggered (factor signals, news drivers, market context).
@@ -34,6 +36,7 @@ It provides **transparent, human-readable justifications** for signals, strategi
 ---
 
 ## ⚙️ Architecture
+
 - **Agents**
   - `explainer_agent.py` — main reasoning orchestrator.
   - `trade_explainability.py` — trade-specific narratives.
@@ -49,13 +52,16 @@ It provides **transparent, human-readable justifications** for signals, strategi
 ---
 
 ## 📊 Inputs
+
 - Trade events (order + fill).
 - Strategy signals (alpha scores, sentiment weights).
 - Market context (prices, volatility, liquidity).
 - Alternative data triggers (news, ESG factors, social sentiment).
 
 ## 📈 Outputs
+
 - JSON narratives like:  
+
   ```json
   {
     "trade_id": "T20250829-XYZ",

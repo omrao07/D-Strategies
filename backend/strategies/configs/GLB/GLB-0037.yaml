@@ -1,7 +1,7 @@
 id: GLB-0037
 firm: Global
 name: USD/INR Inflation Pair (US)
-description: Worldwide diversified strategy in Vol/Options — region: US.
+description:Worldwide diversified strategy in Vol/Options — region: US.
 discipline: Quant
 family: Vol/Options
 region: US

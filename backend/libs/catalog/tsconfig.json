@@ -3,7 +3,7 @@
   "display": "Catalog (ESM, Node 18, types out to dist)",
   "compilerOptions": {
     "target": "ES2021",
-    "module": "ES2022",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2021"],
     "rootDir": "src",

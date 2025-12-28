@@ -1,3 +1,5 @@
+import * as React from "react";
+
 // app/market/loading.tsx
 export default function Loading() {
   return (

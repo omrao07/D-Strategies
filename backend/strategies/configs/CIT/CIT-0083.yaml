@@ -1,6 +1,6 @@
 id: CIT-0083
 firm: Citadel
-name: EU Stat-Arb: Close-to-Open #83
+name: EU Stat-Arb:Close-to-Open #83
 description: Cross-asset factor strategy.
 discipline: Commodities
 family: Metals

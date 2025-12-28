@@ -1,6 +1,6 @@
 id: CIT-0002
 firm: Citadel
-name: US Stat-Arb: Overnight Reversal #2
+name: US Stat-Arb:Overnight Reversal #2
 description: ETF NAV dislocation model.
 discipline: Quant
 family: Trend/Carry

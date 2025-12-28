@@ -7,7 +7,7 @@ kind: Deployment
 metadata:
   name: analyst-worker
   namespace: hf
-spec:
+  spec:
   template:
     spec:
       affinity:
@@ -28,14 +28,13 @@ spec:
                       operator: In
                       values: ["analyst-worker"]
                 topologyKey: topology.kubernetes.io/zone
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: scenario-worker
   namespace: hf
-spec:
+  spec:
   template:
     spec:
       affinity:
@@ -63,7 +62,7 @@ kind: Deployment
 metadata:
   name: sentiment-worker
   namespace: hf
-spec:
+  spec:
   template:
     spec:
       affinity:

@@ -1,17 +1,25 @@
-// routes/index.ts
-// Central route registration (pure Node, no imports)
+import { Router } from "express"
 
-import { healthRoutes } from "./health.js";
-import { v1AuthRoutes } from "./v1/auth.js";
-import { v1UserRoutes } from "./v1/users.js";
+// Import feature routes
+import newsRoutes from "./news.routes"
+// import marketRoutes from "./market.routes"
+// import portfolioRoutes from "./portfolio.routes"
+// import executionRoutes from "./execution.routes"
+// import strategyRoutes from "./strategy.routes"
 
-export function registerRoutes(router) {
-  // Core health endpoints
-  healthRoutes(router);
+const router = Router()
 
-  // Auth routes
-  v1AuthRoutes(router);
+/* ---------------- Feature Routes ---------------- */
 
-  // User routes
-  v1UserRoutes(router);
-}
+// Health passthrough (optional)
+router.get("/", (_req, res) => {
+  res.json({ status: "api routes ok" })
+})
+
+router.use("/news", newsRoutes)
+// router.use("/market", marketRoutes)
+// router.use("/portfolio", portfolioRoutes)
+// router.use("/execution", executionRoutes)
+// router.use("/strategy", strategyRoutes)
+
+export default router

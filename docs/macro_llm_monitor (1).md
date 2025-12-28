@@ -9,7 +9,6 @@
 
 **Problem:** We run LLM jobs that summarize macro releases (CPI, NFP, GDP), parse policy communications, and produce risk classifications. We need **reliable monitoring** for quality, latency, cost, and drift.
 
-**Primary goals**
 - Detect **hallucinations** and **data mismatches** (e.g., wrong CPI YoY).
 - Track **latency**, **token usage**, and **$ cost** per job and per source.
 - Measure **quality** (factuality, calibration, extraction accuracy).
@@ -17,6 +16,7 @@
 - Offer dashboards for **SLOs** and **release-day health**.
 
 **Out of scope (v1):**
+
 - Model training pipelines (only covers inference and post-LLM checks).
 - Data vendor retries beyond a simple backoff policy.
 
@@ -24,7 +24,6 @@
 
 ## 2) Architecture (high level)
 
-```
 Vendor/API Feeds (BLS, BEA, FRED, ECB, BoE, etc.)
       │
       ├── Ingestor (release calendar + fetchers)
@@ -51,9 +50,7 @@ Vendor/API Feeds (BLS, BEA, FRED, ECB, BoE, etc.)
               • Redis/Kafka (events) → Parquet/S3 + Postgres (facts)
               • Prometheus metrics → Grafana
               • Alertmanager/PagerDuty/Slack
-```
 
-**Services**
 - `macro-ingestor` (calendar + fetch)
 - `macro-llm` (inference)
 - `macro-guard` (post checks)
@@ -65,6 +62,7 @@ Vendor/API Feeds (BLS, BEA, FRED, ECB, BoE, etc.)
 ## 3) Data contracts
 
 ### 3.1 Canonical release JSON (examples: CPI, NFP)
+
 ```json
 {
   "release_type": "CPI",
@@ -86,6 +84,7 @@ Vendor/API Feeds (BLS, BEA, FRED, ECB, BoE, etc.)
 ```
 
 ### 3.2 LLM output envelope
+
 ```json
 {
   "job_id": "cpi-2025-08-abcd",
@@ -117,33 +116,36 @@ Vendor/API Feeds (BLS, BEA, FRED, ECB, BoE, etc.)
 ## 4) Guardrails & Scoring
 
 ### 4.1 Numeric reconciliation
+
 - Convert `extracted.*` to numeric.
 - Compare with canonical `values.*` within **tolerance** (e.g., ±0.01pp).
 - Compute **factuality_score ∈ [0,1]** (1 = all fields consistent).
 
 ### 4.2 Policy & content checks
+
 - Disallow PII, trading recommendations without risk disclaimer.
 - Disallow model hallucinations: if confidence below threshold or missing fields → **degrade to template** summary.
 
 ### 4.3 Probabilistic calibration (if forecasts supplied)
+
 - If we output `prob_*` (e.g., `prob_cut_next_meeting`), track **Brier score** after outcome is known.
 - Maintain a **reliability diagram** per horizon.
 
 ### 4.4 Extraction accuracy
+
 - Regex-based slot filling for standard fields (CPI, NFP, GDP).
 - `extraction_accuracy = matched_slots / total_slots`.
 
 ### 4.5 Aggregate quality index
-```
+
 quality_index = 0.5*factuality_score + 0.3*extraction_accuracy + 0.2*(1 - normalized_brier)
-```
 
 ---
 
 ## 5) Metrics (Prometheus)
 
 | Metric | Type | Labels | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `llm_requests_total` | Counter | `model,release_type,source` | Number of LLM calls |
 | `llm_latency_seconds` | Histogram | `model,release_type` | End-to-end latency |
 | `llm_tokens_prompt_total` | Counter | `model,release_type` | Prompt tokens |
@@ -155,7 +157,6 @@ quality_index = 0.5*factuality_score + 0.3*extraction_accuracy + 0.2*(1 - normal
 | `llm_guard_fail_total` | Counter | `reason,release_type` | Guardrail failures |
 | `llm_alerts_total` | Counter | `severity,release_type` | Alerts emitted |
 
-**SLOs**
 - **Availability:** `P(guard_pass) ≥ 99.5%` on release days.
 - **Latency:** p95 `llm_latency_seconds ≤ 8s` during 30m release window.
 - **Quality:** p50 factuality ≥ 0.98, p95 ≥ 0.95.
@@ -165,24 +166,20 @@ quality_index = 0.5*factuality_score + 0.3*extraction_accuracy + 0.2*(1 - normal
 
 ## 6) Alerting
 
-**Immediate (page)**
 - `guard_pass == false` on any tier-1 release (CPI/NFP/FOMC).
 - p95 latency > SLO for 3 consecutive jobs during release window.
 - Cost rate > budget per hour.
 
-**Ticket/Slack (warn)**
 - factuality_score ∈ [0.9, 0.95).
 - extraction_accuracy ∈ [0.8, 0.9).
 - No data fetched by T+3 minutes of scheduled time.
 
-**Silencing rules**
 - Silence alerts for a release if the data vendor status page marks outage.
 
 ---
 
 ## 7) Dashboards (Grafana spec)
 
-**Panels**
 1. **Release Day Health**: bar for guard_pass rate by release_type.
 2. **Latency**: p50/p95 line for `llm_latency_seconds` (by model).
 3. **Cost & Tokens**: stacked area for cost & tokens over time.
@@ -190,7 +187,6 @@ quality_index = 0.5*factuality_score + 0.3*extraction_accuracy + 0.2*(1 - normal
 5. **Failures**: table of last 20 guard fails with reasons and payload links.
 6. **Calibration**: reliability diagram (post-event).
 
-**Useful PromQL**
 ```promql
 sum(rate(llm_cost_usd_total[1h])) by (release_type)
 histogram_quantile(0.95, sum(rate(llm_latency_seconds_bucket[5m])) by (le, release_type))
@@ -202,6 +198,7 @@ avg(llm_factuality_score) by (release_type)
 ## 8) Storage schemas
 
 ### 8.1 Postgres tables
+
 ```sql
 CREATE TABLE macro_release (
   id TEXT PRIMARY KEY,
@@ -237,6 +234,7 @@ CREATE TABLE llm_guard (
 ```
 
 ### 8.2 Object store (S3)
+
 - `s3://macro/ingest/{release_type}/{period}/canonical.json`
 - `s3://macro/llm/{release_type}/{period}/{job_id}.json`
 - `s3://macro/guard/{release_type}/{period}/{job_id}.json`
@@ -313,6 +311,7 @@ def guard(job, canonical):
 ## 12) Runbook (on-call)
 
 **1. Release failure (guard_pass=false on CPI/NFP)**  
+
 - Check `macro-ingestor` logs for fetch errors.  
 - Compare `canonical.json` vs `extracted` in last `llm_job`.  
 - If mismatch due to vendor lag: rerun job with latest payload.  
@@ -320,16 +319,19 @@ def guard(job, canonical):
 - Acknowledge PagerDuty; attach root cause in ticket.
 
 **2. Latency SLO breach**  
+
 - Inspect model queue depth; scale `macro-llm` replicas.  
 - Switch to a **faster model** for surge window (feature flag).  
 - Enable **summary-lite** template (shorter tokens).
 
 **3. Cost surge**  
+
 - Verify no runaway retries.  
 - Enforce token caps; enable compression of context.  
 - Throttle low-priority releases via rate limiter.
 
 **4. Data vendor outage**  
+
 - Mark release as `degraded=true`, silence alerts, post status in Slack.  
 - Backfill when vendor recovers; re-enable guards.
 
@@ -352,14 +354,3 @@ def guard(job, canonical):
 - Human-in-the-loop review for tier-1 releases.
 
 ---
-
-## 15) Appendix — Example OpenMetrics exposition
-
-```
-# HELP llm_quality_index Aggregate quality score
-# TYPE llm_quality_index gauge
-llm_quality_index{release_type="CPI"} 0.98
-llm_latency_seconds_sum{release_type="CPI"} 47.1
-llm_latency_seconds_count{release_type="CPI"} 10
-llm_cost_usd_total{release_type="CPI"} 0.21
-```

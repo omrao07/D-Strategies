@@ -2,7 +2,7 @@
 // Simple request logger (no imports)
 
 export function logger() {
-  return (req, res, next) => {
+  return (req: { method: any; url: any; }, res: { end: (...args: any[]) => any; }, next: () => void) => {
     const start = Date.now();
 
     // Patch res.end to log when response finishes
@@ -13,7 +13,7 @@ export function logger() {
         console.log(
           `[${new Date().toISOString()}] ${req.method} ${req.url} (${ms}ms)`
         );
-      } catch {}
+      } catch { }
       return originalEnd.apply(res, args);
     };
 

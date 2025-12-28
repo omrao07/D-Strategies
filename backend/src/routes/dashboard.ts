@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
-import { getCommodityQuotes } from '../services/apinijas';
+import { getCommodityQuotes } from '../services/apiNinjas';
 
 const r = Router();
 
 // defaults; change to what you actually want
-const DEFAULT_SYMBOLS = ['CL','NG','GC','SI','HG','ZC','ZW']; // WTI, Gas, Gold, Silver, Copper, Corn, Wheat
+const DEFAULT_SYMBOLS = ['CL', 'NG', 'GC', 'SI', 'HG', 'ZC', 'ZW']; // WTI, Gas, Gold, Silver, Copper, Corn, Wheat
 
-function bool01(v: any, def: 0|1) { return String(v ?? def) === '1' ? 1 : 0; }
+function bool01(v: any, def: 0 | 1) { return String(v ?? def) === '1' ? 1 : 0; }
 function clamp(n: number, mi: number, ma: number) { return Math.max(mi, Math.min(ma, n)); }
 
 function buildGeeUrl(q: any): string {
@@ -15,17 +15,17 @@ function buildGeeUrl(q: any): string {
 
   const lat = clamp(Number(q.lat ?? 29.37), -90, 90);
   const lon = clamp(Number(q.lon ?? 48.03), -180, 180);
-  const km  = clamp(Number(q.km  ?? 40), 1, 5000);
-  const date = String(q.date ?? new Date(Date.now() - 86400000).toISOString().slice(0,10));
+  const km = clamp(Number(q.km ?? 40), 1, 5000);
+  const date = String(q.date ?? new Date(Date.now() - 86400000).toISOString().slice(0, 10));
 
   const params = new URLSearchParams({
     lat: String(lat), lon: String(lon), km: String(km), date,
-    ndvi: String(bool01(q.ndvi,1)),
-    rain: String(bool01(q.rain,1)),
-    era:  String(bool01(q.era,1)),
-    fires:String(bool01(q.fires,1)),
-    sar:  String(bool01(q.sar,1)),
-    crop: String(bool01(q.crop,0)),
+    ndvi: String(bool01(q.ndvi, 1)),
+    rain: String(bool01(q.rain, 1)),
+    era: String(bool01(q.era, 1)),
+    fires: String(bool01(q.fires, 1)),
+    sar: String(bool01(q.sar, 1)),
+    crop: String(bool01(q.crop, 0)),
   });
   return `${base}?${params.toString()}`;
 }

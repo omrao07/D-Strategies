@@ -1,15 +1,41 @@
 {
   "compilerOptions": {
+    /* ---------------- Core ---------------- */
     "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "lib": ["ES2022"],
     "outDir": "dist",
     "rootDir": "src",
+    "resolveJsonModule": true,
+
+    /* ---------------- Type Safety ---------------- */
     "strict": true,
-    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+
+    /* ---------------- Interop ---------------- */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* ---------------- Dev Experience ---------------- */
+    "sourceMap": true,
+    "removeComments": true,
+
+    /* ---------------- Path Aliases (Optional) ---------------- */
+    "baseUrl": "./src",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@controllers/*": ["controllers/*"],
+      "@services/*": ["services/*"],
+      "@routes/*": ["routes/*"],
+      "@connectors/*": ["connectors/*"],
+      "@types/*": ["types/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

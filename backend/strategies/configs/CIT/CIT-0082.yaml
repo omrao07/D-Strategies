@@ -1,6 +1,6 @@
 id: CIT-0082
 firm: Citadel
-name: US Stat-Arb: Overnight Reversal #82
+name: US Stat-Arb:Overnight Reversal #82
 description: Commodity curve relative value.
 discipline: Quant
 family: Ensemble ML

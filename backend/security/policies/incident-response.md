@@ -124,7 +124,7 @@ Incidents may include (but are not limited to):
 ## 8. Severity Levels
 
 | Level | Example | Response Time |
-|-------|---------|---------------|
+| ------- | --------- | --------------- |
 | Sev 1 | Active exploit, service down, key leak | Immediate (24/7) |
 | Sev 2 | Vulnerability in production, partial outage | < 4 hours |
 | Sev 3 | Low-impact bug, dev/test only | < 24 hours |

@@ -54,23 +54,23 @@ In-memory index built from all dataset specs; supports queries by id, vendor, ta
 | Column        | Type     | Notes                                      |
 |---------------|----------|--------------------------------------------|
 | `dt`          | date     | trading/business date                      |
-| `ts`          | timestamp| event time (UTC)                            |
-| `ticker`      | string   | internal symbol                             |
-| `currency`    | string   | ISO 4217                                    |
+| `ts`          | timestamp| event time (UTC)                           |
+| `ticker`      | string   | internal symbol                            |
+| `currency`    | string   | ISO 4217                                   |
 | `px_open`     | float64  |                                            |
 | `px_high`     | float64  |                                            |
 | `px_low`      | float64  |                                            |
-| `px_last`     | float64  | close/last                                  |
-| `px_adj`      | float64  | split/div adjusted close                    |
-| `volume`      | float64  | shares/contracts                            |
-| `vwap`        | float64  | volume-weighted average price               |
-| `ret_1d`      | float64  | simple return                               |
-| `pair`        | string   | fx pair (e.g., EURUSD)                      |
-| `tenor`       | string   | `1W/1M/3M/6M/1Y/...`                        |
-| `delta`       | float64  | option delta 10/25/50 (as percent point)    |
-| `vol`         | float64  | implied vol (0–1 or fraction)               |
-| `rr`          | float64  | risk reversal                               |
-| `bf`          | float64  | butterfly                                   |
+| `px_last`     | float64  | close/last                                 |
+| `px_adj`      | float64  | split/div adjusted close                   |
+| `volume`      | float64  | shares/contracts                           |
+| `vwap`        | float64  | volume-weighted average price              |
+| `ret_1d`      | float64  | simple return                              |
+| `pair`        | string   | fx pair (e.g., EURUSD)                     |
+| `tenor`       | string   | `1W/1M/3M/6M/1Y/...`                       |
+| `delta`       | float64  | option delta 10/25/50 (as percent point)   |
+| `vol`         | float64  | implied vol (0–1 or fraction)              |
+| `rr`          | float64  | risk reversal                              |
+| `bf`          | float64  | butterfly                                  |
 
 > Full canonical list and aliases live in **`meta/fields/types.yaml`**.
 

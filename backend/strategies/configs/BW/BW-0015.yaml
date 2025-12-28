@@ -1,6 +1,6 @@
 id: BW-0015
 firm: Bridgewater
-name: Auction Cycle: UST 10Y
+name: Auction Cycle:UST 10Y
 description: Pre/post auction drift alpha.
 discipline: Macro
 family: Rates & Basis

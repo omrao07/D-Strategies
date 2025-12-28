@@ -55,12 +55,12 @@
 ## 3) Schedules & SLAs
 
 | Dataset                | Window (UTC)     | SLA (freshness) | Late data policy                    |
-|-----------------------|------------------|------------------|-------------------------------------|
-| `blp_cds_spreads`     | T (NY close +2h) | ≤ 24h           | Re-pull T-2 if any T gaps detected  |
-| `blp_credit_indices`  | T (NY close +2h) | ≤ 24h           | Same as above                       |
-| `blp_corp_oas`        | T (NY close +2h) | ≤ 24h           | Same as above                       |
-| `blp_ratings_history` | event-driven     | N/A              | Backfill by event time range        |
-| `internal_cds_curves` | after CDS ready  | ≤ 24h           | Rebuild when base re-ingested       |
+|----------------------- |------------------|-----------------|-------------------------------------|
+| `blp_cds_spreads`      | T (NY close +2h) | ≤ 24h           | Re-pull T-2 if any T gaps detected  |
+| `blp_credit_indices`   | T (NY close +2h) | ≤ 24h           | Same as above                       |
+| `blp_corp_oas`         | T (NY close +2h) | ≤ 24h           | Same as above                       |
+| `blp_ratings_history`  | event-driven     | N/A             | Backfill by event time range        |
+| `internal_cds_curves`  | after CDS ready  | ≤ 24h           | Rebuild when base re-ingested       |
 
 Freshness thresholds align with `meta/providers.yaml → ops.alerts.freshness_min`.
 

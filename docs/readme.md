@@ -1,6 +1,7 @@
 # 🏦 Arbitrage Alpha Platform
 
 A **modular hedge-fund style trading research & execution system**, built with:
+
 - **Python back-end**: strategy engines, risk manager, portfolio allocator.
 - **React/TS front-end**: dashboards (overview, risk matrix, exec console, strategy monitor).
 - **Alt-data ingestion**: macro pipelines, satellite/energy/shipping signals, LLM macro monitor.

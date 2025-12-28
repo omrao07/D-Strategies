@@ -1,3 +1,5 @@
+import * as React from "react";
+
 // app/market/page.tsx
 // Server component: no client hooks, no external imports.
 export const dynamic = "force-dynamic";

@@ -14,6 +14,7 @@ metadata:
   name: flink-operator
   namespace: analytics
   annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/hyper-os-sa-flink
     # EKS IRSA example:
     # eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/hyper-os-sa-flink
     # GKE Workload Identity example:

@@ -2,6 +2,8 @@
 // Zero-dependency Spinner primitive: ring & dots variants, accessible, theme-aware.
 // Uses CSS variables when present (e.g., --primary / --text-muted).
 
+import { JSX } from "react";
+
 type ElementType = keyof JSX.IntrinsicElements | ((props: any) => any);
 type ReactNode = any;
 type CSSProperties = any;
@@ -40,9 +42,9 @@ function colorForTone(tone?: SpinnerProps["tone"]): string {
     case "primary": return "var(--primary, #6366f1)";
     case "success": return "var(--success, #10b981)";
     case "warning": return "var(--warning, #f59e0b)";
-    case "danger":  return "var(--danger, #ef4444)";
-    case "info":    return "var(--info, #3b82f6)";
-    default:        return "var(--text-muted, #64748b)";
+    case "danger": return "var(--danger, #ef4444)";
+    case "info": return "var(--info, #3b82f6)";
+    default: return "var(--text-muted, #64748b)";
   }
 }
 

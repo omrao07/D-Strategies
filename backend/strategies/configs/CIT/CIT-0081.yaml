@@ -1,6 +1,6 @@
 id: CIT-0081
 firm: Citadel
-name: US Stat-Arb: Mean Reversion #81
+name: US Stat-Arb:Mean Reversion #81
 description: Credit relative value model.
 discipline: Macro
 family: Rates & Basis

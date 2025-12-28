@@ -6,6 +6,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## 🎯 Purpose
+
 - Bridge strategies and broker APIs (IBKR, Zerodha, Binance, PaperBroker).
 - Translate **orders from strategies or Copilot** into safe, executable trades.
 - Optimize order placement with **algos (VWAP, TWAP, POV, Adaptive VWAP)**.
@@ -14,6 +15,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## 🧩 Capabilities
+
 - **Order Lifecycle**
   - Accepts orders from `strategy_base.py`, `copilot.md`, `dispatcher.py`.
   - Routes to OMS (`orders.py` → `broker_interface.py`).
@@ -36,6 +38,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## ⚙️ Architecture
+
 - **Agents**
   - `rl_execution_agent.py` — reinforcement-learning execution.
   - `execution_agent.py` — deterministic baseline execution logic.
@@ -54,6 +57,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## 📊 Inputs
+
 - Orders from:
   - `Strategy` subclasses (e.g., BuyTheDip, ETF NAV Arb).
   - `Copilot Agent` natural-language commands.
@@ -62,6 +66,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 - Safety/risk configs (`policy.yaml`, `risk_metrics.py`).
 
 ## 📈 Outputs
+
 - Broker acknowledgments and fills.
 - Trade history events → `ledger.py` + `TradeLogPanel.tsx`.
 - Risk metrics + attribution for dashboards.
@@ -69,6 +74,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## 🛡️ Risk & Safeguards
+
 - **SafetyManager** (`safety.py`) ensures:
   - Max notional / leverage / qty.
   - Blocklist instruments.
@@ -83,6 +89,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## 🧪 Example Flow
+
 1. Strategy emits: *“BUY AAPL 100 @ MKT”*.
 2. Order arrives in `execution_agent.py`.
 3. Passes through `safety.py` + risk checks.
@@ -94,6 +101,7 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## 🚀 Roadmap
+
 - Add **smart slicing** using ML volatility forecasts.
 - Plug into **voice interface** for manual override.
 - Integrate **latency-aware optimizers** for HFT-like routing.
@@ -102,5 +110,6 @@ It is responsible for **routing, executing, and monitoring trades** across broke
 ---
 
 ## ✨ Why It Matters
+
 The Execution Agent is the **muscle of Bolt** — it turns strategy intent into live trades while keeping you safe.  
 It’s what makes your platform not just a research environment but a **full hedge fund OMS/EMS** that rivals Bloomberg + FlexTrade.

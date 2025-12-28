@@ -4,6 +4,7 @@
 **Last updated:** 2025-09-15
 
 This document is the human-readable contract for datasets defined in:
+
 - `catalog/lakehouse.sql` (DDL)
 - `catalog/registry.yaml` (dataset registry)
 
@@ -14,12 +15,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ## Equities
 
 ### `equities_prices`
+
 **Purpose:** OHLCV price history for listed equities (daily/intraday aggregates).  
 **Upstream:** Polygon (`equities_polygon.py`), Yahoo (UI/backup).  
 **Storage:** `s3://hyper-lakehouse/equities/prices/` (parquet) • Partition: `DATE(ts)`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Event time (UTC) of the bar close. |
 | ticker | STRING | NO | Ticker symbol, e.g., `AAPL`. |
 | source | STRING | YES | Ingest source: `polygon`, `yahoo`. |
@@ -37,12 +39,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `equities_factors`
+
 **Purpose:** Factor exposures per security and date (e.g., momentum, quality).  
 **Upstream:** Internal factor pipeline (research models).  
 **Storage:** `s3://hyper-lakehouse/equities/factors/` • Partition: `ts`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | DATE | NO | Effective date (UTC). |
 | ticker | STRING | NO | Security identifier. |
 | factor | STRING | NO | Factor name: `momentum`, `quality`, `value`, etc. |
@@ -55,12 +58,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `equities_fundamentals`
+
 **Purpose:** Point-in-time fundamentals (statements & ratios).  
 **Upstream:** SEC/Refinitiv/Polygon fundamentals; curated by `build_curated.py`.  
 **Storage:** `s3://hyper-lakehouse/equities/fundamentals/` • Partition: `ts`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | DATE | NO | Statement effective date (filing/as-of). |
 | ticker | STRING | NO | Security identifier. |
 | metric | STRING | NO | Metric/ratio key, e.g., `ROE`, `EPS`, `EV_EBITDA`. |
@@ -76,12 +80,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ## Foreign Exchange (FX)
 
 ### `fx_rates`
+
 **Purpose:** Spot/cross FX rates.  
 **Upstream:** Yahoo/Oanda via `fx_yahoo.py`.  
 **Storage:** `s3://hyper-lakehouse/fx/rates/` • Partition: `DATE(ts)`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Quote time (UTC). |
 | base | STRING | NO | Base currency ISO, e.g., `USD`. |
 | quote | STRING | NO | Quote currency ISO, e.g., `JPY`. |
@@ -95,12 +100,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `fx_vol_surface`
+
 **Purpose:** Implied vol surface snapshots for FX options.  
 **Upstream:** Bloomberg/Reuters adapters.  
 **Storage:** `s3://hyper-lakehouse/fx/vol_surface/` • Partition: `ts`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | DATE | NO | Surface as-of date (UTC). |
 | pair | STRING | NO | FX pair, e.g., `EURUSD`. |
 | tenor | STRING | NO | Option tenor, e.g., `1M`, `3M`. |
@@ -116,12 +122,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ## Macro
 
 ### `macro_series`
+
 **Purpose:** Macro time series (FRED, World Bank, IMF).  
 **Upstream:** `macro_feed.py` (FRED & World Bank).  
 **Storage:** `s3://hyper-lakehouse/macro/series/` • Partition: `ts`, `source`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | DATE | NO | Observation date (UTC). |
 | source | STRING | NO | `FRED`, `WorldBank`, `IMF`. |
 | series_id | STRING | NO | Series code, e.g., `CPIAUCSL`, `NY.GDP.MKTP.CD`. |
@@ -137,18 +144,19 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ## News
 
 ### `news_feed`
+
 **Purpose:** News headlines & bodies with NLP sentiment and tags.  
 **Upstream:** `news_bridge.py` (Bloomberg, Reuters, RSS).  
 **Storage:** `s3://hyper-lakehouse/news/feed/` • Partition: `DATE(ts)`, `source`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Publish time (UTC). |
 | source | STRING | NO | `bloomberg`, `reuters`, `rss`. |
 | headline | STRING | YES | Headline text. |
 | body | STRING | YES | Body text (may be truncated by feed terms). |
 | sentiment | DOUBLE | YES | Model score [-1, +1] or [0,1] (documented in model card). |
-| tags | ARRAY<STRING> | YES | Extracted entities/topics. |
+| tags | ARRAY< STRING > | YES | Extracted entities/topics. |
 | ingest_ts | TIMESTAMP | YES | Ingestion time. |
 
 **Freshness:** realtime.  
@@ -159,12 +167,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ## Portfolio & Trading
 
 ### `portfolio_positions`
+
 **Purpose:** Positions snapshot per account and ticker.  
 **Upstream:** Execution engine / broker adapters.  
 **Storage:** `s3://hyper-lakehouse/portfolio/positions/` • Partition: `DATE(ts)`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Snapshot time (UTC). |
 | account_id | STRING | YES | Internal account identifier. |
 | ticker | STRING | YES | Security symbol. |
@@ -179,12 +188,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `portfolio_pnl`
+
 **Purpose:** Realized/unrealized P&L metrics.  
 **Upstream:** Risk/PnL attribution jobs.  
 **Storage:** `s3://hyper-lakehouse/portfolio/pnl/` • Partition: `DATE(ts)`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Measurement time. |
 | account_id | STRING | YES | Account id. |
 | realized | DOUBLE | YES | Realized PnL. |
@@ -199,12 +209,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `portfolio_orders`
+
 **Purpose:** Order lifecycle history.  
 **Upstream:** OMS/EMS events.  
 **Storage:** `s3://hyper-lakehouse/portfolio/orders/` • Partition: `DATE(ts)`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Event time (UTC). |
 | order_id | STRING | YES | Unique order id. |
 | account_id | STRING | YES | Account id. |
@@ -223,12 +234,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ## Risk & Policy
 
 ### `risk_scenarios`
+
 **Purpose:** Scenario shocks and PnL impacts.  
 **Upstream:** Risk engine / scenario runner.  
 **Storage:** `s3://hyper-lakehouse/risk/scenarios/`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Run time (UTC). |
 | scenario_id | STRING | YES | Scenario name/id. |
 | description | STRING | YES | Human description. |
@@ -242,12 +254,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `risk_var`
+
 **Purpose:** Portfolio Value-at-Risk metrics.  
 **Upstream:** Risk engine.  
 **Storage:** `s3://hyper-lakehouse/risk/var/`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | As-of time. |
 | portfolio_id | STRING | YES | Portfolio id. |
 | var_95 | DOUBLE | YES | 95% VaR. |
@@ -261,12 +274,13 @@ Each dataset lists: columns (name • type • nullability), semantics, partitio
 ---
 
 ### `policy_audit`
+
 **Purpose:** Compliance & security audit trail.  
 **Upstream:** Policy engine / guards.  
 **Storage:** `s3://hyper-lakehouse/policy/audit/`.
 
 | Column | Type | Null | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | ts | TIMESTAMP | NO | Event time. |
 | user_id | STRING | YES | Actor id (user/service). |
 | action | STRING | YES | Action verb, e.g., `LIMIT_UPDATE`. |

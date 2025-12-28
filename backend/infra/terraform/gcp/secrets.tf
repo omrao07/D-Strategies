@@ -1,12 +1,24 @@
 ############################################
 # Variables
 ############################################
-variable "name"            { type = string  default = "hyper-os" }
-variable "region"          { type = string  default = "us-east-1" }
+variable "name" {
+  type    = string
+  default = "hyper-os"
+}
+variable "region" {
+  type    = string
+  default = "us-east-1"
+}
 
 # Toggle/choose KMS for customer-managed encryption
-variable "use_kms"         { type = bool    default = true }
-variable "kms_key_arn"     { type = string  default = null }  # if null and use_kms=true, create a key
+variable "use_kms" {
+  type    = bool
+  default = true
+}
+variable "kms_key_arn" {
+  type    = string
+  default = null  # if null and use_kms=true, create a key
+}
 
 # Principals allowed to read secrets (ARNS of IAM roles, e.g., IRSA roles from iam_policies.tf)
 variable "reader_role_arns" {
@@ -15,7 +27,10 @@ variable "reader_role_arns" {
 }
 
 # Optional rotation lambda ARN (if you already have a rotation function)
-variable "rotation_lambda_arn" { type = string default = null }
+variable "rotation_lambda_arn" {
+  type    = string
+  default = null
+}
 
 ############################################
 # KMS (optional)
@@ -27,11 +42,19 @@ resource "aws_kms_key" "secrets" {
   enable_key_rotation     = true
   tags = { Project = var.name, Role = "secrets-kms" }
 }
+
+# Remove or properly configure the google provider block if using GCP resources.
+# provider "google" {
+#   project = "<YOUR_GCP_PROJECT_ID>"
+#   region  = "<YOUR_GCP_REGION>"
+# }
+
 locals {
-  secrets_kms_arn = var.use_kms
-    ? (var.kms_key_arn != null ? var.kms_key_arn : aws_kms_key.secrets[0].arn)
-    : null
+  secrets_kms_arn = var.use_kms ? (var.kms_key_arn != null ? var.kms_key_arn : aws_kms_key.secrets[0].arn) : null
 }
+
+
+
 
 ############################################
 # Secrets (add more as needed)
@@ -87,10 +110,13 @@ resource "aws_secretsmanager_secret_version" "exec_broker_v" {
 data "aws_iam_policy_document" "secrets_resource" {
   # Deny cross-account by default; allow specific roles below
   statement {
-    sid     = "DenyRootAccountWideRead"
-    effect  = "Deny"
-    principals { type = "*", identifiers = ["*"] }
-    actions = ["secretsmanager:GetSecretValue","secretsmanager:DescribeSecret"]
+    sid    = "DenyRootAccountWideRead"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
     resources = ["*"]
     condition {
       test     = "StringNotEquals"

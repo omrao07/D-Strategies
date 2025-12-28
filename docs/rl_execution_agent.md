@@ -9,13 +9,11 @@
 
 **Problem.** We want an agent that breaks parent orders into child orders (slice size, price, timing, and routing) to minimize **implementation shortfall (IS)** vs a benchmark (arrival, VWAP, or AC trajectory) while respecting **risk, impact, and compliance** constraints.
 
-**Goals**
 - Reduce IS vs. baselines (TWAP/VWAP/Almgren–Chriss) by 5–20% depending on regime/liquidity.
 - Keep tail risk controlled: p95/p99 IS and **CVaR** within budget.
 - Respect hard limits: participation caps, price bands, notional/inventory, venue restrictions.
 - Robust to regime shifts; degrade gracefully to rule-based policies.
 
-**Out of scope (v1)**
 - Smart order routing across fragmented lit/dark venues with complex microstructure alpha.
 - Position-taking or alpha generation; execution only, flat end-of-horizon inventory target.
 
@@ -26,6 +24,7 @@
 Let a parent order \(Q\) shares be executed over horizon \(T\) with discrete decision times \(t=0,\dots,N-1\).
 
 ### 2.1 State \(s_t\)
+
 Feature vector with stable scaling (z-score/robust). Suggested groups:
 
 - **Market microstructure**
@@ -44,6 +43,7 @@ Feature vector with stable scaling (z-score/robust). Suggested groups:
 > Normalize/clip features to bounded ranges to stabilize training. Persist feature schema in a **Feature Store**.
 
 ### 2.2 Action \(a_t\)
+
 Combination of **size, price, timing, and type**. Two representations:
 
 - **Discrete param head** (safe default):
@@ -56,6 +56,7 @@ Combination of **size, price, timing, and type**. Two representations:
 **Routing**: optional categorical over venues; v1 can keep fixed venue priority.
 
 ### 2.3 Reward \(r_t\)
+
 We minimize IS and penalize risk/impact/violations.
 
 \[
@@ -70,6 +71,7 @@ r_t = -\Delta \text{IS}_t - \lambda_{risk}\,x_t^2\,\sigma_t\,\Delta t - \lambda_
 Terminal bonus: \(r_N = -\text{IS}_{total} - \alpha \cdot \text{slippage\_variance}\).
 
 ### 2.4 Transition
+
 Event-driven environment using **historical L2/L3 replays** or a **simulator** (below).
 
 ---
@@ -92,6 +94,7 @@ Two backends:
 **Fill model** (simplified): FIFO at each price; queued volume ahead + arrivals; probability of fill within `wait` horizon.
 
 **Config** ties to earlier work:
+
 - Use `market_impact_almgren.ipynb` parameters (\(\eta,\gamma,\sigma\)).
 - Regime sampling from **GNN clusters** (to vary liquidity/vol).
 
@@ -108,6 +111,7 @@ Start with **safe, sample-efficient** approaches:
 - **Policy constraints** via **Action Masking** (see §6).
 
 Optional:
+
 - **BCQ/IQL** if dataset is purely offline and diverse.
 - **PPO** with KL clamps if moving to continuous actions later.
 
@@ -115,14 +119,12 @@ Optional:
 
 ## 5) Training Pipeline
 
-```
 raw logs ─► ETL ─► feature store ─► (BC pretrain) ─► offline RL (CQL) ─►
 shadow online (read-only decisions) ─► A/B canary ─► full prod
-```
 
 - **Replay Buffer**: prioritized by TD error; separate buffer for rare regimes (thin markets).
 - **Curriculum**: start with small orders and liquid names; expand to harder scenarios.
-- **Hyperparams (starting)**: 
+- **Hyperparams (starting)**:
   - Dueling DDQN: lr=2e-4, γ=0.995, target_sync=2s, batch=256, replay=200k, ε: 0.1→0.01.
   - CQL α=1.0, temperature=1.0; L2 weight 1e-4.
 - **Normalization**: online feature normalizer with exponential decay; locked per regime bucket.
@@ -132,20 +134,20 @@ shadow online (read-only decisions) ─► A/B canary ─► full prod
 ## 6) Safety & Compliance
 
 **Hard action masks** at inference:
+
 - Max participation (e.g., 10% rolling window).  
 - Price band: limit orders within ±b ticks of reference.  
 - Child size ≤ q_max, cancel rate throttle.  
 - Kill-switch if latency/venue down or if remaining x_t breaches schedule drift.
 
-**Fallbacks**
 - Degrade to **Almgren–Chriss** schedule (our existing implementation) or TWAP.
 - Freeze to passive posting only in extreme volatility or news flags.
 
 **Safe exploration** (if online learning enabled)
+
 - Epsilon only on **non-critical** axes (e.g., wait time), and gated by guard.  
 - Shadow mode collects counterfactuals; A/B canary <10% flow.
 
-**Auditability**
 - Deterministic seeding, full action trace, features snapshot, policy hash per decision.  
 - Write payloads to `STREAM_RESEARCH` and store parquet logs for replay.
 
@@ -162,20 +164,17 @@ shadow online (read-only decisions) ─► A/B canary ─► full prod
 
 ## 8) Metrics & SLOs
 
-**Per-order metrics**
 - IS vs arrival / VWAP / AC benchmark (mean, p50/p95/p99).  
 - Fill rate, time-to-fill, partials, cancels per child, venue hit rates.  
 - Tail risk: **CVaR@95** of per-order IS.  
 - Impact proxies: post-trade drift, footprint.
 
-**Prometheus (suggested)**
 - `exec_is_bps{policy}` (histogram)  
 - `exec_tail_cvar_bps{policy}` (gauge)  
 - `exec_child_rate{type}` (counter)  
 - `exec_violations_total{kind}` (counter)  
 - `exec_decision_latency_ms` (histogram)
 
-**SLOs**
 - p95 decision latency < 50ms.  
 - Violations per 1k decisions < 1.  
 - p95 IS not worse than AC baseline by more than 2 bps during canary.
@@ -185,12 +184,11 @@ shadow online (read-only decisions) ─► A/B canary ─► full prod
 ## 9) Interfaces & Deployment
 
 ### 9.1 Request/Response over Redis Streams
+
 - **Inbound**: `STREAM_ORDERS` (parent order envelope).  
 - **Outbound**: `STREAM_FILLS` (child orders placed / fills), `STREAM_RESEARCH` (traces).  
 - **UI Pub/Sub**: `CHAN_ANALYST` for overlays and diagnostics.
 
-**Parent order payload (example)**
-```json
 {
   "order_id": "ABC-123",
   "symbol": "AAPL",
@@ -201,20 +199,20 @@ shadow online (read-only decisions) ─► A/B canary ─► full prod
   "end_ts": 1693568400,
   "constraints": {"participation": 0.1, "price_band_bps": 5, "child_max": 15000}
 }
-```
 
-**Child order command**
 ```json
 {"parent_id":"ABC-123","type":"limit","qty":8000,"px":187.48,"ttl_ms":3000,"venue":"XNAS"}
 ```
 
 ### 9.2 Services
+
 - `exec-agent` (policy server, gRPC/WS/Redis).  
 - `execution-simulator` (training + OPE).  
 - `policy-trainer` (offline/online).  
 - `risk-guard` (masks + kill-switch).
 
 ### 9.3 Config (YAML sketch)
+
 ```yaml
 policy:
   type: "dueling_ddqn"
@@ -278,7 +276,6 @@ Stat tests: paired t-test or Wilcoxon on per-order IS; plot uplift distribution.
 - Dashboards: IS distributions, tail metrics, violation counts, decision latency, policy version.  
 - Alerts (PagerDuty): violation spike, decision latency p95 > SLO, IS degradation vs baseline > 3 bps sustained.
 
-**Incident steps**
 1. Flip **feature flag** to fallback (AC or TWAP).  
 2. Quarantine policy version; roll back to last green.  
 3. Inspect traces (features, action, Q-values, mask).  

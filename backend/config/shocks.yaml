@@ -28,9 +28,9 @@ equity_factors:
     NIFTY: [-0.04, -0.07, -0.12, +0.04]
   sectors:
     TECH:  [-0.05, -0.10, -0.18, +0.05]
-    ENERGY:[-0.03, -0.06, -0.12, +0.04]
+    ENERGY: [-0.03, -0.06, -0.12, +0.04]
     FIN:   [-0.04, -0.08, -0.15, +0.03]
-    HEALTH:[-0.03, -0.06, -0.10, +0.03]
+    HEALTH: [-0.03, -0.06, -0.10, +0.03]
 
 rates:
   parallel_bp: [ +50, +100, +200, -50, -100 ]
@@ -60,7 +60,7 @@ commodities_rets:
   WTI:   [ +0.10, +0.25, -0.10 ]
   BRENT: [ +0.10, +0.25, -0.10 ]
   GOLD:  [ +0.05, -0.05 ]
-  COPPER:[ -0.05, -0.12, +0.05 ]
+  COPPER: [ -0.05, -0.12, +0.05 ]
 
 crypto_rets:
   BTC: [ -0.10, -0.20, -0.30, +0.10 ]
@@ -174,7 +174,7 @@ propagation:
       NIFTY: ["IN_EQUITIES"]
     sectors:
       TECH:  ["AAPL","MSFT","NVDA","INFY.NS","TCS.NS"]
-      ENERGY:["XOM","CVX","ONGC.NS","RELIANCE.NS"]
+      ENERGY: ["XOM","CVX","ONGC.NS","RELIANCE.NS"]
 
 # === Engine hints (optional knobs your code can read) ========================
 

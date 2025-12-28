@@ -6,6 +6,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 1. Introduction (1 min)
+
 - “This is my hedge fund simulation and trading platform.”  
 - Built to replicate the **end-to-end infrastructure of a global fund**:  
   - **Data ingestion** (market, news, alt-data)  
@@ -17,6 +18,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 2. Data & News Ingestion (1 min)
+
 - Show **live data feeds**: Yahoo Finance + Moneycontrol (for India).  
 - “Here you can see real-time market ticks flowing into Redis streams.”  
 - Show **news ingestion**: RSS parsing with sentiment analysis.  
@@ -25,6 +27,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 3. Strategy Layer (2 min)
+
 - Open `strategy_base.py` → highlight one **example strategy** (EMA crossover / Buy-the-dip).  
 - Then show **Strategy Builder UI** (`strategy-builder.tsx`):
   - Build rule: *IF RSI < 30 AND Sentiment > 0 → BUY*.  
@@ -34,6 +37,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 4. Execution Layer (1.5 min)
+
 - Show order flow:  
   - **Strategy → Risk Manager → OMS → Broker Adapter → Fill → PnL**.  
 - Demo:
@@ -46,6 +50,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 5. Risk Management (2 min)
+
 - Open **Risk Dashboard**:  
   - VaR, drawdown, volatility, Greeks.  
 - Switch to **Stress Sandbox** (`stress-sandbox.tsx`):
@@ -57,6 +62,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 6. Advanced Features (1.5 min)
+
 - **Dark Pool X-Ray** (`dark-pool-xray.tsx`):  
   - Show off-exchange volumes, venue shares, price improvement.  
 - **Options Dashboard**:  
@@ -67,6 +73,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 7. Dashboards & Literacy Mode (1 min)
+
 - Show **PnL Attribution** dashboard (per strategy / per region).  
 - Show **Literacy Mode**:  
   - Click “Explain risk” → AI explainer breaks down what VaR means in plain English.  
@@ -75,6 +82,7 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 ---
 
 ## 8. Closing (30s)
+
 - “This isn’t a toy bot — it’s a **full hedge fund operating system**.  
   - Live data feeds  
   - Real broker connectivity  
@@ -85,7 +93,6 @@ The goal: show **end-to-end capability** (data → signal → execution → risk
 
 ---
 
-# Tips
 - **Golden Path**: Demo exactly the sequence above → don’t click random tabs.  
 - **Keep explanations short** — focus on *visual wow*.  
 - Have a **backup demo mode** (pre-recorded PnL curve, contagion graph screenshots) in case live feed fails.  

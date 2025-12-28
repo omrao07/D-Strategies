@@ -6,6 +6,7 @@ It manages how different specialized agents (Analyst, Execution, Explainer, Quer
 ---
 
 ## 🎯 Purpose
+
 - Orchestrate **multiple agents working in parallel**.  
 - Implement **ensemble-style decision making** across strategies.  
 - Allow Bolt to mimic a **real hedge fund team** — with analysts, quants, risk managers, and traders all represented digitally.  
@@ -14,6 +15,7 @@ It manages how different specialized agents (Analyst, Execution, Explainer, Quer
 ---
 
 ## 🧩 Capabilities
+
 - **Agent Coordination**
   - Launches and supervises sub-agents (`analyst_agent.py`, `execution_agent.py`, `explainer_agent.py`, `query_agent.py`).  
   - Runs multiple strategies in parallel.  
@@ -30,6 +32,7 @@ It manages how different specialized agents (Analyst, Execution, Explainer, Quer
 ---
 
 ## ⚙️ Architecture
+
 - **Core**
   - `swarm_manager.py` — main orchestrator.  
   - `dispatcher.py` — routes jobs/tasks to agents.  
@@ -49,13 +52,16 @@ It manages how different specialized agents (Analyst, Execution, Explainer, Quer
 ---
 
 ## 📊 Inputs
+
 - Signals from all strategy agents.  
 - Market data (via adapters).  
 - User or Copilot queries.  
 - Scenarios from `scenario_generator.py`.  
 
 ## 📈 Outputs
+
 - Aggregated “Swarm Decision” JSON, e.g.:  
+
   ```json
   {
     "decision": "BUY",

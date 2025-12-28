@@ -1,8 +1,10 @@
 {
   "devDependencies": {
+    "@types/morgan": "^1.9.10",
     "@types/node": "^24.8.1",
     "@types/react": "^19.1.11",
-    "@types/ws": "^8.18.1"
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@nivo/heatmap": "^0.99.0",
@@ -12,6 +14,7 @@
     "faiss": "^1.0.0",
     "fuzz": "^0.0.3",
     "kafkajs": "^2.2.4",
+    "morgan": "^1.10.1",
     "nats": "^2.29.3",
     "open": "^10.2.0",
     "pd": "^0.8.1",
@@ -19,6 +22,7 @@
     "strategy": "^1.1.1",
     "strawberry": "^1.0.1",
     "telemetry": "^0.1.0",
+    "winston": "^3.19.0",
     "ws": "^8.18.3"
   }
 }

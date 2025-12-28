@@ -2,26 +2,56 @@
 # Variables
 ############################################
 variable "project_id"          { type = string }
-variable "region"              { type = string  default = "us-central1" }
-variable "name"                { type = string  default = "hyper-os" }
+variable "region" {
+  type    = string
+  default = "us-central1"
+}
+variable "name" {
+  type    = string
+  default = "hyper-os"
+}
 
 # Buckets from gcs_lake.tf (pass outputs/known names)
 variable "bucket_raw"          { type = string }
 variable "bucket_processed"    { type = string }
 variable "bucket_curated"      { type = string }
-variable "use_cmek"            { type = bool    default = false }
-variable "kms_key"             { type = string  default = null } # projects/.../cryptoKeys/...
-
+variable "use_cmek" {
+  type    = bool
+  default = false
+}
+variable "kms_key" {
+  type    = string
+  default = null
+}
+# projects/.../cryptoKeys/...
 # BigQuery dataset (from bigquery.tf)
-variable "bq_dataset_id"       { type = string  default = "hyper_os_analytics" }
+variable "bq_dataset_id" {
+  type    = string
+  default = "hyper_os_analytics"
+}
 
 # KSA (Kubernetes ServiceAccount) identities that need cloud perms
 # Format: namespace/name
-variable "ksa_storage_gateway" { type = string  default = "data/storage-gateway" }
-variable "ksa_clickhouse"      { type = string  default = "analytics/clickhouse" }
-variable "ksa_api_gateway"     { type = string  default = "os/api-gateway" }
-variable "ksa_streamer"        { type = string  default = "data/streamer" }         # Pub/Sub consumer/producer
-variable "ksa_bq_loader"       { type = string  default = "analytics/bq-loader" }
+variable "ksa_storage_gateway" {
+  type    = string
+  default = "data/storage-gateway"
+}
+variable "ksa_clickhouse" {
+  type    = string
+  default = "analytics/clickhouse"
+}
+variable "ksa_api_gateway" {
+  type    = string
+  default = "os/api-gateway"
+}
+variable "ksa_streamer" {
+  type    = string
+  default = "data/streamer"
+}         # Pub/Sub consumer/producer
+variable "ksa_bq_loader" {
+  type    = string
+  default = "analytics/bq-loader"
+}
 
 ############################################
 # Providers & helpers

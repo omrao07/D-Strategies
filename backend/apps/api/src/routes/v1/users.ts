@@ -1,10 +1,50 @@
 // routes/v1/users.ts
 // User CRUD routes (pure Node, no imports)
 
-const users = new Map(); // in-memory store
+/* =========================
+   Types
+   ========================= */
 
-function makeUser(email, name) {
+interface User {
+  id: string;
+  email: string;
+  name?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Request {
+  body?: unknown;
+  headers: Record<string, unknown>;
+  params: Record<string, string>;
+}
+
+interface Response {
+  writeHead(statusCode: number, headers?: Record<string, string>): void;
+  end(body?: string): void;
+}
+
+type Handler = (req: Request, res: Response) => void;
+
+interface Router {
+  get(path: string, handler: Handler): void;
+  post(path: string, handler: Handler): void;
+  delete(path: string, handler: Handler): void;
+}
+
+/* =========================
+   In-memory Store
+   ========================= */
+
+const users = new Map<string, User>();
+
+/* =========================
+   Helpers
+   ========================= */
+
+function makeUser(email: string, name?: string): User {
   const now = new Date().toISOString();
+
   return {
     id: Math.random().toString(36).slice(2, 10),
     email,
@@ -14,7 +54,11 @@ function makeUser(email, name) {
   };
 }
 
-export function v1UserRoutes(router) {
+/* =========================
+   Routes
+   ========================= */
+
+export function v1UserRoutes(router: Router): void {
   // GET /api/v1/users
   router.get("/api/v1/users", (_req, res) => {
     const payload = JSON.stringify(Array.from(users.values()));
@@ -24,55 +68,56 @@ export function v1UserRoutes(router) {
 
   // POST /api/v1/users
   router.post("/api/v1/users", (req, res) => {
-    const body = req.body || {};
-    const email = body.email;
+    const body = (req.body as Record<string, unknown>) || {};
+    const email = typeof body.email === "string" ? body.email : "";
+    const name = typeof body.name === "string" ? body.name : undefined;
 
     if (!email) {
-      const payload = JSON.stringify({ error: "email required" });
       res.writeHead(400, { "Content-Type": "application/json" });
-      return res.end(payload);
+      res.end(JSON.stringify({ error: "email required" }));
+      return;
     }
 
-    // check duplicate email without .values()
-    const allUsers = Array.from(users); // gives [ [id, user], [id, user] ... ]
-    for (let i = 0; i < allUsers.length; i++) {
-      const u = allUsers[i][1]; // index 1 is the user object
-      if (u.email === email) {
-        const payload = JSON.stringify({ error: "email exists" });
+    // Check duplicate email
+    for (const user of users.values()) {
+      if (user.email === email) {
         res.writeHead(400, { "Content-Type": "application/json" });
-        return res.end(payload);
+        res.end(JSON.stringify({ error: "email exists" }));
+        return;
       }
     }
 
-    const user = makeUser(email, body.name);
+    const user = makeUser(email, name);
     users.set(user.id, user);
 
-    const payload = JSON.stringify(user);
     res.writeHead(201, { "Content-Type": "application/json" });
-    res.end(payload);
+    res.end(JSON.stringify(user));
   });
 
   // GET /api/v1/users/:id
   router.get("/api/v1/users/:id", (req, res) => {
-    const u = users.get(req.params.id);
-    if (!u) {
-      const payload = JSON.stringify({ error: "user not found" });
+    const id = req.params.id;
+    const user = users.get(id);
+
+    if (!user) {
       res.writeHead(404, { "Content-Type": "application/json" });
-      return res.end(payload);
+      res.end(JSON.stringify({ error: "user not found" }));
+      return;
     }
 
-    const payload = JSON.stringify(u);
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(payload);
+    res.end(JSON.stringify(user));
   });
 
   // DELETE /api/v1/users/:id
   router.delete("/api/v1/users/:id", (req, res) => {
-    const ok = users.delete(req.params.id);
+    const id = req.params.id;
+    const ok = users.delete(id);
+
     if (!ok) {
-      const payload = JSON.stringify({ error: "user not found" });
       res.writeHead(404, { "Content-Type": "application/json" });
-      return res.end(payload);
+      res.end(JSON.stringify({ error: "user not found" }));
+      return;
     }
 
     res.writeHead(204);

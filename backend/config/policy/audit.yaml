@@ -64,7 +64,7 @@ spec:
           volumeMounts:
             - name: audit-logs
               mountPath: /var/log/kubernetes
-      volumes:
+          volumes:
         - name: audit-logs
           hostPath:
             path: /var/log/kubernetes

@@ -1,7 +1,7 @@
 id: GLB-0021
 firm: Global
 name: US TIPS vs Nominals Breakevens (JP)
-description: Worldwide diversified strategy in Vol/Options — region: JP.
+description:Worldwide diversified strategy in Vol/Options — region: JP.
 discipline: Quant
 family: Vol/Options
 region: JP

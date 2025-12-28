@@ -60,13 +60,13 @@ The agent learns **optimal trade scheduling, order slicing, and venue selection*
 ## 4. Monitoring Metrics
 
 | Category         | Metric                              | Threshold / Alert |
-|------------------|-------------------------------------|------------------|
-| **Slippage**     | Avg exec vs arrival price           | > 10 bps → alert |
-| **Impact**       | % of trades moving mid by > 1 tick  | > 5% → alert     |
-| **Fill rate**    | % of target size executed           | < 95% → review   |
-| **Latency**      | Decision → child order submission   | > 100ms → alert  |
-| **Drift**        | KL-div between current policy & ref | > 0.15 → retrain |
-| **Fallback rate**| % orders falling back to VWAP       | > 20% → review   |
+|------------------|-------------------------------------|------------------ |
+| **Slippage**     | Avg exec vs arrival price           | > 10 bps → alert  |
+| **Impact**       | % of trades moving mid by > 1 tick  | > 5% → alert      |
+| **Fill rate**    | % of target size executed           | < 95% → review    |
+| **Latency**      | Decision → child order submission   | > 100ms → alert   |
+| **Drift**        | KL-div between current policy & ref | > 0.15 → retrain  |
+| **Fallback rate**| % orders falling back to VWAP       | > 20% → review    |
 
 ---
 
@@ -116,5 +116,3 @@ The agent learns **optimal trade scheduling, order slicing, and venue selection*
 - **Risk Oversight**: [Name / Slack handle]  
 
 ---
-
-_Last updated: 2025-09-07_

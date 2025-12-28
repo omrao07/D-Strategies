@@ -6,6 +6,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 🔎 Purpose
+
 - Transform raw **market + alternative data** into actionable insights.
 - Act as the **bridge** between unstructured news/sentiment and structured strategies.
 - Support **both discretionary traders and autonomous strategies**.
@@ -13,6 +14,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 🧩 Capabilities
+
 - **Market Research**
   - Real-time screening of equities, FX, crypto, futures.
   - Factor analysis: momentum, value, carry, sentiment.
@@ -30,6 +32,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## ⚙️ Architecture
+
 - **Agents Layer**
   - `analyst_agent.py` — base class + pipelines.
   - `insight_agent.py` — extracts and structures insights.
@@ -46,11 +49,13 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 📊 Inputs
+
 - Market data (via adapters: IBKR, Zerodha, Binance, PaperBroker).
 - Alt-data feeds (RSS, APIs, scrapers).
 - Historical datasets (backtests, research mode).
 
 ## 📈 Outputs
+
 - Insight JSON payloads: `{symbol, factors, sentiment, rationale}`.
 - UI components:
   - `SentimentRadar.tsx`
@@ -61,6 +66,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 🛡️ Risk & Safeguards
+
 - CSRF + session validation (`sessions.py`).
 - Rate-limiting for API calls (avoid overloading providers).
 - Bias awareness: reports include **confidence scores** + caveats.
@@ -69,6 +75,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 🧪 Example Flow
+
 1. News arrives via `news_yahoo.py`.
 2. Analyst Agent parses → extracts tickers/entities.
 3. Sentiment AI scores article.
@@ -79,6 +86,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 🗂️ Demo Queries
+
 - *“What’s the impact of OPEC cuts on Reliance Industries?”*  
 - *“Explain the trade in AAPL on 2025-08-20.”*  
 - *“Show me sentiment for NIFTY50 last 24h.”*
@@ -86,6 +94,7 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## 🚀 Roadmap
+
 - Expand ESG factor integration (`esg_factor.py`).
 - Integrate multilingual news feeds (Hindi, Japanese, Chinese).
 - Add GPT-based **“Analyst Copilot”** for portfolio managers.
@@ -94,5 +103,6 @@ It functions as a Bloomberg–style analyst that continuously digests raw feeds,
 ---
 
 ## ✨ Why It Matters
+
 The Analyst Agent is what makes Bolt feel like a **Bloomberg Terminal + Hedge Fund Research Desk in one**.  
 It’s the *narrative engine* that makes your trading platform not just execute, but **explain and justify** decisions.

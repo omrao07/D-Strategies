@@ -2,26 +2,86 @@
 # Variables (set via terraform.tfvars or parent module)
 #########################################################
 
-variable "project_id"            { type = string }
-variable "region"                { type = string  default = "US" }          # BQ location (US/EU/region)
-variable "dataset_id"            { type = string  default = "hyper_os_analytics" }
-variable "dataset_friendly"      { type = string  default = "Hyper OS Analytics" }
-variable "default_table_exp_days"{ type = number  default = 0 }             # 0 = never expire
-variable "use_cmek"              { type = bool    default = false }
-variable "kms_key_id"            { type = string  default = null }          # projects/.../locations/.../keyRings/.../cryptoKeys/...
-variable "labels"                { type = map(string) default = { project = "hyper-os" } }
+variable "project_id" {
+  type = string
+}
+
+variable "region" {
+  type    = string
+  default = "US"
+}          # BQ location (US/EU/region)
+
+variable "dataset_id" {
+  type    = string
+  default = "hyper_os_analytics"
+}
+
+variable "dataset_friendly" {
+  type    = string
+  default = "Hyper OS Analytics"
+}
+
+variable "default_table_exp_days" {
+  type    = number
+  default = 0
+}             # 0 = never expire
+
+variable "use_cmek" {
+  type    = bool
+  default = false
+}
+
+variable "kms_key_id" {
+  type    = string
+  default = null
+}          # projects/.../locations/.../keyRings/.../cryptoKeys/...
+
+variable "labels" {
+  type    = map(string)
+  default = { project = "hyper-os" }
+}
 
 # Optional: principals
-variable "analyst_members"       { type = list(string) default = [] }       # e.g. ["group:analysts@yourco.com"]
-variable "engineer_members"      { type = list(string) default = [] }       # e.g. ["group:data-eng@yourco.com"]
-variable "reader_members"        { type = list(string) default = [] }
+variable "analyst_members" {
+  type    = list(string)
+  default = []
+}       # e.g. ["group:analysts@yourco.com"]
+
+variable "engineer_members" {
+  type    = list(string)
+  default = []
+}       # e.g. ["group:data-eng@yourco.com"]
+
+variable "reader_members" {
+  type    = list(string)
+  default = []
+}
 
 # Optional: GCS transfer
-variable "enable_gcs_transfer"   { type = bool   default = false }
-variable "gcs_source_bucket"     { type = string default = null }           # gs://bucket/path/…
-variable "gcs_schedule"          { type = string default = "every 24 hours" }
-variable "gcs_file_pattern"      { type = string default = "*.parquet" }    # or *.csv
-variable "transfer_display_name" { type = string default = "lake-to-bq" }
+variable "enable_gcs_transfer" {
+  type    = bool
+  default = false
+}
+
+variable "gcs_source_bucket" {
+  type    = string
+  default = null
+}           # gs://bucket/path/…
+
+variable "gcs_schedule" {
+  type    = string
+  default = "every 24 hours"
+}
+
+variable "gcs_file_pattern" {
+  type    = string
+  default = "*.parquet"
+}    # or *.csv
+
+variable "transfer_display_name" {
+  type    = string
+  default = "lake-to-bq"
+}
 
 #########################################################
 # Dataset (CMEK optional)
@@ -54,8 +114,7 @@ resource "google_bigquery_table" "market_bars_1m" {
   table_id  = "market_bars_1m"
 
   time_partitioning {
-    type                     = "DAY"
-    require_partition_filter = true
+    type = "DAY"
   }
   clustering = ["symbol"]
 
@@ -86,9 +145,8 @@ resource "google_bigquery_table" "news_index" {
   table_id   = "news_index"
 
   time_partitioning {
-    type                     = "DAY"
-    field                    = "published_date" # partition by column
-    require_partition_filter = true
+    type  = "DAY"
+    field = "published_date"
   }
   clustering = ["ticker", "topic"]
 
@@ -121,9 +179,8 @@ resource "google_bigquery_table" "strategy_pnl_daily" {
   table_id   = "strategy_pnl_daily"
 
   time_partitioning {
-    type                     = "DAY"
-    field                    = "date"
-    require_partition_filter = true
+    type  = "DAY"
+    field = "date"
   }
   clustering = ["strategy_id"]
 
@@ -156,20 +213,17 @@ resource "google_bigquery_row_access_policy" "pnl_rls" {
   project    = var.project_id
   dataset_id = google_bigquery_dataset.dataset.dataset_id
   table_id   = google_bigquery_table.strategy_pnl_daily.table_id
-  row_access_policy_id = "strategy_scope"
+  policy_id  = "strategy_scope"
 
   # Simple expression: assumes a session parameter @allowed_ids (array<string>)
   # You can also tie this to a mapping table and use an authorized view instead.
-  predicate_expression = "strategy_id IN UNNEST(@allowed_ids)"
+  filter_predicate = "strategy_id IN UNNEST(@allowed_ids)"
 
   depends_on = [google_bigquery_table.strategy_pnl_daily]
 }
-
 #########################################################
-# Authorized View (exposes only selected columns/rows)
+# Views — example aggregated view on news_index
 #########################################################
-
-# Create a restricted view over news_index (no body text, only aggregates)
 resource "google_bigquery_table" "vw_news_sentiment_daily" {
   project     = var.project_id
   dataset_id  = google_bigquery_dataset.dataset.dataset_id
@@ -195,8 +249,14 @@ resource "google_bigquery_table" "vw_news_sentiment_daily" {
 
 # Authorize a consumer dataset (e.g., for a downstream project) to query this view
 # (If you need cross-project access, set consumer_project_id accordingly.)
-variable "consumer_project_id" { type = string default = null }
-variable "consumer_dataset_id" { type = string default = null }
+variable "consumer_project_id" {
+  type    = string
+  default = null
+}
+variable "consumer_dataset_id" {
+  type    = string
+  default = null
+}
 
 resource "google_bigquery_dataset_access" "authorize_view" {
   count     = var.consumer_project_id != null && var.consumer_dataset_id != null ? 1 : 0
@@ -207,11 +267,6 @@ resource "google_bigquery_dataset_access" "authorize_view" {
     project_id = var.project_id
     dataset_id = google_bigquery_dataset.dataset.dataset_id
     table_id   = google_bigquery_table.vw_news_sentiment_daily.table_id
-  }
-
-  dataset {
-    project_id = var.consumer_project_id
-    dataset_id = var.consumer_dataset_id
   }
 }
 
@@ -284,7 +339,6 @@ resource "google_bigquery_data_transfer_config" "gcs_to_bq" {
   }
 
   service_account_name = google_service_account.transfer_sa[0].email
-  dataset_region       = var.region
 
   depends_on = [google_bigquery_table.market_bars_1m]
 }

@@ -1,6 +1,6 @@
 id: CIT-0001
 firm: Citadel
-name: US Stat-Arb: Mean Reversion #1
+name: US Stat-Arb:Mean Reversion #1
 description: Concrete stat-arb microstructure model.
 discipline: Macro
 family: Cross-Asset

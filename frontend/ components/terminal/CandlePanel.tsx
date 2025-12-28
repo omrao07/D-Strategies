@@ -321,23 +321,9 @@ function OHLCtooltip({ active, payload, label, currency = "" }: any) {
 }
 type ScaleFn = (v: any) => number;
 
-function getScale(axis: any): ScaleFn | null {
-  if (!axis) return null;
-
-  // Common patterns across chart libs
-  const raw =
-    (axis as any).scale ??
-    (axis as any).props?.scale ??
-    (typeof (axis as any).getScale === "function" ? (axis as any).getScale() : undefined);
-
-  // If it's a function (d3-scale, recharts internal), use it
-  if (typeof raw === "function") return raw as ScaleFn;
-
-  // Some libs keep the function under `.scale()` (method returning a fn)
-  if (typeof (axis as any).scale === "function") {
-    const maybe = (axis as any).scale();
-    if (typeof maybe === "function") return maybe as ScaleFn;
-  }
-
-  return null;
+function getScale(axis: any) {
+  // Defensive: recharts axis may be undefined or missing scale
+  if (axis && typeof axis.scale === 'function') return axis.scale;
+  if (axis && axis.scale) return axis.scale;
+  return () => 0; // fallback
 }

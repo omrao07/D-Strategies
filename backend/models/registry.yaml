@@ -1,0 +1,68 @@
+version: "1.0"
+
+metadata:
+  name: model-registry
+  owner: quant-platform
+  description: Central registry for trading, risk, and analytics models
+  created_at: 2025-01-01
+
+defaults:
+  runtime: python
+  framework: numpy
+  status: active
+
+models:
+
+  - id: alpha_carry_trade
+    name: FX Carry Trade Alpha
+    type: alpha
+    asset_class: fx
+    region: global
+    runtime: python
+    entrypoint: alpha/carry_trade.py
+    parameters:
+      lookback_days: 252
+      rebalance_days: 5
+      min_rate_diff: 0.02
+    risk:
+      max_leverage: 3
+      stop_loss_pct: 2
+    status: active
+
+  - id: equity_mean_reversion
+    name: Equity Mean Reversion
+    type: alpha
+    asset_class: equity
+    region: us
+    runtime: python
+    entrypoint: alpha/mean_reversion.py
+    parameters:
+      lookback_days: 60
+      zscore_entry: 2
+      zscore_exit: 0.5
+    risk:
+      max_position_pct: 5
+    status: active
+
+  - id: portfolio_var
+    name: Portfolio VaR Model
+    type: risk
+    asset_class: multi
+    region: global
+    runtime: typescript
+    entrypoint: risk/var.ts
+    parameters:
+      confidence: 0.99
+      horizon_days: 1
+    status: active
+
+  - id: pnl_attribution
+    name: PnL Attribution
+    type: analytics
+    asset_class: multi
+    region: global
+    runtime: typescript
+    entrypoint: analytics/pnl.ts
+    parameters:
+      method: factor
+    status: active

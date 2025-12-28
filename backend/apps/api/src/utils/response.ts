@@ -1,7 +1,12 @@
 // utils/response.ts
 // Helpers to send JSON responses (pure Node, no imports)
 
-function send(res, status, data, headers = {}) {
+function send(
+  res: any,
+  status: number,
+  data: any,
+  headers: { [key: string]: string } = {}
+) {
   const body = data === undefined ? "" : JSON.stringify(data);
   const h = {
     "Content-Type": "application/json; charset=utf-8",
@@ -12,18 +17,18 @@ function send(res, status, data, headers = {}) {
   res.end(body);
 }
 
-export const ok = (res, data) => send(res, 200, data);
-export const created = (res, data) => send(res, 201, data);
-export const noContent = (res) => send(res, 204, "");
-export const badRequest = (res, msg = "Bad Request") =>
+export const ok = (res: any, data: any) => send(res, 200, data);
+export const created = (res: any, data: any) => send(res, 201, data);
+export const noContent = (res: any) => send(res, 204, "");
+export const badRequest = (res: any, msg = "Bad Request") =>
   send(res, 400, { error: msg });
-export const unauthorized = (res, msg = "Unauthorized") =>
+export const unauthorized = (res: any, msg = "Unauthorized") =>
   send(res, 401, { error: msg });
-export const forbidden = (res, msg = "Forbidden") =>
+export const forbidden = (res: any, msg = "Forbidden") =>
   send(res, 403, { error: msg });
-export const notFound = (res, msg = "Not Found") =>
+export const notFound = (res: any, msg = "Not Found") =>
   send(res, 404, { error: msg });
-export const error = (res, msg = "Internal Error") =>
+export const error = (res: any, msg = "Internal Error") =>
   send(res, 500, { error: msg });
 
 export { send };

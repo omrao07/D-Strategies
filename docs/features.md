@@ -125,6 +125,7 @@ It is organized by **layer**: data ingestion, simulation, agents, infrastructure
 ---
 
 ## 🔑 Notes
+
 - All features are modular: you can run **just sim**, **just swarm agents**, or wire the **whole stack**.  
 - Configs are always external (YAML/JSON) → easy to reproduce or tweak scenarios.  
 - The system is both **a trading research platform** and **a Wharton-application-worthy showcase**.

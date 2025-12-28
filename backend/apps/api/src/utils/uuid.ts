@@ -2,7 +2,7 @@
 // Lightweight UUID v4-like generator (pure Node, no imports)
 
 export function uuid() {
-  function rnd(len) {
+  function rnd(len: number) {
     let out = "";
     for (let i = 0; i < len; i++) {
       out += Math.floor(Math.random() * 16).toString(16);

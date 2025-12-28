@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Momentum Strategy Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #0e1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --good: #2ea043;
+      --warn: #d29922;
+      --bad: #f85149;
+      --accent: #58a6ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    header span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    main {
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    section h2 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .metric {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+    .bad  { color: var(--bad); }
+
+    footer {
+      padding: 16px 28px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      background: var(--panel);
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Momentum Strategy</h1>
+  <span>Report generated at <span id="ts"></span></span>
+</header>
+
+<main>
+
+  <!-- STRATEGY SUMMARY -->
+  <section>
+    <h2>Strategy Summary</h2>
+    <table>
+      <tr><th>Universe</th><td>Global Equities</td></tr>
+      <tr><th>Signal</th><td>12-1 Price Momentum</td></tr>
+      <tr><th>Lookback</th><td>252 trading days</td></tr>
+      <tr><th>Rebalance</th><td>Monthly</td></tr>
+    </table>
+  </section>
+
+  <!-- PERFORMANCE -->
+  <section>
+    <h2>Performance</h2>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Total Return</td><td class="good">+31.7%</td></tr>
+      <tr><td>Annualized Volatility</td><td>15.9%</td></tr>
+      <tr><td>Sharpe Ratio</td><td class="good">1.73</td></tr>
+      <tr><td>Max Drawdown</td><td class="bad">-12.4%</td></tr>
+    </table>
+  </section>
+
+  <!-- SIGNAL STATS -->
+  <section>
+    <h2>Signal Statistics</h2>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Trades</td><td>684</td></tr>
+      <tr><td>Hit Rate</td><td>61.8%</td></tr>
+      <tr><td>Avg Trade Return</td><td class="good">+0.46%</td></tr>
+      <tr><td>Avg Holding Period</td><td>28 days</td></tr>
+    </table>
+  </section>
+
+  <!-- RISK -->
+  <section>
+    <h2>Risk Metrics</h2>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>VaR (99%)</td><td class="bad">-$780,000</td></tr>
+      <tr><td>Expected Shortfall</td><td class="bad">-$1,050,000</td></tr>
+      <tr><td>Gross Exposure</td><td>$14,600,000</td></tr>
+      <tr><td>Net Exposure</td><td>$9,200,000</td></tr>
+    </table>
+  </section>
+
+  <!-- NOTES -->
+  <section>
+    <h2>Notes</h2>
+    <p style="font-size:13px;color:var(--muted);line-height:1.5">
+      Momentum strategy benefits from sustained market trends and regime persistence.
+      Performance deteriorates during sharp reversals and range-bound markets.
+      Risk is concentrated in market beta and cross-asset correlation spikes.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  Hyper-OS Analytics · Momentum Model
+</footer>
+
+<script>
+  document.getElementById("ts").textContent = new Date().toISOString();
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Portfolio Risk Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />    
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: var(--text);
+      background: var(--panel);
+    }
+    header {
+        padding: 20px 28px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);    
+    }    
+    header h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+    main {
+        padding: 20px 28px;
+        background: var(--panel);
+    }
+    footer {
+        padding: 16px 28px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+        background: var(--panel);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Portfolio Risk Report</h1>
+  </header>
+  <main>
+    <p>Generated on <span id="ts"></span></p>
+  </main>
+  <footer>
+    <p>Hyper-OS Analytics</p>
+  </footer>
+  <script>
+    document.getElementById("ts").textContent = new Date().toISOString();
+  </script>
+</body>
+</html> 

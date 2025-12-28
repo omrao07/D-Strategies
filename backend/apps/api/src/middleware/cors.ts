@@ -11,7 +11,7 @@ export function cors(opts?: {
   methods?: string[];
   headers?: string[];
   credentials?: boolean;
-}){
+}) {
   const o = {
     origin: opts?.origin || "*",
     methods: (opts?.methods || ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]).join(","),
@@ -19,7 +19,7 @@ export function cors(opts?: {
     credentials: !!opts?.credentials,
   };
 
-  return (req, res, next) => {
+  return (req: { method: string; }, res: { setHeader: (arg0: string, arg1: string) => void; writeHead: (arg0: number) => void; end: () => any; }, next: () => any) => {
     res.setHeader("Access-Control-Allow-Origin", o.origin);
     res.setHeader("Access-Control-Allow-Methods", o.methods);
     res.setHeader("Access-Control-Allow-Headers", o.headers);
