@@ -1,4 +1,4 @@
-from __future__ import annotations
+
 
 import io
 import os
@@ -13,6 +13,12 @@ from fastapi import FastAPI, UploadFile, File, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
 
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]  # backend/
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 # ------------------------------------------------------------------------------
 # REQUIRED INTERNAL IMPORTS (NO MAGIC)
 # ------------------------------------------------------------------------------
