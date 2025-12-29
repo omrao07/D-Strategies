@@ -25,7 +25,7 @@ if str(ROOT) not in sys.path:
 
 try:
     from orchestration.strategy_manager import Orchestrator
-    from orchestration.utils import load_yaml_or_json, ensure_dir, setup_logging
+    from orchestration.ts_utils import load_yaml_or_json, ensure_dir, setup_logging
 except Exception as e:
     raise RuntimeError(
         "Failed to import orchestration modules. "
