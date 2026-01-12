@@ -12,34 +12,42 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
 
 import sys
+from pathlib import Path
 
-# ------------------------------------------------------------------------------
-# Path setup
-# ------------------------------------------------------------------------------
-
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[1]  # backend/
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
 # ------------------------------------------------------------------------------
-# Internal imports
+# REQUIRED INTERNAL IMPORTS (NO MAGIC)
 # ------------------------------------------------------------------------------
 
 try:
     from orchestration.strategy_manager import Orchestrator
     from orchestration.ts_utils import load_yaml_or_json, ensure_dir, setup_logging
-    from orchestration.modes import RunMode
 except Exception as e:
     raise RuntimeError(
         "Failed to import orchestration modules. "
         "Ensure backend/orchestration/* is on PYTHONPATH."
     ) from e
 
+# Optional modules
+try:
+    from calibrate import Calibrator, ParamSpace, TimeSeriesCV  # type: ignore
+    HAS_CALIBRATE = True
+except Exception:
+    HAS_CALIBRATE = False
+
+try:
+    import prompts  # type: ignore
+    HAS_PROMPTS = True
+except Exception:
+    HAS_PROMPTS = False
+
 # ------------------------------------------------------------------------------
-# App & logging
+# App & Logging
 # ------------------------------------------------------------------------------
 
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.2.0"
 RUNS_DIR = Path(os.getenv("RUNS_DIR", "runs")).resolve()
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
@@ -49,7 +57,6 @@ logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.INFO),
     format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
 )
-
 logger = logging.getLogger("api")
 
 app = FastAPI(title="Damodar Orchestrator API", version=APP_VERSION)
@@ -62,25 +69,7 @@ app.add_middleware(
 )
 
 # ------------------------------------------------------------------------------
-# Global orchestrator (Phase 1)
-# ------------------------------------------------------------------------------
-
-orchestrator = Orchestrator(run_mode=RunMode.PAPER)
-START_TIME = time.time()
-
-@app.on_event("startup")
-def startup_event():
-    logger.info("Loading strategies from registry...")
-    try:
-        orchestrator.load_from_registry(limit=2)  # start small (1–2 strategies)
-        orchestrator.warmup_all()
-        logger.info(f"Loaded {len(orchestrator.handles())} strategies")
-    except Exception as e:
-        logger.exception("Failed to initialize orchestrator")
-        raise
-
-# ------------------------------------------------------------------------------
-# Schemas (existing)
+# Schemas
 # ------------------------------------------------------------------------------
 
 class InlineData(BaseModel):
@@ -107,7 +96,6 @@ class InlineData(BaseModel):
 
         return df
 
-
 class BacktestRequest(BaseModel):
     config_path: Optional[str] = None
     registry_path: Optional[str] = None
@@ -120,7 +108,6 @@ class BacktestRequest(BaseModel):
     @validator("config", "registry", pre=True)
     def empty_to_none(cls, v):
         return None if v in ("", {}, []) else v
-
 
 class BacktestResponse(BaseModel):
     run_id: str
@@ -138,8 +125,10 @@ def new_run_dir(prefix: str) -> Path:
     setup_logging(path, LOG_LEVEL)
     return path
 
-
-def resolve_data(csv_path: Optional[str], inline: Optional[InlineData]) -> pd.DataFrame:
+def resolve_data(
+    csv_path: Optional[str],
+    inline: Optional[InlineData],
+) -> pd.DataFrame:
     if inline:
         return inline.to_dataframe()
     if csv_path:
@@ -150,70 +139,12 @@ def resolve_data(csv_path: Optional[str], inline: Optional[InlineData]) -> pd.Da
     raise HTTPException(400, "No data provided")
 
 # ------------------------------------------------------------------------------
-# Phase 1 API endpoints
-# ------------------------------------------------------------------------------
-
-@app.get("/status")
-def status():
-    return {
-        "status": "ok",
-        "version": APP_VERSION,
-        "uptime_sec": int(time.time() - START_TIME),
-        "strategies_loaded": len(orchestrator.handles()),
-        "mode": orchestrator.run_mode.name,
-    }
-
-
-@app.get("/strategies")
-def list_strategies():
-    return [
-        {
-            "id": sid,
-            "name": h.spec.name,
-            "family": h.spec.family,
-            "run_mode": h.spec.run_mode,
-            "control_mode": h.spec.control_mode,
-            "health": h.state.health,
-        }
-        for sid, h in orchestrator.handles().items()
-    ]
-
-
-@app.get("/strategies/{sid}/state")
-def strategy_state(sid: str):
-    h = orchestrator.handles().get(sid)
-    if not h:
-        raise HTTPException(404, "Strategy not found")
-
-    return {
-        "id": sid,
-        "spec": h.spec.__dict__,
-        "state": h.state.__dict__,
-    }
-
-
-@app.post("/strategies/{sid}/tick")
-def tick_strategy(sid: str):
-    if sid not in orchestrator.handles():
-        raise HTTPException(404, "Strategy not found")
-
-    result = orchestrator.tick_once(sid)
-    return {"result": result}
-
-
-@app.post("/strategies/run")
-def tick_all():
-    result = orchestrator.tick_all()
-    return {"result": result}
-
-# ------------------------------------------------------------------------------
-# Existing routes (kept)
+# Routes
 # ------------------------------------------------------------------------------
 
 @app.get("/health")
 def health():
     return {"status": "ok", "version": APP_VERSION}
-
 
 @app.post("/backtest", response_model=BacktestResponse)
 def run_backtest(req: BacktestRequest):
@@ -228,7 +159,14 @@ def run_backtest(req: BacktestRequest):
     run_dir = Path(req.out_dir) if req.out_dir else new_run_dir("bt")
     df = resolve_data(req.csv_path, req.inline_data)
 
-    orch = Orchestrator(run_mode=RunMode.PAPER)
+    orch = Orchestrator(
+        config=config,
+        registry=registry,
+        out_dir=run_dir,
+        mode="backtest",
+        paper=True,
+    )
+
     result = orch.run_backtest(df)
 
     return BacktestResponse(
@@ -237,13 +175,12 @@ def run_backtest(req: BacktestRequest):
         manifest=result["manifest"],
     )
 
-
 @app.post("/echo")
 def echo(payload: Dict[str, Any]):
     return {"received": payload, "ts": time.time()}
 
 # ------------------------------------------------------------------------------
-# Entrypoint
+# Entrypoint (Render / Docker safe)
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
