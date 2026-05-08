@@ -25,6 +25,7 @@ COOLDOWN_S  = int(os.getenv("CCB_COOLDOWN_S", "60"))     # min time between trad
 MAX_POS     = int(os.getenv("CCB_MAX_POS", "1"))         # max concurrent positions per pair
 
 # Symbols (how we’ll see them in your feed & how OMS knows them)
+
 SPOT_SYMBOL = os.getenv("CCB_SPOT_SYMBOL", f"{PAIR}.SPOT").upper()
 FWD_SYMBOL  = os.getenv("CCB_FWD_SYMBOL",  f"{PAIR}.FWD{TENOR_DAYS}D").upper()
 VENUE       = os.getenv("CCB_VENUE", "OANDA").upper()    # hint for region router (FX)
@@ -33,6 +34,7 @@ VENUE       = os.getenv("CCB_VENUE", "OANDA").upper()    # hint for region route
 # Example:
 #   HSET rates:USD '1D' 0.052 '30D' 0.053
 #   HSET rates:EUR '1D' 0.036 '30D' 0.037
+
 DOM_CCY = os.getenv("CCB_DOM_CCY", "USD").upper()  # quote currency for EURUSD is USD
 FOR_CCY = os.getenv("CCB_FOR_CCY", "EUR").upper()  # base currency for EURUSD is EUR
 RATES_DOM_KEY = f"rates:{DOM_CCY}"

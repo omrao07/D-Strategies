@@ -72,36 +72,34 @@ export default function VoiceCommand() {
     }
   };
 
-return (
+  return (
     <div className="rounded-2xl shadow-md p-4 bg-white dark:bg-gray-900">
-        <header className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Voice Command</h2>
-            <button
-                onClick={toggleListening}
-                className={`px-3 py-1.5 rounded-lg text-sm ${
-                    listening ? "bg-red-500 text-white" : "bg-blue-600 text-white"
-                }`}
-            >
-                {listening ? "Stop" : "Start"}
-            </button>
-        </header>
+      <header className="mb-3 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Voice Command</h2>
+        <button
+          onClick={toggleListening}
+          className={`px-3 py-1.5 rounded-lg text-sm ${listening ? "bg-red-500 text-white" : "bg-blue-600 text-white"
+            }`}
+        >
+          {listening ? "Stop" : "Start"}
+        </button>
+      </header>
 
-        <div className="text-sm mb-2">
-            {listening ? "🎙 Listening…" : "Idle"}
+      <div className="text-sm mb-2">
+        {listening ? "🎙 Listening…" : "Idle"}
+      </div>
+
+      {transcript && (
+        <div className="mb-2 p-2 border rounded bg-gray-50 dark:bg-gray-800 text-sm">
+          Last: {transcript}
         </div>
+      )}
 
-        {transcript && (
-            <div className="mb-2 p-2 border rounded bg-gray-50 dark:bg-gray-800 text-sm">
-                Last: {transcript}
-            </div>
-        )}
-
-        <div className="h-40 overflow-auto border rounded-lg p-2 text-sm bg-gray-50 dark:bg-gray-800">
-            {log.map((l, i) => (
-                <div key={i}>{l}</div>
-            ))}
-            {log.length === 0 && <div className="opacity-60">No commands yet.</div>}
-        </div>
+      <div className="h-40 overflow-auto border rounded-lg p-2 text-sm bg-gray-50 dark:bg-gray-800">
+        {log.map((l, i) => (
+          <div key={i}>{l}</div>
+        ))}
+        {log.length === 0 && <div className="opacity-60">No commands yet.</div>}
+      </div>
     </div>
-);
-}
+  );
