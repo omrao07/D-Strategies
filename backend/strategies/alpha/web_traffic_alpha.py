@@ -5,7 +5,12 @@ import json, math, os, time
 from dataclasses import dataclass
 from typing import Dict, Optional, List
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 from backend.engine.strategy_base import Strategy
 
 """
@@ -99,7 +104,7 @@ EARN_BLACKOUT_MIN_D = float(os.getenv("WTA_EARN_BMIN","2.0"))  # skip new entrie
 BUZZ_SPIKE_HARD_Z   = float(os.getenv("WTA_BUZZ_HARD","3.5"))  # skip if social spike extreme
 
 # ============================ Redis ============================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

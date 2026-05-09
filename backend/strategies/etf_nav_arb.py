@@ -228,8 +228,8 @@ class ETFNavArb(Strategy):
         # Premium/discount in bps vs NAV
         raw_edge_bps = (etf_mid - nav) / nav * 1e4
 
-        # Approximate cost: 1 ETF leg + N basket legs (or 2 legs if using iNAV proxy trades both sides in equity)
-        legs = 1 + (len(self.basket) if not self.cfg.use_inav else len(self.basket))
+        # Approximate cost: 1 ETF leg + N basket legs
+        legs = 1 + len(self.basket)
         net_edge_bps = raw_edge_bps - self._haircut_bps(legs)
 
         # Emit signal for allocators/UI (scale 10bps → 1.0)

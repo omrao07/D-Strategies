@@ -7,10 +7,15 @@ import os
 import signal
 import sys
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 
 from backend.bus.streams import (
     consume_stream,
@@ -23,19 +28,20 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 INCOMING_ORDERS = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 
 @dataclass
 class Context:
     """
     Lightweight context passed to strategies.
-    Extend as needed (e.g., cache last prices, calendar, etc.)
     """
     name: str
     region: Optional[str] = None
     capital_base: float = 100_000.0
     default_qty: float = 1.0
+    india_compatible: bool = False
+    data_sources_required: List[str] = field(default_factory=list)
 
 
 class Strategy(abc.ABC):
@@ -64,9 +70,23 @@ class Strategy(abc.ABC):
         """
         raise NotImplementedError
 
+    def on_bar(self, bar: Dict[str, Any]) -> None:
+        """Called on each completed OHLCV bar. Override for bar-based logic."""
+        pass
+
     def on_stop(self) -> None:
         """Called once when stopping. Override as needed."""
         pass
+
+    def get_metadata(self) -> Dict[str, Any]:
+        """Return static metadata about this strategy for the registry/UI."""
+        return {
+            "name": self.ctx.name,
+            "region": self.ctx.region,
+            "india_compatible": self.ctx.india_compatible,
+            "data_sources_required": self.ctx.data_sources_required,
+            "capital_base": self.ctx.capital_base,
+        }
 
     # ---- Order API ---------------------------------------------------------
     def order(
@@ -148,8 +168,8 @@ class Strategy(abc.ABC):
                     tick = json.loads(tick)
                 self.on_tick(tick)
             except Exception as e:
-                # minimal safety log to Redis (optional)
-                r.lpush(f"strategy:errors:{self.ctx.name}", json.dumps({"ts": int(time.time()*1000), "err": str(e)}))
+                if r is not None:
+                    r.lpush(f"strategy:errors:{self.ctx.name}", json.dumps({"ts": int(time.time()*1000), "err": str(e)}))
 
 
 # ---------------- Convenience: a toy example ----------------

@@ -5,7 +5,12 @@ import json, math, os, time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple, List
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 from backend.engine.strategy_base import Strategy
 
 """
@@ -87,7 +92,7 @@ LAST_HK    = os.getenv("C2C_LAST_HK", "last_price")
 FEES_HK    = os.getenv("C2C_FEES_HK", "fees:cmd")
 
 # ============================ Redis ============================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

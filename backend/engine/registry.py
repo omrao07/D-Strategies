@@ -24,11 +24,13 @@ components across the execution stack.
 
 from __future__ import annotations
 
+import inspect
 import os
+import pkgutil
 import threading
 import importlib
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, List, Optional, Type
 
 # Optional: yaml (used only if present)
 try:
@@ -305,6 +307,50 @@ def register_router(name: str) -> Callable[[Any], Any]:
         HUB.routers.register(name, obj)
         return obj
     return _dec
+
+
+# ---------------------------------------------------------------------
+# Auto-registration: scan strategies package for all Strategy subclasses
+# ---------------------------------------------------------------------
+
+def auto_register_strategies(strategies_pkg: str = "backend.strategies") -> List[str]:
+    """
+    Walk every module in strategies_pkg (recursively), import it, find all
+    Strategy subclasses, and register them in HUB.strategies by their
+    `ctx.name` (i.e., the default name arg in __init__) or class name.
+
+    Returns list of registered names.
+    """
+    from backend.engine.strategy_base import Strategy  # local import to avoid circularity
+
+    pkg = importlib.import_module(strategies_pkg)
+    pkg_path = getattr(pkg, "__path__", [])
+    registered: List[str] = []
+
+    for finder, mod_name, is_pkg in pkgutil.walk_packages(
+        path=pkg_path, prefix=strategies_pkg + ".", onerror=lambda _: None
+    ):
+        try:
+            mod = importlib.import_module(mod_name)
+        except Exception:
+            continue
+
+        for attr_name in dir(mod):
+            obj = getattr(mod, attr_name, None)
+            if (
+                obj is None
+                or not isinstance(obj, type)
+                or not issubclass(obj, Strategy)
+                or obj is Strategy
+            ):
+                continue
+            # Derive a registry key: snake_case module leaf or class name
+            key = attr_name
+            if not HUB.strategies.maybe_get(key):
+                HUB.strategies.register(key, obj)
+                registered.append(key)
+
+    return registered
 
 
 # ---------------------------------------------------------------------

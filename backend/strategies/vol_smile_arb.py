@@ -445,10 +445,10 @@ class VolSmileArb(Strategy):
         qty_long = 1.0
         qty_short = 1.0
         if self.cfg.target_vega_neutral and v_ratio_ok and abs(v1) > 1e-6 and abs(v2) > 1e-6:
-            # choose integer-ish ratio
+            # qty_long:1 ratio neutralizes vega when long_vega * qty_long ≈ short_vega * 1
             ratio = abs(v2 / v1)
             qty_long = max(1.0, round(ratio))
-            qty_short = float(qty_long)  # 1:1 after rounding because both multiplied
+            qty_short = 1.0
         # premium cap
         gross = abs(long_p["mid"] * qty_long * self.cfg.lot_mult) + abs(short_p["mid"] * qty_short * self.cfg.lot_mult)
         scale = min(1.0, self.cfg.max_gross_premium / max(1.0, gross))

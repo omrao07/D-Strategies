@@ -5,7 +5,12 @@ import json, math, os, time, uuid
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 from backend.engine.strategy_base import Strategy
 
 """
@@ -103,7 +108,7 @@ XFER_STATUS_PFX= os.getenv("OSA_XFER_PFX", "xfer:status:")
 HALT_KEY      = os.getenv("OSA_HALT_KEY", "risk:halt")
 
 # ====================== Redis ======================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ====================== helpers ======================
 def _now_ms() -> int: return int(time.time() * 1000)

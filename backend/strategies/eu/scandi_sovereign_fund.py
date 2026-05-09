@@ -537,8 +537,10 @@ def scenario_pl(alloc: pd.DataFrame, funds_meta: pd.DataFrame, scen_df: pd.DataF
             exp = ccy_exp[ccy_exp["fund"]==f].copy()
             hr = float(funds_meta.set_index("fund").loc[f, "hedge_ratio"]) if "hedge_ratio" in funds_meta.columns else 0.0
             if hedge_override is not None:
-                try: hr = float(hedge_override)
-                except Exception: pass
+                try:
+                    hr = float(hedge_override)
+                except (TypeError, ValueError):
+                    pass  # keep default hedge ratio if override is not numeric
             fx_contrib = float(((exp["weight"] * (1-hr)).sum()) * (fx_base_pct/100.0))
         rows.append({"fund": f, "scenario": scenario, "equity_shock_pct": eq_shock, "rates_shock_bp": rt_bp, "spread_shock_bp": sp_bp,
                      "fx_base_pct": fx_base_pct, "hedge_ratio_used": float(hedge_override) if hedge_override is not None else (float(hr) if 'hr' in locals() else np.nan),

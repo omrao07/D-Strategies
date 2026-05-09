@@ -5,7 +5,12 @@ import json, math, os, time
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 from backend.engine.strategy_base import Strategy
 
 """
@@ -95,7 +100,7 @@ BASE_WEIGHTS_DOVE = {"EQUITIES": +0.20, "UST_7_10": +0.25, "UST_20Y": +0.20, "GO
 MAX_TILT_SCALE = float(os.getenv("SPI_MAX_TILT_SCALE", "1.0"))
 
 # ============================ Redis ============================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ utils ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

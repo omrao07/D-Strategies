@@ -5,7 +5,12 @@ import json, math, os, time, datetime as dt
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 from backend.engine.strategy_base import Strategy
 
 """
@@ -92,7 +97,7 @@ CLOSED_KEY_FMT  = os.getenv("MA_CLOSED_KEY_FMT", "deal:closed:{pair}")
 BROKEN_KEY_FMT  = os.getenv("MA_BROKEN_KEY_FMT", "deal:broken:{pair}")
 
 # ============================ Redis ============================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_price(sym: str) -> Optional[float]:

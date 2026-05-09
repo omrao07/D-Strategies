@@ -7,7 +7,12 @@ import time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 
 from backend.engine.strategy_base import Strategy
 
@@ -41,7 +46,7 @@ RATES_DOM_KEY = f"rates:{DOM_CCY}"
 RATES_FOR_KEY = f"rates:{FOR_CCY}"
 RATES_FIELD   = f"{TENOR_DAYS}D"
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 
 # ---------------- Helpers ----------------

@@ -147,7 +147,17 @@ def compute_pnl(
     ret_gross = (price_pnl_dollars + carry) / equity_base.replace(0, np.nan)
     ret_net = pnl_dollars / equity_base.replace(0, np.nan)
 
-    
+    df = pd.DataFrame({
+        "gross_exposure": gross,
+        "net_exposure": net,
+        "turnover": turnover,
+        "pnl_dollars": pnl_dollars,
+        "price_pnl_dollars": price_pnl_dollars,
+        "carry_pnl_dollars": carry,
+        "fees_dollars": costs,
+        "ret_gross": ret_gross,
+        "ret_net": ret_net,
+    })
 
     return df, (per_ticker_price_pnl.add(carry, axis=0).sub(costs, axis=0)) # type: ignore
 

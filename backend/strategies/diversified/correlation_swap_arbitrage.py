@@ -8,7 +8,12 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 
 from backend.engine.strategy_base import Strategy
 
@@ -85,7 +90,7 @@ EXP_CORR_KEY = f"corr:expected:{INDEX}"  # SET corr:expected:SPX <rho>
 LAST_PRICE_HKEY = os.getenv("CORR_LAST_PRICE_KEY", "last_price")
 
 # ===================== Redis =====================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ===================== Helpers =====================
 def _parse_components(env: str) -> List[Tuple[str, float]]:

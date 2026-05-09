@@ -8,7 +8,12 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-import redis
+try:
+    import redis as _redis_mod
+    _HAVE_REDIS = True
+except ImportError:
+    _redis_mod = None  # type: ignore
+    _HAVE_REDIS = False
 
 from backend.engine.strategy_base import Strategy
 
@@ -98,7 +103,7 @@ BETA_HKEY_FMT     = os.getenv("DVF_BETA_FMT",  "beta:div:{year}")          # HSE
 WGT_HKEY_FMT      = os.getenv("DVF_WGT_FMT",   "index:weight:{index}")     # HSET index:weight:SX5E <TICKER> <w>
 
 # ============================ Redis ============================
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ Helpers ============================
 def _hgetf(key: str, field: str) -> Optional[float]:
