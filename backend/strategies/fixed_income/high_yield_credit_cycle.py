@@ -132,7 +132,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"HY credit cycle | OAS: {current_oas:.0f}bp | Phase: {summary['current_phase']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"HY credit cycle | OAS: {current_oas:.0f}bp | Phase: {summary['current_phase']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

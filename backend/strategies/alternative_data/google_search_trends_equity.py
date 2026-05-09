@@ -114,7 +114,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Google Trends | Tickers: {svi_wide.shape[1]} | Buy signals: {summary['n_buy_signals']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Google Trends | Tickers: {svi_wide.shape[1]} | Buy signals: {summary['n_buy_signals']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

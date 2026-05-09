@@ -126,7 +126,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Real yields vs gold | TIPS: {summary['current_tips_10y']:.2f}% | Gold: ${summary['current_gold_usd']:.0f} | Signal: {summary['current_signal']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Real yields vs gold | TIPS: {summary['current_tips_10y']:.2f}% | Gold: ${summary['current_gold_usd']:.0f} | Signal: {summary['current_signal']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

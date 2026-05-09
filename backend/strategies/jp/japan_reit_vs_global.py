@@ -396,7 +396,7 @@ def run_scenario(D_last: pd.Series, EL: pd.DataFrame,
         # infer hedge ratio from identity: eff = h*usd + (1-h)*unhedged
         # Using last period to recover h; if not solvable, default h=0
         try:
-            h = (D_last["ret_global_jpy_eff"] - D_last.get("ret_global_jpy_unhedged", D_last.get("ret_global", 0.0)))) / (D_last.get("ret_global", 0.0) - D_last.get("ret_global_jpy_unhedged", D_last.get("ret_global", 0.0)) + 1e-12)
+            h = (D_last["ret_global_jpy_eff"] - D_last.get("ret_global_jpy_unhedged", D_last.get("ret_global", 0.0))) / (D_last.get("ret_global", 0.0) - D_last.get("ret_global_jpy_unhedged", D_last.get("ret_global", 0.0)) + 1e-12)
             h = float(np.clip(h, 0.0, 1.0))
         except Exception:
             h = 0.0

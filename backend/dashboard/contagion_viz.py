@@ -448,11 +448,11 @@ if __name__ == "__main__":
                 "B": _Bank("B","Beta",80,200,500,620),
                 "C": _Bank("C","Gamma",60,150,450,540),
             }
-            self.exposures = 
-                {"lender":"A","borrower":"B","amount":120.0,"recovery_rate":0.5}, # type: ignore
-                {"lender":"B","borrower":"C","amount":100.0,"recovery_rate":0.4}, # type: ignore
-                {"lender":"C","borrower":"A","amount":90.0, "recovery_rate":0.3}, # type: ignore
-            
+            self.exposures = [
+                {"lender":"A","borrower":"B","amount":120.0,"recovery_rate":0.5},
+                {"lender":"B","borrower":"C","amount":100.0,"recovery_rate":0.4},
+                {"lender":"C","borrower":"A","amount":90.0, "recovery_rate":0.3},
+            ]
 
     G = _G()
     fig = plot_snapshot(G, title="Contagion Snapshot (demo)")

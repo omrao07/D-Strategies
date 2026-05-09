@@ -196,7 +196,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"RL Execution | Episodes: {cfg.n_episodes} | Q-table: {len(Q)} states | Avg reward: {summary['avg_reward_last_100']:.2f if summary['avg_reward_last_100'] else 'N/A'} | Written to {cfg.outdir}")
+    print(f"RL Execution | Episodes: {cfg.n_episodes} | Q-table: {len(Q)} states | Avg reward: {f'{summary['avg_reward_last_100']:.2f}' if summary['avg_reward_last_100'] else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

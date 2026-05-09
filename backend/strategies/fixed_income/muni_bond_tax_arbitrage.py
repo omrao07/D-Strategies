@@ -130,7 +130,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Muni arb | States: {summary['n_states']} | Buy signals: {summary['n_buy']} | Avg TEY spread: {avg_spread:.1f}bp | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Muni arb | States: {summary['n_states']} | Buy signals: {summary['n_buy']} | Avg TEY spread: {avg_spread:.1f}bp | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

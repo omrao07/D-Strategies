@@ -149,7 +149,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"India RERA | Registrations YoY: {summary['latest_yoy_pct']:.1f}% | Signal: {summary['latest_signal']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"India RERA | Registrations YoY: {summary['latest_yoy_pct']:.1f}% | Signal: {summary['latest_signal']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

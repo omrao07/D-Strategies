@@ -145,7 +145,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Agri weather | ENSO: {current_enso:.2f} ({summary['current_enso_phase']}) | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Agri weather | ENSO: {current_enso:.2f} ({summary['current_enso_phase']}) | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

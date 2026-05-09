@@ -204,7 +204,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Genetic Algo | Tickers: {len(best_params_all)} | IS Sharpe: {avg_is:.2f if avg_is else 'N/A'} | OOS Sharpe: {avg_oos:.2f if avg_oos else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Genetic Algo | Tickers: {len(best_params_all)} | IS Sharpe: {f'{avg_is:.2f}' if avg_is else 'N/A'} | OOS Sharpe: {f'{avg_oos:.2f}' if avg_oos else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

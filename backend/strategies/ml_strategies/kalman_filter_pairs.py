@@ -127,7 +127,6 @@ def run(cfg):
         pos = spread_zscore.apply(
             lambda z: (1 if z < -cfg.entry_z else (-1 if z > cfg.entry_z else 0))
         ).shift(1).fillna(0)
-        hedge_ret = pos * (pair_ret_y - beta_s := pd.Series(beta, index=df.index) * pair_ret_x)
         hedge_ret = pos * (pair_ret_y - pd.Series(beta, index=df.index) * pair_ret_x)
         hedge_ret_clean = hedge_ret.dropna()
 
@@ -187,7 +186,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Kalman Pairs | Pairs: {summary['n_pairs']} | Avg half-life: {summary['avg_half_life_days']:.1f}d | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Kalman Pairs | Pairs: {summary['n_pairs']} | Avg half-life: {summary['avg_half_life_days']:.1f}d | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

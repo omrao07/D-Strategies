@@ -146,7 +146,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Fallen angels | Events: {summary['n_fallen_angels']} | Buy signals: {summary['n_buy_signals']} | Avg 6M alpha: {summary['avg_6m_alpha']:.2%} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Fallen angels | Events: {summary['n_fallen_angels']} | Buy signals: {summary['n_buy_signals']} | Avg 6M alpha: {summary['avg_6m_alpha']:.2%} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

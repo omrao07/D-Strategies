@@ -153,7 +153,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Mining difficulty | Capitulations: {len(cap_records)} | Hash ribbon signals: {summary['n_hash_ribbon_signals']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Mining difficulty | Capitulations: {len(cap_records)} | Hash ribbon signals: {summary['n_hash_ribbon_signals']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -138,7 +138,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"CTA crowding | Assets: {summary['n_assets']} | Fade long: {summary['n_fade_long']} | Fade short: {summary['n_fade_short']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"CTA crowding | Assets: {summary['n_assets']} | Fade long: {summary['n_fade_long']} | Fade short: {summary['n_fade_short']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

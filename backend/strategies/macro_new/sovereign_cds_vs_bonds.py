@@ -142,7 +142,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Sovereign CDS | Countries: {summary['n_countries']} | Crisis days: {summary['n_crisis_risk_days']} | Basis signals: {summary['n_basis_signals']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Sovereign CDS | Countries: {summary['n_countries']} | Crisis days: {summary['n_crisis_risk_days']} | Basis signals: {summary['n_basis_signals']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

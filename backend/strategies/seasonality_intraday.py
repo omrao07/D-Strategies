@@ -1,20 +1,11 @@
 # backend/strategies/seasonality_intraday.py
 from __future__ import annotations
 
-import os
 import time
-import json
-import math
 from typing import Dict, Any, Optional, List
 
-import redis
 from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
-
-# ---------- Redis Setup ----------
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 
 class SeasonalityIntraday(Strategy):
@@ -92,20 +83,21 @@ class SeasonalityIntraday(Strategy):
             self._update_seasonality(minute, ret)
         self.last_price = price
 
-        # expected seasonal return
+        # expected seasonal return for this minute of day
         exp_ret = self._expected_return(minute)
 
-        # signal: go long if return is below seasonal expectation, short if above
-        signal_score = exp_ret - (0.0 if self.last_price is None else 0.0)
+        # signal tracks the expected seasonal direction; scale to [-1, +1]
+        # exp_ret is a small fractional return, scale by 1000 so 0.1% expected → ~1.0
+        signal_score = max(-1.0, min(1.0, exp_ret * 1000.0))
         self.emit_signal(signal_score)
 
-        # execution logic: buy if price under seasonal exp, sell if above
-        if exp_ret > 0 and signal_score > 0.0001:
+        # enter in the direction predicted by the seasonality curve
+        if exp_ret > 0.0001:
             self.order(self.symbol, "buy", qty=1, order_type="market", mark_price=price,
-                       extra={"reason": "seasonality_long", "exp_ret": exp_ret})
-        elif exp_ret < 0 and signal_score < -0.0001:
+                       extra={"reason": "seasonality_long", "exp_ret": exp_ret, "minute": minute})
+        elif exp_ret < -0.0001:
             self.order(self.symbol, "sell", qty=1, order_type="market", mark_price=price,
-                       extra={"reason": "seasonality_short", "exp_ret": exp_ret})
+                       extra={"reason": "seasonality_short", "exp_ret": exp_ret, "minute": minute})
 
 
 # ---------------- Optional Runner ----------------

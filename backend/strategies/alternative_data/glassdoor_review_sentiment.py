@@ -134,7 +134,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Glassdoor sentiment | Tickers: {len(tickers)} | Avg corr: {summary['avg_corr_fwd21d']:.3f if summary['avg_corr_fwd21d'] else 'N/A'} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Glassdoor sentiment | Tickers: {len(tickers)} | Avg corr: {f'{summary['avg_corr_fwd21d']:.3f}' if summary['avg_corr_fwd21d'] else 'N/A'} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

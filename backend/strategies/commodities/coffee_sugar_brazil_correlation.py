@@ -132,7 +132,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Coffee/Sugar/BRL | BRL: {summary['current_brl']:.2f} | Arabica: ${summary['current_arabica_usd_lb']:.2f}/lb | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Coffee/Sugar/BRL | BRL: {summary['current_brl']:.2f} | Arabica: ${summary['current_arabica_usd_lb']:.2f}/lb | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

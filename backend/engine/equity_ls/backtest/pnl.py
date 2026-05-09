@@ -133,8 +133,8 @@ def compute_pnl(
     costs = _slippage_costs(trades, prices, adv_usd, fee_bps, slippage_bps, slippage_mode) # type: ignore
 
     # Summaries
-    price_pnl$ = per_ticker_price_pnl.sum(axis=1) # type: ignore
-    pnl$ = price_pnl$ + carry - costs # type: ignore
+    price_pnl_dollars = per_ticker_price_pnl.sum(axis=1)
+    pnl_dollars = price_pnl_dollars + carry - costs
 
     # Exposures & turnover
     notional = _dollar_notional(pos_lag, prices)
@@ -144,8 +144,8 @@ def compute_pnl(
 
     # Returns
     equity_base = cash_equity + gross  # rough proxy if you don’t track NAV
-    ret_gross = (price_pnl + carry) / equity_base.replace(0, np.nan) # type: ignore
-    ret_net = pnl$ / equity_base.replace(0, np.nan) # type: ignore
+    ret_gross = (price_pnl_dollars + carry) / equity_base.replace(0, np.nan)
+    ret_net = pnl_dollars / equity_base.replace(0, np.nan)
 
     
 

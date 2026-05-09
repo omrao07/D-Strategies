@@ -347,7 +347,7 @@ class HybridIndexer:
 
         dense_map = {_key(r): r for r in dense_hits}
         sparse_map = {_key(r): r for r in sparse_hits}
-        keys = list({*_key(r) for r in dense_hits} | {*_key(r) for r in sparse_hits})# type: ignore
+        keys = list(set(_key(r) for r in dense_hits) | set(_key(r) for r in sparse_hits))
 
         def _passes(r: Dict[str, Any]) -> bool:
             if not filters:
@@ -429,7 +429,7 @@ class HybridIndexer:
 
         dense_map = {_key(r): r for r in dense_hits}
         sparse_map = {_key(r): r for r in sparse_hits}
-        keys = list({*_key(r) for r in dense_hits} | {*_key(r) for r in sparse_hits})# type: ignore
+        keys = list(set(_key(r) for r in dense_hits) | set(_key(r) for r in sparse_hits))
 
         def _passes(r: Dict[str, Any]) -> bool:
             if not filters:

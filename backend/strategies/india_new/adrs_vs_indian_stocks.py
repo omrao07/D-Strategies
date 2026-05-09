@@ -161,7 +161,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"ADR Arb | Tickers: {len(summary['tickers_tracked'])} | Buy: {summary['n_buy_signals']} | Sell: {summary['n_sell_signals']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"ADR Arb | Tickers: {len(summary['tickers_tracked'])} | Buy: {summary['n_buy_signals']} | Sell: {summary['n_sell_signals']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

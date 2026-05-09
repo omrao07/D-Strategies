@@ -192,8 +192,10 @@ def compute_pair_pnl(inputs: PairInputs) -> Dict[str, pd.DataFrame | pd.Series |
     carry_total = carry_y + carry_x
 
     # Trading costs
-    notional_traded = (trd_y.abs().squeeze() * py.squeeze()).fillna(0.0) +  # type: ignore
-                      (trd_x.abs().squeeze() * px.squeeze()).fillna(0.0) # type: ignore
+    notional_traded = (
+        (trd_y.abs().squeeze() * py.squeeze()).fillna(0.0)
+        + (trd_x.abs().squeeze() * px.squeeze()).fillna(0.0)
+    )
     costs = _flat_costs(notional_traded, inputs.fee_bps, inputs.slippage_bps)
 
     # Exposures

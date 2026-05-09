@@ -134,7 +134,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"PMI regime | Countries: {summary['countries_analyzed']} | Regimes: {regime_dist} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"PMI regime | Countries: {summary['countries_analyzed']} | Regimes: {regime_dist} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

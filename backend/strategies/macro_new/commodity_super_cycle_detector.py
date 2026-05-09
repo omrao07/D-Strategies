@@ -156,7 +156,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Commodity super-cycle | Commodities: {summary['n_commodities']} | In bull: {summary['n_in_bull']} | In trough: {summary['n_in_trough']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Commodity super-cycle | Commodities: {summary['n_commodities']} | In bull: {summary['n_in_bull']} | In trough: {summary['n_in_trough']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

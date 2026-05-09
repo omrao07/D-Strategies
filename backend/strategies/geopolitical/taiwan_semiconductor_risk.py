@@ -153,7 +153,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Taiwan Semi Risk | Events: {summary['n_events']} | Military: {summary['n_military_events']} | Max tension: {summary['max_tension_score']:.1f} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Taiwan Semi Risk | Events: {summary['n_events']} | Military: {summary['n_military_events']} | Max tension: {summary['max_tension_score']:.1f} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

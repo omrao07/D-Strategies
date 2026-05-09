@@ -141,7 +141,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"CPI divergence | Regime: {summary['current_regime']} | Headline: {summary['avg_headline_yoy']:.1f}% | Core: {summary['avg_core_yoy']:.1f}% | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"CPI divergence | Regime: {summary['current_regime']} | Headline: {summary['avg_headline_yoy']:.1f}% | Core: {summary['avg_core_yoy']:.1f}% | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -161,7 +161,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"India Crude | Brent: ${summary['current_brent_usd']:.1f} | USDINR: {summary['current_usdinr']:.2f} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"India Crude | Brent: ${summary['current_brent_usd']:.1f} | USDINR: {summary['current_usdinr']:.2f} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

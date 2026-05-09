@@ -143,7 +143,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"India Auto Scrappage | Scrapped: {summary['latest_scrapped_units']:,} | Replacement ratio: {summary['latest_replacement_ratio']:.2f if summary['latest_replacement_ratio'] else 'N/A'} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"India Auto Scrappage | Scrapped: {summary['latest_scrapped_units']:,} | Replacement ratio: {f'{summary['latest_replacement_ratio']:.2f}' if summary['latest_replacement_ratio'] else 'N/A'} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

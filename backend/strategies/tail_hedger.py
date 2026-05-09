@@ -7,15 +7,8 @@ import time
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
 
-import redis
-
 from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
-
-# ---------- Redis ----------
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-_r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 KEY_NLV = os.getenv("PORTFOLIO_NLV_KEY", "portfolio:nlv")  # HGET <KEY_NLV> value -> float
 
@@ -82,8 +75,21 @@ class TailHedger(Strategy):
         self.und = cfg.underlying.upper()
         self.proxy = cfg.proxy_asset.upper() if cfg.proxy_asset else None
 
+        # Lazy Redis client for NAV lookup
+        self._redis = None
+        try:
+            import redis as _redis_mod
+            self._redis = _redis_mod.Redis(
+                host=os.getenv("REDIS_HOST", "localhost"),
+                port=int(os.getenv("REDIS_PORT", "6379")),
+                decode_responses=True
+            )
+        except Exception:
+            self._redis = None
+
         # State
         self._last_px: float = 0.0
+        self._proxy_last_px: float = 0.0  # last seen price of the proxy asset
         self._ewma_fast: float = 0.0
         self._ewma_slow: float = 0.0
         self._vol_ewma: float = 1e-8
@@ -119,9 +125,11 @@ class TailHedger(Strategy):
             return d
 
     def _nlv(self) -> float:
+        if self._redis is None:
+            return 0.0
         try:
-            v = _r.hget(KEY_NLV, "value")
-            return float(v) if v is not None else 0.0 # type: ignore
+            v = self._redis.hget(KEY_NLV, "value")
+            return float(v) if v is not None else 0.0  # type: ignore
         except Exception:
             return 0.0
 
@@ -272,9 +280,8 @@ class TailHedger(Strategy):
 
             # Decide instrument & side
             if self.proxy:
-                # Buy proxy when risk up (positive notional), sell when peeling (negative step)
-                proxy_px = None  # we’ll allow market mark from underlying if proxy tick not seen
-                proxy_px = proxy_px or px  # conservative
+                # Use last seen proxy price; fall back to underlying price if never seen
+                proxy_px = self._proxy_last_px if self._proxy_last_px > 0 else px
                 qty = max(1.0, min(abs(step), self.cfg.notional_clip) / max(proxy_px, 1e-9))
                 side = "buy" if step > 0 else "sell"
                 self._act(side, self.proxy, qty, proxy_px,
@@ -292,8 +299,10 @@ class TailHedger(Strategy):
             self._last_act_ms = now
 
         else:
-            # proxy price tick (optional; not strictly needed for actions)
-            _ = self._proxy_price(tick)  # kept for future enhancements
+            # proxy price tick: update last known proxy price for accurate sizing
+            proxy_px = self._proxy_price(tick)
+            if proxy_px is not None and proxy_px > 0:
+                self._proxy_last_px = proxy_px
             return
 
 

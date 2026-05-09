@@ -134,7 +134,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"NatGas storage | vs 5yr avg: {current_vs:.1f}% | Season: {summary['current_season']} | Signal: {summary['current_signal']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"NatGas storage | vs 5yr avg: {current_vs:.1f}% | Season: {summary['current_season']} | Signal: {summary['current_signal']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

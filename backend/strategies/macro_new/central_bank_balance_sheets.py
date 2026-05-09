@@ -118,7 +118,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"CB balance sheets | Regime: {current_regime} | Global BS: ${summary['current_global_bs_bn']:.1f}B | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"CB balance sheets | Regime: {current_regime} | Global BS: ${summary['current_global_bs_bn']:.1f}B | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -8,15 +8,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, List, Tuple, DefaultDict
 from collections import defaultdict
 
-import redis
-
 from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
-
-# ---------- Redis (optional, for precomputed GEX) ----------
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-_r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 
 # ---------- Config ----------
@@ -65,6 +58,20 @@ class GammaExposureGEX(Strategy):
         super().__init__(name=name, region=region, default_qty=cfg.default_qty)
         self.cfg = cfg
         self.sym = cfg.symbol.upper()
+
+        # Lazy Redis client — only created when use_redis_gex=True
+        self._redis = None
+        if cfg.use_redis_gex:
+            try:
+                import redis as _redis_mod
+                import os
+                self._redis = _redis_mod.Redis(
+                    host=os.getenv("REDIS_HOST", "localhost"),
+                    port=int(os.getenv("REDIS_PORT", "6379")),
+                    decode_responses=True
+                )
+            except Exception:
+                self._redis = None
 
         # State
         self._last_px: float = 0.0
@@ -115,16 +122,18 @@ class GammaExposureGEX(Strategy):
 
     # ---- Redis precomputed path ----
     def _read_gex_from_redis(self) -> Optional[Tuple[float, Optional[float], Optional[float]]]:
+        if self._redis is None:
+            return None
         key = self.cfg.gex_key_tpl.format(sym=self.sym)
         try:
-            d = _r.hgetall(key) or {}
+            d = self._redis.hgetall(key) or {}
             if not d:
                 return None
-            gex_total = self._safe_float(d.get("gex_total"), 0.0) # type: ignore
-            wall = d.get("wall") # type: ignore
-            wall = self._safe_float(wall, None) if wall is not None else None # type: ignore
-            spot = d.get("spot") # type: ignore
-            spot = self._safe_float(spot, None) if spot is not None else None # type: ignore
+            gex_total = self._safe_float(d.get("gex_total"), 0.0)  # type: ignore
+            wall = d.get("wall")  # type: ignore
+            wall = self._safe_float(wall, None) if wall is not None else None  # type: ignore
+            spot = d.get("spot")  # type: ignore
+            spot = self._safe_float(spot, None) if spot is not None else None  # type: ignore
             return gex_total, wall, spot
         except Exception:
             return None

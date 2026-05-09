@@ -142,7 +142,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"2s10s curve | Current: {current_spread:.1f}bp | Regime: {summary['current_regime']} | Max inversion: {max_inv}d | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"2s10s curve | Current: {current_spread:.1f}bp | Regime: {summary['current_regime']} | Max inversion: {max_inv}d | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

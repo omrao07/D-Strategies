@@ -171,6 +171,6 @@ def allocate_from_scores(
     Returns (weights, dollars, shares) aligned to `scores.index`.
     """
     w = weights_from_scores(scores, max_name=max_name, max_gross=max_gross, max_net=max_net)
-  dollars_from_weights(w, nav, cash_buffer=cash_buffer) # type: ignore
-    sh = shares_from_dollars( last_prices.reindex(w.index), lot_size=lot_size) # type: ignore
-    return w , sh, scores # type: ignore
+    d = dollars_from_weights(w, nav, cash_buffer=cash_buffer)
+    sh = shares_from_dollars(last_prices.reindex(w.index), lot_size=lot_size)
+    return w, d, sh

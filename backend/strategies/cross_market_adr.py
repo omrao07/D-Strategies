@@ -252,10 +252,12 @@ class CrossMarketADR(Strategy):
                        mark_price=buy_px_loc,
                        extra={"reason": "adr>theo_hedge", "pair": f"{adr}/{local}"})
 
-            # FX hedge (SELL local_ccy / BUY adr_ccy if needed) — optional stub:
-            # if fx_ven:
-            #     self.order(fx_sym, "sell", qty=local_qty * mid_local * ratio, order_type="market", venue=fx_ven,
-            #                mark_price=mid_fx, extra={"reason":"fx_hedge"})
+            # FX hedge: selling ADR (receive USD), buying local (pay INR) → sell local_ccy / buy adr_ccy
+            # notional in local_ccy ≈ local_qty * mid_local; convert to FX units
+            if fx_ven and mid_fx > 0:
+                fx_notional = local_qty * mid_local  # local ccy notional
+                self.order(fx_sym, "sell", qty=fx_notional, order_type="market", venue=fx_ven,
+                           mark_price=mid_fx, extra={"reason": "fx_hedge_sell_local", "pair": f"{adr}/{local}"})
 
             # cooldown & pos
             self._last_sym_ms[adr] = now
@@ -281,9 +283,11 @@ class CrossMarketADR(Strategy):
                        mark_price=sell_px_loc,
                        extra={"reason": "adr<theo_hedge", "pair": f"{adr}/{local}"})
 
-            # if fx_ven:
-            #     self.order(fx_sym, "buy", qty=local_qty * mid_local * ratio, order_type="market", venue=fx_ven,
-            #                mark_price=mid_fx, extra={"reason":"fx_hedge"})
+            # FX hedge: buying ADR (pay USD), selling local (receive INR) → buy local_ccy / sell adr_ccy
+            if fx_ven and mid_fx > 0:
+                fx_notional = local_qty * mid_local  # local ccy notional
+                self.order(fx_sym, "buy", qty=fx_notional, order_type="market", venue=fx_ven,
+                           mark_price=mid_fx, extra={"reason": "fx_hedge_buy_local", "pair": f"{adr}/{local}"})
 
             self._last_sym_ms[adr] = now
             self._last_ven_ms[buy_ven_adr]   = now

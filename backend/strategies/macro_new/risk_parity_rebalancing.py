@@ -139,7 +139,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Risk parity | RP Sharpe: {summary['rp_sharpe']:.2f if summary['rp_sharpe'] else 'N/A'} vs 60/40: {summary['eq_6040_sharpe']:.2f if summary['eq_6040_sharpe'] else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Risk parity | RP Sharpe: {f'{summary['rp_sharpe']:.2f}' if summary['rp_sharpe'] else 'N/A'} vs 60/40: {f'{summary['eq_6040_sharpe']:.2f}' if summary['eq_6040_sharpe'] else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -117,7 +117,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Kimchi premium | Avg: {summary['avg_premium_pct']:.2f}% | Max: {summary['max_premium_pct']:.2f}% | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Kimchi premium | Avg: {summary['avg_premium_pct']:.2f}% | Max: {summary['max_premium_pct']:.2f}% | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

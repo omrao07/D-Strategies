@@ -128,7 +128,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Fiscal impulse | Regime: {summary['current_regime']} | Ann return: {ann_ret:.2%} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Fiscal impulse | Regime: {summary['current_regime']} | Ann return: {ann_ret:.2%} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -165,7 +165,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Oil time spreads | Structure: {current_struct} | Backwardation: {summary['pct_backwardation']:.1%} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Oil time spreads | Structure: {current_struct} | Backwardation: {summary['pct_backwardation']:.1%} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

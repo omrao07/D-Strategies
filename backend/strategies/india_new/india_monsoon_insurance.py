@@ -171,7 +171,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"India Monsoon | Deficient years: {summary['pct_deficient_years']:.0f}% | Current: {summary['current_class']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"India Monsoon | Deficient years: {summary['pct_deficient_years']:.0f}% | Current: {summary['current_class']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

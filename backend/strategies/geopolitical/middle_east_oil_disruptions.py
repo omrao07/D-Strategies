@@ -154,7 +154,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Middle East Oil | MENA Events: {summary['n_mena_events']} | Avg oil impact: {summary['avg_30d_oil_impact_pct']:.1f}% | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Middle East Oil | MENA Events: {summary['n_mena_events']} | Avg oil impact: {summary['avg_30d_oil_impact_pct']:.1f}% | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -160,7 +160,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Clustering | Best k: {best_k} | Silhouette: {summary['best_silhouette']:.3f if summary['best_silhouette'] else 'N/A'} | Current: {summary['current_regime']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Clustering | Best k: {best_k} | Silhouette: {f'{summary['best_silhouette']:.3f}' if summary['best_silhouette'] else 'N/A'} | Current: {summary['current_regime']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -140,7 +140,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Dollar carry | Currencies: {summary['currencies_analyzed']} | Ann carry: {summary['ann_carry_return']:.2%} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Dollar carry | Currencies: {summary['currencies_analyzed']} | Ann carry: {summary['ann_carry_return']:.2%} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

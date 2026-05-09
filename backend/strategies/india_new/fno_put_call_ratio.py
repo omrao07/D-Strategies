@@ -157,7 +157,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"PCR | Indices: {summary['indices_tracked']} | Contrarian buys: {summary['n_contrarian_buy']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"PCR | Indices: {summary['indices_tracked']} | Contrarian buys: {summary['n_contrarian_buy']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

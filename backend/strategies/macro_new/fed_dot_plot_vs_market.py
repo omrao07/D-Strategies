@@ -131,7 +131,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Fed dots | Meetings: {summary['n_meetings']} | Hawkish: {summary['n_hawkish']} | Dovish: {summary['n_dovish']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Fed dots | Meetings: {summary['n_meetings']} | Hawkish: {summary['n_hawkish']} | Dovish: {summary['n_dovish']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -153,7 +153,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Liquidation cascades | Events: {summary['n_cascade_events']} | Long-casc 7d win rate: {summary['win_rate_7d_long_cascade']:.1%} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Liquidation cascades | Events: {summary['n_cascade_events']} | Long-casc 7d win rate: {summary['win_rate_7d_long_cascade']:.1%} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

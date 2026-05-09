@@ -151,7 +151,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Dr. Copper | Cu: ${summary['current_copper_usd_lb']:.2f}/lb | Cu/Au: {summary['current_cu_au_ratio']:.4f} | Signal: {summary['current_signal']} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Dr. Copper | Cu: ${summary['current_copper_usd_lb']:.2f}/lb | Cu/Au: {summary['current_cu_au_ratio']:.4f} | Signal: {summary['current_signal']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

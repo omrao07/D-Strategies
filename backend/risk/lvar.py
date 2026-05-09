@@ -197,8 +197,8 @@ class LiquidityVaR:
             if q <= 0: 
                 continue
             if params.price_impact_model == "amihud":
-                adv_$ = adv_q * mid_px # type: ignore
-                impact_bps = params.k_amihud * (q * mid_px) / max(1e-9, adv_$) * 1e4 # type: ignore
+                adv_notional = adv_q * mid_px
+                impact_bps = params.k_amihud * (q * mid_px) / max(1e-9, adv_notional) * 1e4
             else:
                 # sqrt-law impact, using daily ADV as liquidity bucket
                 impact_bps = params.k_sqrt * math.sqrt(q / adv_q)
@@ -371,4 +371,3 @@ if __name__ == "__main__":
         spread_widen_mult=2.5, adv_drop_mult=0.4
     )
     print("Stress LVaR (bps):", round(stress.total_lvar_bps, 2))
-    )

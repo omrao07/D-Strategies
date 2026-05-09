@@ -119,7 +119,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"TIPS breakeven | BE: {summary['current_breakeven_pct']:.2f}% | CPI: {summary['current_realized_cpi_pct']:.2f if summary['current_realized_cpi_pct'] else 'N/A'}% | Signal: {summary['current_signal']} | Written to {cfg.outdir}")
+    print(f"TIPS breakeven | BE: {summary['current_breakeven_pct']:.2f}% | CPI: {f'{summary['current_realized_cpi_pct']:.2f}' if summary['current_realized_cpi_pct'] else 'N/A'}% | Signal: {summary['current_signal']} | Written to {cfg.outdir}")
 
 
 def main():

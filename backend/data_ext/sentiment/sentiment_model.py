@@ -34,7 +34,7 @@ _HAVE_TRANSFORMERS = False
 _HAVE_TEXTBLOB = False
 try:
     from transformers import pipeline  # type: ignore
-    _ HAVE_TRANSFORMERS = True  # type: ignore
+    _HAVE_TRANSFORMERS = True
 except Exception:
     _HAVE_TRANSFORMERS = False
 

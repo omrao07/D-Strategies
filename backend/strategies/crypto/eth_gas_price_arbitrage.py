@@ -125,7 +125,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"ETH gas | Avg: {summary['avg_gas_gwei']:.1f} gwei | Extreme {summary['pct_extreme']:.1%} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"ETH gas | Avg: {summary['avg_gas_gwei']:.1f} gwei | Extreme {summary['pct_extreme']:.1%} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

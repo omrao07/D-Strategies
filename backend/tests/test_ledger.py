@@ -185,7 +185,7 @@ def test_time_bounded_balances(api, seed_equity_book):
         assert float(pos_mid.get("qty", 0)) == pytest.approx(1500.0)
     assert isinstance(bal_mid, dict)
 
-def test_idempotent_posts_and_find_void(api, seed_equity_book, api: API): # type: ignore
+def test_idempotent_posts_and_find_void(api: "API", seed_equity_book): # type: ignore
     if not api.has("post"):
         pytest.skip("No post() API")
     # Post a deterministic journal, then re-post; second should either return same id or be rejected.

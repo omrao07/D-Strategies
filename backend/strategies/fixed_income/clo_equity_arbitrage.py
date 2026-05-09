@@ -134,7 +134,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"CLO equity arb | CLOs: {summary['n_clos']} | Buy signals: {summary['n_buy_signals']} | Avg implied IRR: {summary['avg_implied_irr_pct']:.1f}% | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"CLO equity arb | CLOs: {summary['n_clos']} | Buy signals: {summary['n_buy_signals']} | Avg implied IRR: {summary['avg_implied_irr_pct']:.1f}% | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

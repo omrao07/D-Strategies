@@ -196,7 +196,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"LSTM | Avg Acc: {summary['avg_rolling_accuracy']:.3f if summary['avg_rolling_accuracy'] else 'N/A'} | Sharpe: {sharpe:.2f if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"LSTM | Avg Acc: {f'{summary['avg_rolling_accuracy']:.3f}' if summary['avg_rolling_accuracy'] else 'N/A'} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():
