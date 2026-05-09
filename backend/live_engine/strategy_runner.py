@@ -2,8 +2,8 @@
 StrategyRunner — loads all registered strategies and dispatches market bars.
 
 Integration points:
-  - ``backend.execution_plus.registry.HUB.strategies`` — the global strategy registry
-  - ``backend.execution_plus.registry.auto_register_strategies()`` — scans
+  - ``backend.engine.registry.HUB.strategies`` — the global strategy registry
+  - ``backend.engine.registry.auto_register_strategies()`` — scans
     ``backend.strategies`` package and populates HUB
   - ``backend.engine.strategy_base.Strategy._collector`` hook — zero-Redis
     in-memory order capture (same mechanism as the backtester)
@@ -37,10 +37,10 @@ except Exception:
     _HAS_REDIS = False
 
 try:
-    from backend.execution_plus.registry import HUB, auto_register_strategies
+    from backend.engine.registry import HUB, auto_register_strategies
     _HAS_REGISTRY = True
 except Exception as _e:
-    log.warning("execution_plus registry unavailable: %s", _e)
+    log.warning("engine registry unavailable: %s", _e)
     HUB = None  # type: ignore[assignment]
     auto_register_strategies = None  # type: ignore[assignment]
     _HAS_REGISTRY = False

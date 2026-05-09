@@ -62,9 +62,13 @@ class LiveEngineScheduler:
         else:
             log.error("APScheduler unavailable — scheduler will not run")
 
-        # Graceful shutdown
-        signal.signal(signal.SIGTERM, self._handle_shutdown)
-        signal.signal(signal.SIGINT, self._handle_shutdown)
+        # Graceful shutdown (only register if not already handled by __main__)
+        if not getattr(signal.getsignal(signal.SIGTERM), "__module__", "").startswith("backend.live_engine.__main__"):
+            try:
+                signal.signal(signal.SIGTERM, self._handle_shutdown)
+                signal.signal(signal.SIGINT, self._handle_shutdown)
+            except ValueError:
+                pass  # Not the main thread — signal registration not allowed
 
     # ── Job registry ──────────────────────────────────────────────────────────
 
