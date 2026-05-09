@@ -75,6 +75,14 @@ try:
 except Exception as _ws_err:
     logger.warning("ws_live router unavailable: %s", _ws_err)
 
+# Wire production backtest engine router
+try:
+    from backend.api.backtest_router import router as backtest_router
+    app.include_router(backtest_router)
+    logger.info("Backtest engine router mounted at /backtest")
+except Exception as _bt_err:
+    logger.warning("backtest_router unavailable: %s", _bt_err)
+
 # ------------------------------------------------------------------------------
 # Schemas
 # ------------------------------------------------------------------------------

@@ -103,8 +103,14 @@ class Strategy(abc.ABC):
     ) -> None:
         """
         Submit an order to the pre-risk stream. Risk manager will validate, then OMS fills.
+        In backtest mode (_collector is set) the order is captured in-memory, not published.
         """
         q = self.ctx.default_qty if (qty is None or qty <= 0) else float(qty)
+        # Backtest interception
+        _col = getattr(self, "_collector", None)
+        if _col is not None:
+            _col.collect("order", str(symbol).upper(), side.lower(), q, order_type, limit_price)
+            return
         payload = {
             "ts_ms": int(time.time() * 1000),
             "strategy": self.ctx.name,
@@ -123,21 +129,27 @@ class Strategy(abc.ABC):
 
     # ---- Metrics API (allocator inputs) -----------------------------------
     def emit_signal(self, score: float) -> None:
-        """
-        score in [-1, +1]. Stored under HSET strategy:signal <name> {"score": x}
-        """
+        """score in [-1, +1]. In backtest mode captured by _collector."""
+        _col = getattr(self, "_collector", None)
+        if _col is not None:
+            _col.collect("signal", float(max(-1.0, min(1.0, score))))
+            return
         hset("strategy:signal", self.ctx.name, {"score": float(max(-1.0, min(1.0, score)))})
 
     def emit_vol(self, vol: float) -> None:
-        """
-        Strategy risk metric (e.g., stdev of returns). Scale consistently across strategies.
-        """
+        """Annualised vol. In backtest mode captured by _collector."""
+        _col = getattr(self, "_collector", None)
+        if _col is not None:
+            _col.collect("vol", float(max(0.0, vol)))
+            return
         hset("strategy:vol", self.ctx.name, {"vol": float(max(0.0, vol))})
 
     def emit_drawdown(self, dd: float) -> None:
-        """
-        Rolling drawdown fraction (e.g., 8% -> 0.08).
-        """
+        """Rolling drawdown fraction. In backtest mode captured by _collector."""
+        _col = getattr(self, "_collector", None)
+        if _col is not None:
+            _col.collect("drawdown", float(max(0.0, min(1.0, dd))))
+            return
         hset("strategy:drawdown", self.ctx.name, {"dd": float(max(0.0, min(1.0, dd)))})
 
     # ---- Runner ------------------------------------------------------------
