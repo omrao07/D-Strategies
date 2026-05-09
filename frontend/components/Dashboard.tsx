@@ -32,6 +32,20 @@ const RiskDashboard = dynamic(
     })),
   { ssr: false, loading: () => <Spinner /> }
 );
+const IndiaFODashboard = dynamic(
+  () =>
+    import("./dashboards/IndiaFODashboard").then((m) => ({
+      default: m.IndiaFODashboard ?? m.default,
+    })),
+  { ssr: false, loading: () => <Spinner /> }
+);
+const BacktesterPanel = dynamic(
+  () =>
+    import("./dashboards/BacktesterPanel").then((m) => ({
+      default: m.BacktesterPanel ?? m.default,
+    })),
+  { ssr: false, loading: () => <Spinner /> }
+);
 
 function Spinner() {
   return (
@@ -55,6 +69,8 @@ const TABS = [
   { id: "strategies", label: "Strategies" },
   { id: "risk", label: "Risk" },
   { id: "portfolio", label: "Portfolio" },
+  { id: "india", label: "India F&O" },
+  { id: "backtest", label: "Backtest" },
 ];
 
 function TabBar() {
@@ -164,6 +180,32 @@ function TabContent() {
         <div style={{ padding: 16, flex: 1, overflow: "auto" }}>
           <Suspense fallback={<Spinner />}>
             <PortfolioOverview />
+          </Suspense>
+        </div>
+      );
+    case "india":
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "340px 1fr",
+            gap: 16,
+            padding: 16,
+            flex: 1,
+            overflow: "auto",
+          }}
+        >
+          <Suspense fallback={<Spinner />}>
+            <IndiaFODashboard />
+          </Suspense>
+          <RiskGatesPanel />
+        </div>
+      );
+    case "backtest":
+      return (
+        <div style={{ padding: 16, flex: 1, overflow: "auto" }}>
+          <Suspense fallback={<Spinner />}>
+            <BacktesterPanel />
           </Suspense>
         </div>
       );

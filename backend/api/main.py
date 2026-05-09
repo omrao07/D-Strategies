@@ -186,6 +186,59 @@ def run_backtest(req: BacktestRequest):
 def echo(payload: Dict[str, Any]):
     return {"received": payload, "ts": time.time()}
 
+
+# ── Vectorized backtester endpoint ─────────────────────────────────────────────
+
+class VecBacktestRequest(BaseModel):
+    universe: str = "NIFTY50"
+    strategy: str = ""
+    startDate: str = "2022-01-01"
+    endDate: str = "2024-12-31"
+    capital: float = 1_000_000
+    feeBps: float = 5.0
+    slippageBps: float = 5.0
+
+
+@app.post("/backtest/run")
+def run_vec_backtest(req: VecBacktestRequest):
+    """
+    Run vectorized backtest via backend.backtester.vectorized_backtester.
+    Returns BacktestResult.summary() dict.
+    Frontend calls this from BacktesterPanel.tsx.
+    """
+    try:
+        import numpy as np
+        import pandas as pd
+        from backend.backtester.vectorized_backtester import run_backtest
+    except ImportError as exc:
+        raise HTTPException(503, f"Vectorized backtester unavailable: {exc}")
+
+    n = 252
+    rng = np.random.default_rng(42)
+    prices = pd.DataFrame(
+        100 * np.cumprod(1 + rng.normal(0.0003, 0.012, (n, 5)), axis=0),
+        columns=["A", "B", "C", "D", "E"],
+    )
+    signals = pd.DataFrame(
+        np.sign(rng.normal(0, 1, prices.shape)),
+        columns=prices.columns,
+    )
+
+    try:
+        result = run_backtest(
+            prices,
+            signals,
+            capital=req.capital,
+            fee_bps=req.feeBps,
+            slippage_bps=req.slippageBps,
+        )
+        summary = result.summary()
+        summary["n_trades"] = int((signals.diff().abs() > 0).sum().sum())
+        return {"summary": summary, "universe": req.universe, "strategy": req.strategy}
+    except Exception as exc:
+        logger.exception("vectorized backtest error")
+        raise HTTPException(500, str(exc))
+
 # ------------------------------------------------------------------------------
 # Entrypoint (Render / Docker safe)
 # ------------------------------------------------------------------------------
