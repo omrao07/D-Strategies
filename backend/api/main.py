@@ -68,6 +68,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Wire live WebSocket router
+try:
+    from backend.api.ws_live import router as ws_live_router
+    app.include_router(ws_live_router)
+except Exception as _ws_err:
+    logger.warning("ws_live router unavailable: %s", _ws_err)
+
 # ------------------------------------------------------------------------------
 # Schemas
 # ------------------------------------------------------------------------------

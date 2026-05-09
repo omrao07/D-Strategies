@@ -1,43 +1,135 @@
 version: "3.9"
 
+# D-Strategies dev stack
+# Services: TimescaleDB · Redis · FastAPI · Vite frontend
+#
+# Usage:
+#   docker compose up            # start all services
+#   docker compose up api        # start only backend
+#   PAPER_MODE=true docker compose up
+
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: hedgefund_app
-    env_file:
-      - .env
-    command: python -m orchestrator.backtest_job --universe all --from 2020-01-01 --to 2025-01-01
+
+  # ─── Data layer ──────────────────────────────────────────────────────────────
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: dstrategies_tsdb
+    environment:
+      POSTGRES_USER: ${DB_USER:-dstrategies}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dstrategies}
+      POSTGRES_DB: ${DB_NAME:-dstrategies}
+    ports:
+      - "${DB_PORT:-5432}:5432"
     volumes:
-      - .:/app
-    depends_on:
-      - redis
+      - tsdb_data:/var/lib/postgresql/data
+      - ./scripts/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dstrategies}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
-    container_name: hedgefund_redis
+    container_name: dstrategies_redis
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     restart: unless-stopped
 
-  # Optional: Postgres if you want persistent DB for runs
-  # db:
-  #   image: postgres:15-alpine
-  #   container_name: hedgefund_db
-  #   environment:
-  #     POSTGRES_USER: hedge
-  #     POSTGRES_PASSWORD: hedgepass
-  #     POSTGRES_DB: hedgefund
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - pg_data:/var/lib/postgresql/data
-  #   restart: unless-stopped
+  # ─── Backend ─────────────────────────────────────────────────────────────────
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/base.Dockerfile
+    container_name: dstrategies_api
+    env_file:
+      - .env
+    environment:
+      DB_HOST: timescaledb
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-dstrategies}
+      DB_PASSWORD: ${DB_PASSWORD:-dstrategies}
+      DB_NAME: ${DB_NAME:-dstrategies}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PAPER_MODE: ${PAPER_MODE:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./backend:/app/backend:cached
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      uvicorn backend.api.main:app
+        --host 0.0.0.0
+        --port 8000
+        --reload
+        --log-level ${LOG_LEVEL:-info}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── Frontend ────────────────────────────────────────────────────────────────
+
+  frontend:
+    image: node:20-alpine
+    container_name: dstrategies_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      VITE_API_URL: http://api:8000
+    depends_on:
+      - api
+    command: sh -c "npm install --prefer-offline && npm run dev -- --host 0.0.0.0"
+    restart: unless-stopped
+
+  # ─── Workers (optional) ──────────────────────────────────────────────────────
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    container_name: dstrategies_worker
+    env_file:
+      - .env
+    environment:
+      DB_HOST: timescaledb
+      REDIS_HOST: redis
+      PAPER_MODE: ${PAPER_MODE:-true}
+    volumes:
+      - ./backend:/app/backend:cached
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: python -m backend.workers.signal_worker
+    restart: unless-stopped
+    profiles:
+      - worker
 
 volumes:
+  tsdb_data:
   redis_data:
-  # pg_data:
