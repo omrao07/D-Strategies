@@ -83,6 +83,22 @@ try:
 except Exception as _bt_err:
     logger.warning("backtest_router unavailable: %s", _bt_err)
 
+# Wire live engine router
+try:
+    from backend.api.live_engine_router import router as live_router
+    app.include_router(live_router)
+    logger.info("Live engine router mounted at /live")
+except Exception as _le_err:
+    logger.warning("live_engine_router unavailable: %s", _le_err)
+
+# Wire institutional risk engine router
+try:
+    from backend.api.risk_router import router as risk_router
+    app.include_router(risk_router)
+    logger.info("Institutional risk router mounted at /risk")
+except Exception as _rr_err:
+    logger.warning("risk_router unavailable: %s", _rr_err)
+
 # ------------------------------------------------------------------------------
 # Schemas
 # ------------------------------------------------------------------------------
