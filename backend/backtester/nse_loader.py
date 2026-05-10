@@ -404,9 +404,9 @@ class NSELoader:
         if "volume" not in df.columns:
             df["volume"] = 0.0
 
-        # Fill gaps if enabled
+        # Fill gaps if enabled — ffill only (bfill uses future prices)
         if self.fill_gaps:
-            df = df.ffill().bfill()
+            df = df.ffill()
 
         return df
 

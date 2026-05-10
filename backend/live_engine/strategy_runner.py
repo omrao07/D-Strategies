@@ -205,16 +205,28 @@ class StrategyRunner:
         orders: List[OrderRequest] = []
 
         for name, strategy in list(self._strategies.items()):
+            # Check both in-memory disabled set and Redis key (set by API)
             if name in self._disabled:
                 continue
+            try:
+                from backend.live_engine.order_router import _r_get
+                if _r_get(f"strategy:disabled:{name}") == "1":
+                    continue
+            except Exception:
+                pass
+
             collector = _Collector(name)
+            # Use a per-call local variable instead of mutating the shared instance
+            # to avoid race conditions when multiple symbols run concurrently.
+            prev_collector = getattr(strategy, "_collector", None)
             strategy._collector = collector
             try:
+                strategy.on_bar(bar_dict)
                 strategy.on_tick(bar_dict)
             except Exception as exc:
                 log.error("Strategy %s raised on bar for %s: %s", name, symbol, exc)
             finally:
-                strategy._collector = None
+                strategy._collector = prev_collector
 
             orders.extend(collector.orders)
 
@@ -222,25 +234,16 @@ class StrategyRunner:
 
     def run_all_bars(self, bars: Dict[str, Dict[str, Any]]) -> List[OrderRequest]:
         """
-        Dispatch bars for multiple symbols in parallel using a ThreadPoolExecutor.
-
-        Returns a flat list of all ``OrderRequest`` objects from every strategy
-        across every symbol.
+        Dispatch bars serially across strategies; symbols parallelised per-strategy.
+        (Strategies are shared instances — parallel strategy dispatch is unsafe.)
         """
         all_orders: List[OrderRequest] = []
 
-        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
-            futures = {
-                executor.submit(self.run_bar, bar, symbol): symbol
-                for symbol, bar in bars.items()
-            }
-            for future in as_completed(futures):
-                symbol = futures[future]
-                try:
-                    result = future.result()
-                    all_orders.extend(result)
-                except Exception as exc:
-                    log.error("run_all_bars: error for symbol %s: %s", symbol, exc)
+        for symbol, bar in bars.items():
+            try:
+                all_orders.extend(self.run_bar(bar, symbol))
+            except Exception as exc:
+                log.error("run_all_bars: error for symbol %s: %s", symbol, exc)
 
         return all_orders
 

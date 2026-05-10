@@ -37,7 +37,7 @@ BATCH_MAX_SEC  = float(os.getenv("CH_BATCH_MAX_SEC", "2.0"))
 SNAPSHOT_EVERY_SEC = int(os.getenv("CH_SNAPSHOT_EVERY_SEC", "15"))
 
 # ---------- Clients ----------
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 ch = clickhouse_connect.get_client(host=CH_HOST, port=CH_PORT, username=CH_USER or None, password=CH_PASS or None, database=CH_DB) # type: ignore
 
 _stop = False

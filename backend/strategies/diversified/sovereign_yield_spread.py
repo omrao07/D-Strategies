@@ -110,7 +110,7 @@ BASIS_FAIR  = os.getenv("SYS_BASIS_FAIR","basis:fair")
 FEES_HK     = os.getenv("SYS_FEES_HK",   "fees:rates")
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hgetf(hk: str, field: str) -> Optional[float]:

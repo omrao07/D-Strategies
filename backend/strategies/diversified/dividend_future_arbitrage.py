@@ -103,7 +103,7 @@ BETA_HKEY_FMT     = os.getenv("DVF_BETA_FMT",  "beta:div:{year}")          # HSE
 WGT_HKEY_FMT      = os.getenv("DVF_WGT_FMT",   "index:weight:{index}")     # HSET index:weight:SX5E <TICKER> <w>
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ Helpers ============================
 def _hgetf(key: str, field: str) -> Optional[float]:

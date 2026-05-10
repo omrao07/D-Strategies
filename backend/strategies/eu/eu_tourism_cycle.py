@@ -262,7 +262,7 @@ def capacity_gap(tour: pd.DataFrame, air: pd.DataFrame) -> pd.DataFrame:
     # rough lead/lag correlation (arrivals vs seats lead 1-3m)
     rows = []
     for ctry, g in m.sort_values("date").groupby("country"):
-        corr0 = np.corrcoef(g["arrivals"].fillna(method="ffill"), g["seats"].fillna(method="ffill"))[0,1] if len(g)>6 else np.nan
+        corr0 = np.corrcoef(g["arrivals"].ffill(), g["seats"].ffill())[0,1] if len(g)>6 else np.nan
         lead1 = g["seats"].shift(1)
         lead2 = g["seats"].shift(2)
         corr1 = np.corrcoef(g["arrivals"].dropna(), lead1.dropna()) if len(g)>8 else [[np.nan,np.nan],[np.nan,np.nan]]

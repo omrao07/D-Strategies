@@ -40,7 +40,7 @@ def _to_series(x, index):
     if np.isscalar(x):
         return pd.Series(float(x), index=index) # type: ignore
     s = pd.Series(x)
-    return s.reindex(index).fillna(method="ffill").fillna(0.0) # type: ignore
+    return s.reindex(index).ffill().fillna(0.0) # type: ignore
 
 
 def _dollar_notional(positions: pd.DataFrame, prices: pd.DataFrame) -> pd.DataFrame:

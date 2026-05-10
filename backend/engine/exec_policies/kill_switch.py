@@ -19,7 +19,7 @@ REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 KILL_KEY   = os.getenv("KILL_SWITCH_KEY", "policy:kill_switch")
 ALERTS_KEY = os.getenv("ALERTS_STREAM", "alerts")
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 
 
 class KillSwitch:

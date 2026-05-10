@@ -10,7 +10,8 @@ import os
 from typing import Any, Dict, List, Optional
 
 import redis as _redis
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
@@ -18,10 +19,22 @@ router = APIRouter(prefix="/risk", tags=["risk-engine"])
 
 _REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 _REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+_REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
+_ENGINE_API_KEY = os.environ.get("ENGINE_API_KEY", "")
+_key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
+
+
+def _require_key(key: str = Security(_key_header)) -> None:
+    if not _ENGINE_API_KEY:
+        raise HTTPException(500, "ENGINE_API_KEY not configured on server")
+    if key != _ENGINE_API_KEY:
+        raise HTTPException(403, "Invalid or missing X-Engine-Key")
 
 
 def _r():
-    return _redis.Redis(host=_REDIS_HOST, port=_REDIS_PORT, decode_responses=True)
+    return _redis.Redis(
+        host=_REDIS_HOST, port=_REDIS_PORT, password=_REDIS_PASSWORD, decode_responses=True
+    )
 
 
 def _load_engine():
@@ -76,7 +89,7 @@ def get_risk_config():
         raise HTTPException(503, str(exc))
 
 
-@router.patch("/config")
+@router.patch("/config", dependencies=[Depends(_require_key)])
 def update_risk_param(req: RiskConfigUpdate):
     """Adjust a single risk parameter at runtime (takes effect on next order)."""
     try:
@@ -91,7 +104,7 @@ def update_risk_param(req: RiskConfigUpdate):
         raise HTTPException(500, str(exc))
 
 
-@router.patch("/config/bulk")
+@router.patch("/config/bulk", dependencies=[Depends(_require_key)])
 def bulk_update_risk_params(req: RiskConfigBulkUpdate):
     """Update multiple risk parameters at once."""
     try:

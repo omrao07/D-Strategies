@@ -313,7 +313,7 @@ class ExecutionEngine:
     def _max_fill_qty(self, bar: MarketEvent) -> float:
         """Max qty fillable this bar given participation rate constraint."""
         if bar.adv_20 > 0 and bar.close > 0:
-            max_notional = bar.adv_20 * self.max_participation_rate / 252.0
+            max_notional = bar.adv_20 * self.max_participation_rate  # adv_20 is already daily
             return max_notional / bar.close
         if bar.volume > 0 and bar.close > 0:
             return bar.volume * self.max_participation_rate / bar.close
@@ -359,10 +359,10 @@ class ExecutionEngine:
         slippage_abs = abs(exec_price - mark_price) * result.fill_qty
         slippage_bps_val = abs(exec_price - mark_price) / max(mark_price, 1e-9) * 10_000.0
 
-        # Market impact (Almgren-Chriss)
+        # Market impact (Almgren-Chriss) — only when not already baked into exec_price
         impact_abs = 0.0
         impact_bps_val = 0.0
-        if bar.volume > 0:
+        if bar.volume > 0 and self.slippage_model != SlippageModel.VOLUME_IMPACT:
             participation = result.fill_qty / max(bar.volume, 1.0)
             impact_frac = self.price_impact_eta * math.sqrt(participation)
             impact_abs = notional * impact_frac

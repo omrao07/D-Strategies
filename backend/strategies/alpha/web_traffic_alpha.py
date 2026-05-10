@@ -104,7 +104,7 @@ EARN_BLACKOUT_MIN_D = float(os.getenv("WTA_EARN_BMIN","2.0"))  # skip new entrie
 BUZZ_SPIKE_HARD_Z   = float(os.getenv("WTA_BUZZ_HARD","3.5"))  # skip if social spike extreme
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

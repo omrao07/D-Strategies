@@ -112,7 +112,7 @@ def main() -> None:
         try:
             _log_pulse(state, _pulse_count)
         except Exception as exc:
-            log.debug("Pulse log error: %s", exc)
+            log.warning("Pulse log error: %s", exc)
 
     # ── 7. Graceful shutdown ──────────────────────────────────────────────────
     log.warning("Shutdown initiated...")
@@ -159,7 +159,22 @@ def _arm_risk_limits(state) -> None:
         state.redis.set("risk:drawdown_kill_pct",    str(MAX_DRAWDOWN_PCT / 100))
         state.redis.set("portfolio:capital_base",    str(CAPITAL_BASE))
 
-        # Clear any stale kill-switch from previous session
+        # Guard: preserve kill-switch across restarts unless operator explicitly clears it
+        ks_active  = state.redis.get("risk:kill_switch_active")
+        halt_active = state.redis.get("risk:daily_trading_halted")
+        if ks_active in ("1", "true") or halt_active in ("1", "true"):
+            force = os.getenv("FORCE_CLEAR_KILL_SWITCH", "0").lower() in ("1", "true", "yes")
+            if not force:
+                log.critical(
+                    "Kill switch was active from previous session — engine will NOT start. "
+                    "Set FORCE_CLEAR_KILL_SWITCH=1 to resume trading after human review."
+                )
+                state.alert(
+                    "🚨 ENGINE START BLOCKED: kill switch was active from previous session. "
+                    "Set FORCE_CLEAR_KILL_SWITCH=1 to override."
+                )
+                sys.exit(1)
+            log.warning("FORCE_CLEAR_KILL_SWITCH=1 — clearing kill switch from previous session")
         state.redis.delete("risk:kill_switch_active")
         state.redis.delete("risk:daily_trading_halted")
 

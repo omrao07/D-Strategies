@@ -79,7 +79,7 @@ DV01_HKEY       = os.getenv("CURVE_DV01_KEY",  "dv01")   # HSET dv01 TU 85
 LAST_PRICE_HKEY = os.getenv("CURVE_LAST_PRICE_KEY", "last_price")
 
 # ============================== REDIS ==============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================== HELPERS ==============================
 @dataclass

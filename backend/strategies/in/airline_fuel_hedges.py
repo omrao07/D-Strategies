@@ -351,13 +351,13 @@ def backtest(
     J = J_price.sort_index()
     H = H_price.sort_index().reindex(J.index).dropna(how="all")
     J = J.reindex(H.index)
-    betas = betas.reindex(H.index).fillna(method="ffill")
+    betas = betas.reindex(H.index).ffill()
 
     # Exposure bbl per day
     if exposure_bbl.empty:
         exposure = pd.Series(1.0, index=J.index, name="fuel_bbl")
     else:
-        exposure = exposure_bbl.reindex(J.index).fillna(method="ffill")
+        exposure = exposure_bbl.reindex(J.index).ffill()
         if exposure.isna().all():
             exposure = pd.Series(1.0, index=J.index, name="fuel_bbl")
 
@@ -592,7 +592,7 @@ def main():
     J = J.reindex(idx)
     H = H.reindex(idx).dropna(how="all")
     if not EXP.empty:
-        EXP = EXP.reindex(idx).fillna(method="ffill")
+        EXP = EXP.reindex(idx).ffill()
 
     # Betas
     betas = compute_betas(J, H, lookback=int(args.lookback))

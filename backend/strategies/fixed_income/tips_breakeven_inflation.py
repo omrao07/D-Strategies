@@ -39,7 +39,7 @@ def run(cfg):
     cpi.columns = [c.lower().strip() for c in cpi.columns]
     cpi = cpi.set_index("date").sort_index()
 
-    merged = tips.join(cpi[["cpi_yoy_pct", "core_cpi_yoy_pct"]], how="left").fillna(method="ffill")
+    merged = tips.join(cpi[["cpi_yoy_pct", "core_cpi_yoy_pct"]], how="left").ffill()
 
     be_col = "breakeven_10y_pct" if "breakeven_10y_pct" in merged.columns else merged.columns[0]
     merged["breakeven_5y5y"] = merged.get("breakeven_5y_pct", pd.Series(np.nan, index=merged.index))

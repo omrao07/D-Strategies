@@ -62,7 +62,7 @@ HEALTH_STREAM    = os.getenv("RISK_HEALTH_STREAM", "risk.health")            # h
 _R = None
 if redis:
     try:
-        _R = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+        _R = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
     except Exception:
         _R = None
 

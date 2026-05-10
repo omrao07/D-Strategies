@@ -84,7 +84,7 @@ REPO_HKEY      = "repo:bond"                # HGET repo:bond <BOND_ID> -> decima
 RECOV_HKEY     = "recovery"                 # HGET recovery <ISSUER> -> decimal (e.g., 0.40)
 
 # ========================= REDIS =========================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ========================= Helpers =========================
 @dataclass

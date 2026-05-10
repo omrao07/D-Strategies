@@ -231,7 +231,7 @@ class DriftMonitor:
         self._r = None
         if _redis is not None:
             try:
-                self._r = _redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+                self._r = _redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
             except Exception:
                 self._r = None
 

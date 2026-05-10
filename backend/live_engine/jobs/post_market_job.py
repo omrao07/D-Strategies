@@ -32,7 +32,7 @@ _REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 def _redis():
     try:
         import redis
-        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
     except Exception:
         return None
 

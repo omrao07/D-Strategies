@@ -118,7 +118,7 @@ def compute_futures_pnl(
 
     # FX panel per symbol → USD
     if fx_rates is not None and not fx_rates.empty:
-        fx_panel = _fx_series(fx_rates.reindex(idx), px.columns, ccy_map, base_ccy=base_ccy).fillna(method="ffill").fillna(1.0) # type: ignore
+        fx_panel = _fx_series(fx_rates.reindex(idx), px.columns, ccy_map, base_ccy=base_ccy).ffill().fillna(1.0) # type: ignore
     else:
         fx_panel = pd.DataFrame(1.0, index=idx, columns=px.columns)
 

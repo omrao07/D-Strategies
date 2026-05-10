@@ -93,7 +93,7 @@ WEIGHTS_HK  = os.getenv("VAR_WEIGHTS_HK", "var:weights")
 FEES_HK     = os.getenv("VAR_FEES_HK", "fees:var")
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

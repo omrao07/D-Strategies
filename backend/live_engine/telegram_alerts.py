@@ -187,17 +187,17 @@ class TelegramAlerter:
             return False
 
     def send_sync(self, msg: str) -> bool:
-        """
-        Synchronous wrapper for ``send``.  Safe to call from non-async code.
-        Creates a new event loop if one isn't running.
-        """
+        """Synchronous wrapper safe to call from any thread (including APScheduler workers)."""
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # Schedule and return immediately; result not awaited
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        try:
+            if loop and loop.is_running():
                 asyncio.ensure_future(self.send(msg))
                 return True
-            return loop.run_until_complete(self.send(msg))
+            return asyncio.run(self.send(msg))
         except Exception as exc:
             log.error("TelegramAlerter.send_sync failed — %s", exc)
             return False

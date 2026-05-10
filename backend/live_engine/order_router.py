@@ -218,10 +218,12 @@ class OrderRouter:
                 pass
 
         # ── Gate 4: Kill switch ─────────────────────────────────────────────
-        kill_all = _r_get("risk:kill_all")
-        if kill_all and str(kill_all).lower() in ("1", "true", "yes"):
-            self._reject(order, "kill_all")
-            return None
+        for _ks_key in ("risk:kill_switch_active", "risk:daily_trading_halted", "risk:kill_all"):
+            _ks_val = _r_get(_ks_key)
+            if _ks_val and str(_ks_val).lower() in ("1", "true", "yes"):
+                self._halted = True
+                self._reject(order, f"kill_switch:{_ks_key}")
+                return None
 
         # ── Gate 5: Risk manager check ──────────────────────────────────────
         order_dict = self._order_to_dict(order)
@@ -232,9 +234,9 @@ class OrderRouter:
                     self._reject(order, reason or "risk_manager")
                     return None
             except Exception as exc:
-                log.error("risk_manager check_order raised: %s", exc)
-                # Fail open with a warning in degraded mode — operators should
-                # monitor the risk:alive key and restart if needed.
+                log.error("risk_manager check_order raised: %s — rejecting order", exc)
+                self._reject(order, f"risk_manager_exception:{exc}")
+                return None
 
         # ── Gate 6: Allocator sizing cap ────────────────────────────────────
         if _HAS_ALLOCATOR and get_notionals is not None:
@@ -367,7 +369,7 @@ class OrderRouter:
                 )
             except Exception as exc:
                 log.error("Zerodha submit_order failed for %s: %s", order.symbol, exc)
-                order_id = f"ERR-{uuid.uuid4().hex[:8]}"
+                return None
         else:
             # Paper-trading mode
             order_id = f"PAPER-{uuid.uuid4().hex[:10]}"
@@ -401,6 +403,9 @@ class OrderRouter:
     def _record_fill(self, order: OrderRequest, order_id: str) -> None:
         """Record a (simulated or confirmed) fill in PnL tracker + Redis streams."""
         price = order.limit_price or self._get_last_price(order.symbol)
+        if not price or price <= 0:
+            log.error("_record_fill: no valid price for %s — skipping fill record", order.symbol)
+            return
         fill = {
             "order_id": order_id,
             "strategy": order.strategy,
@@ -475,8 +480,11 @@ class OrderRouter:
         if quote_raw:
             try:
                 q = json.loads(quote_raw)
-                return float(q.get("last_price", 100.0))
+                px = q.get("last_price")
+                if px:
+                    return float(px)
             except Exception:
                 pass
 
-        return 100.0  # sentinel default
+        log.critical("No price found for %s — order fill skipped", symbol)
+        return 0.0  # caller must guard price > 0

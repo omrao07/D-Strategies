@@ -1,1 +1,44 @@
-node_modules
+node_modules/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Secrets and environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+credentials/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data / output
+runs/
+data/raw/
+*.csv.gz
+*.parquet
+
+# Docker volumes (when using local paths)
+postgres_data/
+redis_data/
+grafana_data/
+
+# Logs
+*.log
+logs/

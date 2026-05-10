@@ -147,6 +147,19 @@ class MarketDataService:
         self._kite = _kite_obj
         self._ticker: Any = None  # KiteTicker instance
         self._tick_callbacks: List[Callable] = []
+        self._instruments_cache: List[Dict[str, Any]] = []
+        self._instruments_cache_ts: float = 0.0
+
+    def _get_instruments(self) -> List[Dict[str, Any]]:
+        """Return NSE instrument list, refreshing at most once per hour."""
+        now = time.time()
+        if self._kite is not None and (now - self._instruments_cache_ts) > 3600:
+            try:
+                self._instruments_cache = self._kite.instruments("NSE")
+                self._instruments_cache_ts = now
+            except Exception as exc:
+                log.warning("instruments() fetch failed: %s", exc)
+        return self._instruments_cache
 
     # ------------------------------------------------------------------
     # Live quotes
@@ -253,7 +266,7 @@ class MarketDataService:
         if self._kite is not None:
             try:
                 # KiteConnect requires instrument_token — look it up
-                instruments = self._kite.instruments("NSE")
+                instruments = self._get_instruments()
                 token = None
                 for inst in instruments:
                     if inst.get("tradingsymbol") == symbol:
@@ -283,7 +296,9 @@ class MarketDataService:
             except Exception as exc:
                 log.warning("KiteConnect history fetch failed for %s: %s", symbol, exc)
 
-        # Synthetic fallback
+        # Synthetic fallback — flag clearly so callers can choose to reject
+        log.warning("SYNTHETIC DATA: returning synthetic OHLCV for %s (no real data available)", symbol)
+
         import hashlib
         import numpy as np
 
@@ -292,12 +307,14 @@ class MarketDataService:
         n_days = (to_date - from_date).days
         dates = pd.bdate_range(start=from_date, end=to_date)[:n_days]
         closes = 1000.0 * np.exp(np.cumsum(rng.normal(0, 0.01, len(dates))))
-        opens = closes * rng.uniform(0.995, 1.005, len(dates))
-        highs = np.maximum(opens, closes) * rng.uniform(1.001, 1.02, len(dates))
-        lows = np.minimum(opens, closes) * rng.uniform(0.98, 0.999, len(dates))
+        # Open = prior close with small gap; first bar opens at initial price
+        prior_closes = np.concatenate([[closes[0]], closes[:-1]])
+        opens = prior_closes * rng.uniform(0.997, 1.003, len(dates))
+        highs = np.maximum(opens, closes) * rng.uniform(1.001, 1.015, len(dates))
+        lows = np.minimum(opens, closes) * rng.uniform(0.985, 0.999, len(dates))
         vols = rng.integers(50_000, 5_000_000, len(dates))
 
-        return pd.DataFrame({
+        df = pd.DataFrame({
             "date": dates,
             "open": opens,
             "high": highs,
@@ -305,6 +322,8 @@ class MarketDataService:
             "close": closes,
             "volume": vols,
         })
+        df["synthetic"] = True  # sentinel column — callers should check this
+        return df
 
     # ------------------------------------------------------------------
     # India VIX
@@ -470,7 +489,7 @@ class MarketDataService:
                 # Look up instrument tokens
                 try:
                     assert self._kite is not None
-                    instruments = self._kite.instruments("NSE")
+                    instruments = self._get_instruments()
                     token_map = {
                         inst["tradingsymbol"]: inst["instrument_token"]
                         for inst in instruments

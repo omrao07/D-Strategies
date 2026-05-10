@@ -189,7 +189,7 @@ def backtest_skew_rr(
         return {"summary": pd.DataFrame(), "position": pd.Series(dtype=float), "z": pd.DataFrame()} # type: ignore
 
     rr = rr_bf["RR25"].reindex(out["position"].index).ffill().dropna() # type: ignore
-    pos_full = out["position"].reindex(rr.index).fillna(method="ffill").fillna(0.0) # type: ignore
+    pos_full = out["position"].reindex(rr.index).ffill().fillna(0.0) # type: ignore
 
     idx = rr.index
     rb = _rb_mask(idx, cfg.rebal_freq) # type: ignore

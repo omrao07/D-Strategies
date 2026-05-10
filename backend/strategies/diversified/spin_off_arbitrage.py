@@ -98,7 +98,7 @@ BORROW_FEE_HK=os.getenv("SPIN_BORROW_FEE_HK","borrow:fee")
 FUND_HK     = os.getenv("SPIN_FUND_HK", "funding:cash")
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

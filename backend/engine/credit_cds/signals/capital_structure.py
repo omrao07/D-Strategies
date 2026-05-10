@@ -108,7 +108,7 @@ def equity_implied_spread(
     sig_e = r_e.rolling(cfg.asset_vol_lb_days).std() * sqrt(TRADING_DAYS)
     # Avoid zero/NaN
     lev_equity = (E / V).replace(0, np.nan)
-    sig_v = (sig_e * lev_equity).fillna(method="ffill").fillna(0.0001).clip(0.0001, 3.0) # type: ignore
+    sig_v = (sig_e * lev_equity).ffill().fillna(0.0001).clip(0.0001, 3.0) # type: ignore
 
     # Distance to default (d2)
     with np.errstate(divide='ignore', invalid='ignore'):

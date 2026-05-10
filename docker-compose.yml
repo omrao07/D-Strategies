@@ -63,6 +63,10 @@ services:
       DB_NAME: ${DB_NAME:-dstrategies}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
+      DATA_API_KEY: ${DATA_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       PAPER_MODE: ${PAPER_MODE:-true}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
@@ -78,7 +82,6 @@ services:
       uvicorn backend.api.main:app
         --host 0.0.0.0
         --port 8000
-        --reload
         --log-level ${LOG_LEVEL:-info}
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]

@@ -78,7 +78,7 @@ IV_T2_KEY       = f"iv:imp:{T2_TENOR}"
 IV_FWD_KEY      = f"iv:fwd:{T1_TENOR}-{T2_TENOR}"     # optional direct market quote
 
 # ======================= Redis =======================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ======================= utils =======================
 def _hget_price(sym: str) -> Optional[float]:

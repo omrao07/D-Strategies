@@ -613,6 +613,8 @@ class BacktestEngine:
         error_counts: Dict[str, int] = {}
         halted = False
         prev_date: Optional[datetime.date] = None
+        # Orders queued from bar T are filled at bar T+1 open (no fill-at-signal-close bias)
+        pending_orders: List[Tuple[Dict, str, Any]] = []  # (order_dict, strat_name, prev_batch)
 
         for batch in feed.iter_batches(start, end):
             if halted:
@@ -633,9 +635,66 @@ class BacktestEngine:
             prev_date = current_date
 
             tick = self._build_tick(batch)
-            bar_orders: List[Tuple[Dict, str]] = []
 
-            # ── Strategy signal collection ─────────────────────────────────
+            # ── Fill orders queued from the PREVIOUS bar at this bar's open ──
+            for order_dict, strat_name, _ in pending_orders:
+                sym = order_dict["symbol"]
+                bar = batch.bars.get(sym)
+                if bar is None or bar.open <= 0:
+                    continue
+
+                qty = abs(order_dict.get("qty", 0))
+                side = order_dict["side"]
+                order_type = order_dict.get("order_type", "market")
+                limit_price = order_dict.get("limit_price")
+                stop_price = order_dict.get("stop_price")
+                trail_pct = order_dict.get("trail_pct")
+
+                gate_fail = False
+                if self.enable_risk_gates:
+                    nav = book.equity()
+                    notional = qty * bar.open
+                    if nav <= 0 or notional > nav * self.max_leverage:
+                        risk_events.append({"ts": batch.ts, "gate": "leverage",
+                                            "strategy": strat_name, "sym": sym})
+                        gate_fail = True
+                    if notional > nav * 0.20:
+                        risk_events.append({"ts": batch.ts, "gate": "position_size",
+                                            "strategy": strat_name, "sym": sym,
+                                            "notional": notional, "nav": nav})
+                        gate_fail = True
+
+                if gate_fail:
+                    continue
+
+                if self.use_intrabar_simulation:
+                    results = self._path_sim.fill_order_on_bar(
+                        open_=bar.open, high=bar.high, low=bar.low, close=bar.close,
+                        order_type=order_type, side=side, qty=qty,
+                        limit_price=limit_price, stop_price=stop_price, trail_pct=trail_pct,
+                    )
+                    for res in results:
+                        if res.filled:
+                            fee = res.fill_qty * res.fill_price * self.fee_bps * 1e-4
+                            fill_dict = {
+                                "ts": batch.ts, "strategy": strat_name, "symbol": sym,
+                                "side": side, "qty": res.fill_qty, "fill_price": res.fill_price,
+                                "fee": fee, "is_partial": res.partial,
+                                "impact_bps": 0.0, "order_type": order_type,
+                                "fill_step": res.fill_step,
+                            }
+                            book.apply_fill(fill_dict)
+                            all_orders.append(fill_dict)
+                else:
+                    fill = self._legacy_sim.fill(order_dict, bar, batch.ts, strat_name)
+                    if fill:
+                        book.apply_fill(fill)
+                        all_orders.append(fill)
+
+            pending_orders = []  # reset after processing
+
+            # ── Strategy signal collection — orders queued for NEXT bar ────
+            bar_orders_this_bar: List[Tuple[Dict, str]] = []
             for strategy, collector in adapters:
                 name = collector.name
                 if error_counts.get(name, 0) >= 5:
@@ -652,7 +711,8 @@ class BacktestEngine:
 
                 sig_records[name].append(collector.signal)
                 for o in collector.orders:
-                    bar_orders.append((o, name))
+                    bar_orders_this_bar.append((o, name))
+                    pending_orders.append((o, name, batch))
 
                 if self.log_events and collector.signal != 0:
                     event_log.append({
@@ -660,67 +720,6 @@ class BacktestEngine:
                         "strategy": name, "score": collector.signal,
                     })
 
-            # ── Order processing ───────────────────────────────────────────
-            for order_dict, strat_name in bar_orders:
-                sym = order_dict["symbol"]
-                bar = batch.bars.get(sym)
-                if bar is None:
-                    continue
-
-                qty = abs(order_dict.get("qty", 0))
-                side = order_dict["side"]
-                order_type = order_dict.get("order_type", "market")
-                limit_price = order_dict.get("limit_price")
-                stop_price = order_dict.get("stop_price")
-                trail_pct = order_dict.get("trail_pct")
-
-                # Risk pre-check
-                gate_fail = False
-                if self.enable_risk_gates:
-                    nav = book.equity()
-                    notional = qty * bar.close
-                    if nav <= 0 or notional > nav * (self.max_leverage + 0.1):
-                        risk_events.append({"ts": batch.ts, "gate": "leverage",
-                                            "strategy": strat_name, "sym": sym})
-                        gate_fail = True
-                    if notional > nav * 0.20:  # single position > 20% of NAV
-                        risk_events.append({"ts": batch.ts, "gate": "position_size",
-                                            "strategy": strat_name, "sym": sym,
-                                            "notional": notional, "nav": nav})
-                        gate_fail = True
-
-                if gate_fail:
-                    continue
-
-                # Intra-bar path fill (realistic)
-                if self.use_intrabar_simulation and bar.open > 0:
-                    results = self._path_sim.fill_order_on_bar(
-                        open_=bar.open, high=bar.high, low=bar.low, close=bar.close,
-                        order_type=order_type, side=side, qty=qty,
-                        limit_price=limit_price, stop_price=stop_price,
-                        trail_pct=trail_pct,
-                    )
-                    for res in results:
-                        if res.filled:
-                            fee = res.fill_qty * res.fill_price * self.fee_bps * 1e-4
-                            fill_dict = {
-                                "ts": batch.ts, "strategy": strat_name, "symbol": sym,
-                                "side": side, "qty": res.fill_qty, "fill_price": res.fill_price,
-                                "fee": fee, "is_partial": res.partial,
-                                "impact_bps": 0.0, "order_type": order_type,
-                                "fill_step": res.fill_step,
-                            }
-                            book.apply_fill(fill_dict)
-                            all_orders.append(fill_dict)
-                            if self.log_events:
-                                event_log.append({"type": "fill", "ts": batch.ts.isoformat(),
-                                                  **fill_dict})
-                else:
-                    # Fallback to legacy simulator
-                    fill = self._legacy_sim.fill(order_dict, bar, batch.ts, strat_name)
-                    if fill:
-                        book.apply_fill(fill)
-                        all_orders.append(fill)
 
             # Mark to market
             book.mark(batch.prices())
@@ -731,12 +730,16 @@ class BacktestEngine:
             dates.append(batch.ts)
             pos_records.append(book.snapshot())
 
-            # Post-bar risk check (daily loss)
+            # Post-bar risk check (daily loss — compare against start-of-day NAV)
             if self.enable_risk_gates:
-                total_loss_pct = (self.capital - eq) / self.capital * 100
-                if total_loss_pct > self.daily_loss_limit_pct:
+                day_key = getattr(batch.ts, 'date', lambda: batch.ts)()
+                if not hasattr(self, '_day_start_nav') or getattr(self, '_last_day_key', None) != day_key:
+                    self._day_start_nav = eq
+                    self._last_day_key = day_key
+                daily_loss_pct = (self._day_start_nav - eq) / max(self._day_start_nav, 1e-9) * 100
+                if daily_loss_pct > self.daily_loss_limit_pct:
                     risk_events.append({"ts": batch.ts, "gate": "daily_loss",
-                                        "loss_pct": total_loss_pct})
+                                        "loss_pct": daily_loss_pct})
 
         self._teardown_adapters(adapters)
         if not dates:
@@ -937,9 +940,11 @@ class BacktestEngine:
 
         # Per-strategy metrics
         strat_metrics: Dict[str, StrategyMetrics] = {}
+        # Normalise signals to portfolio weights (sum-to-1) before attribution
+        sig_abs_sum = signals_df.abs().sum(axis=1).clip(lower=1e-9)
         for col in signals_df.columns:
-            sig = signals_df[col].values
-            strat_pnl = sig * (pnl_arr + _EPS)
+            sig = (signals_df[col] / sig_abs_sum).values
+            strat_pnl = sig * pnl_arr
             strat_eq = self.capital + np.cumsum(strat_pnl)
             strat_ords = (orders[orders["strategy"] == col]
                           if not orders.empty and "strategy" in orders.columns else None)
@@ -1030,8 +1035,8 @@ class BacktestEngine:
         )
         regimes_set = set(detect_regimes(ret_arr))
         n_trades = len(orders) if not orders.empty else sum(m.n_trades for m in strat_metrics.values())
-        oos_sharpe = (float(np.mean(wf_oos_sharpes)) if wf_oos_sharpes
-                      else portfolio_m.sharpe * 0.6)
+        # If walk-forward failed, set oos_sharpe=0 so anti-overfit check correctly fails
+        oos_sharpe = float(np.mean(wf_oos_sharpes)) if wf_oos_sharpes else 0.0
 
         anti_overfit = check_anti_overfit(
             n_trades=n_trades,

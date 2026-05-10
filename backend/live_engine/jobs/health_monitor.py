@@ -25,7 +25,13 @@ log = logging.getLogger(__name__)
 
 _REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 _REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+_REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
 _MAX_BAR_STALENESS_S = int(os.getenv("MAX_BAR_STALENESS_S", "120"))   # 2 minutes
+
+
+def _redis():
+    import redis as _r
+    return _r.Redis(host=_REDIS_HOST, port=_REDIS_PORT, password=_REDIS_PASSWORD, decode_responses=True)
 
 
 def run() -> Dict[str, Any]:
@@ -64,12 +70,11 @@ def run() -> Dict[str, Any]:
 
     # Persist to Redis
     try:
-        import redis as _r
-        r = _r.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        r = _redis()
         r.set("health:status", json.dumps(status))
         r.expire("health:status", 600)   # 10 min TTL
-    except Exception:
-        pass
+    except Exception as exc:
+        log.warning("Failed to persist health status to Redis: %s", exc)
 
     # Send Telegram if any failures
     if status["alerts"]:
@@ -93,8 +98,7 @@ def run() -> Dict[str, Any]:
 def _check_redis() -> dict:
     t0 = time.perf_counter()
     try:
-        import redis as _r
-        r = _r.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        r = _redis()
         r.ping()
         info = r.info("server")
         latency_ms = round((time.perf_counter() - t0) * 1000, 2)
@@ -147,8 +151,7 @@ def _check_broker_api() -> dict:
 
 def _check_data_feeds() -> dict:
     try:
-        import redis as _r
-        r = _r.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        r = _redis()
 
         # Check freshness of the last published bar for a spot-check symbol
         from backend.live_engine.config import NIFTY50_SYMBOLS
@@ -176,13 +179,12 @@ def _check_data_feeds() -> dict:
             return {"ok": False, "message": f"Stale feeds: {stale}"}
         return {"ok": True, "checked_symbols": check_symbols}
     except Exception as exc:
-        return {"ok": True, "message": f"Feed check skipped: {exc}"}
+        return {"ok": False, "message": f"Feed check failed: {exc}"}
 
 
 def _check_kill_switch_status() -> dict:
     try:
-        import redis as _r
-        r = _r.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        r = _redis()
         kill_active = bool(r.get("risk:kill_switch_active"))
         halted = bool(r.get("risk:daily_trading_halted"))
         return {
@@ -192,4 +194,4 @@ def _check_kill_switch_status() -> dict:
             "trading_allowed": not kill_active and not halted,
         }
     except Exception as exc:
-        return {"ok": True, "message": f"Kill switch check skipped: {exc}"}
+        return {"ok": False, "message": f"Kill switch check failed (Redis error): {exc}"}

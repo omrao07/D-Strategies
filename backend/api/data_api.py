@@ -17,8 +17,7 @@ API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)
 def get_api_key(x_api_key: Optional[str] = Depends(API_KEY_HEADER)):
     expected = os.getenv("DATA_API_KEY", "").strip()
     if not expected:
-        # no key set -> open (dev mode)
-        return None
+        raise HTTPException(status_code=500, detail="DATA_API_KEY not configured — server misconfiguration")
     if x_api_key != expected:
         raise HTTPException(status_code=401, detail="Invalid API key")
     return x_api_key
@@ -127,12 +126,13 @@ class NewsItem(BaseModel):
 app = FastAPI(title="Trading Data API", version="1.0.0")
 
 # CORS for dashboard dev
+_cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("DATA_API_CORS", "*").split(","),
+    allow_origins=_cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["X-API-Key", "Content-Type"],
 )
 
 # ---------- Health ----------

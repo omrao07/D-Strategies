@@ -36,7 +36,7 @@ def _get_redis():
         import redis
         host = os.getenv("REDIS_HOST", "localhost")
         port = int(os.getenv("REDIS_PORT", "6379"))
-        r = redis.Redis(host=host, port=port, decode_responses=True)
+        r = redis.Redis(host=host, port=port, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
         r.ping()
         return r
     except Exception as exc:

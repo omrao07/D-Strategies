@@ -92,7 +92,7 @@ BASIS_ADJ_HASH    = os.getenv("CARB_BASIS_ADJ_HASH", "carbon:basis_adj")  # HGET
 BASIS_ADJ_FIELD   = os.getenv("CARB_BASIS_ADJ_FIELD", "EUA_UKA")
 
 # ============================= Redis =============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================= Helpers =============================
 def _hget_price(sym: str) -> Optional[float]:

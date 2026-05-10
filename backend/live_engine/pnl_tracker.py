@@ -125,15 +125,17 @@ class PnLTracker:
     """
 
     _POS_HASH = "pnl:positions"
-    _REALIZED_KEY = "pnl:realized"
+    _REALIZED_KEY = "pnl:realized_alltime"   # never reset — all-time cumulative
+    _REALIZED_TODAY_KEY = "pnl:realized_today"  # reset daily
     _PEAK_KEY = "pnl:peak_equity"
     _TRADES_ZSET = "pnl:trades"
 
     def __init__(self, capital_base: float = 0.0) -> None:
         self._capital_base: float = capital_base or CAPITAL_BASE
-        # In-memory fallback when Redis is unavailable
         self._positions: Dict[str, Dict[str, Any]] = {}
-        self._realized_pnl: float = 0.0
+        self._realized_pnl: float = 0.0      # today's realized (reset daily)
+        self._alltime_realized: float = 0.0   # never reset
+        self._last_persisted_daily: float = 0.0  # baseline for daily delta tracking
         self._peak_equity: float = self._capital_base
         self._trades: List[Dict[str, Any]] = []
 
@@ -161,20 +163,40 @@ class PnLTracker:
         pos = self._load_position(symbol)
 
         if side == "buy":
-            new_qty = pos["qty"] + qty
-            if new_qty > 0:
-                pos["avg_price"] = (pos["avg_price"] * pos["qty"] + price * qty) / new_qty
-            pos["qty"] = new_qty
+            if pos["qty"] >= 0:  # adding to long or opening from flat
+                new_qty = pos["qty"] + qty
+                if new_qty > 0:
+                    pos["avg_price"] = (pos["avg_price"] * pos["qty"] + price * qty) / new_qty
+                pos["qty"] = new_qty
+            else:  # closing a short
+                close_qty = min(qty, abs(pos["qty"]))
+                realized = (pos["avg_price"] - price) * close_qty
+                self._realized_pnl += realized
+                self._persist_realized()
+                pos["qty"] += close_qty  # qty is negative; adding positive reduces short
+                remainder = qty - close_qty
+                if remainder > 0:  # flip to long
+                    pos["qty"] = remainder
+                    pos["avg_price"] = price
+                elif pos["qty"] == 0:
+                    pos["avg_price"] = 0.0
         else:  # sell
-            sell_qty = min(qty, pos["qty"])
-            realized = (price - pos["avg_price"]) * sell_qty
-            self._realized_pnl += realized
-            self._persist_realized()
-
-            pos["qty"] = pos["qty"] - sell_qty
-            if pos["qty"] <= 0:
-                pos["qty"] = 0.0
-                pos["avg_price"] = 0.0
+            if pos["qty"] >= 0:  # closing long or opening short from flat
+                sell_qty = min(qty, pos["qty"])
+                realized = (price - pos["avg_price"]) * sell_qty
+                self._realized_pnl += realized
+                self._persist_realized()
+                pos["qty"] -= sell_qty
+                remainder = qty - sell_qty
+                if remainder > 0:  # flip to short
+                    pos["qty"] = -remainder
+                    pos["avg_price"] = price
+                elif pos["qty"] == 0:
+                    pos["avg_price"] = 0.0
+            else:  # adding to existing short
+                total_short = abs(pos["qty"]) + qty
+                pos["avg_price"] = (pos["avg_price"] * abs(pos["qty"]) + price * qty) / total_short
+                pos["qty"] = -total_short
 
         pos["unrealized_pnl"] = (price - pos["avg_price"]) * pos["qty"]
         self._save_position(symbol, pos)
@@ -247,7 +269,7 @@ class PnLTracker:
     # ------------------------------------------------------------------
 
     def get_daily_pnl(self) -> float:
-        """Sum of realized + unrealized PnL since last ``reset_daily()`` call."""
+        """Sum of today's realized + current unrealized PnL since last reset_daily()."""
         unrealized = sum(
             pos.get("unrealized_pnl", 0.0)
             for pos in self.get_all_positions().values()
@@ -255,18 +277,18 @@ class PnLTracker:
         return self._realized_pnl + unrealized
 
     def get_total_equity(self) -> float:
-        """Capital base + cumulative all-time realized PnL + current unrealized."""
-        realized_str = _r_get(self._REALIZED_KEY)
+        """Capital base + all-time realized PnL + current unrealized."""
+        alltime_str = _r_get(self._REALIZED_KEY)
         try:
-            realized = float(realized_str) if realized_str else self._realized_pnl
+            alltime = float(alltime_str) if alltime_str else self._alltime_realized
         except Exception:
-            realized = self._realized_pnl
+            alltime = self._alltime_realized
 
         unrealized = sum(
             pos.get("unrealized_pnl", 0.0)
             for pos in self.get_all_positions().values()
         )
-        return self._capital_base + realized + unrealized
+        return self._capital_base + alltime + unrealized
 
     def get_peak_equity(self) -> float:
         """All-time high-water mark equity."""
@@ -364,9 +386,10 @@ class PnLTracker:
         _r_set(f"pnl:daily_snapshot:{today}", json.dumps(snapshot), ex=60 * 86400)
         log.info("PnL daily snapshot saved for %s: realized=%.2f", today, self._realized_pnl)
 
-        # Reset daily counter
+        # Reset daily counter and its tracking baseline (all-time key is never touched here)
         self._realized_pnl = 0.0
-        _r_set(self._REALIZED_KEY, "0.0")
+        self._last_persisted_daily = 0.0
+        _r_set(self._REALIZED_TODAY_KEY, "0.0")
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -386,4 +409,7 @@ class PnLTracker:
         _r_hset(self._POS_HASH, symbol, json.dumps(pos))
 
     def _persist_realized(self) -> None:
-        _r_set(self._REALIZED_KEY, str(self._realized_pnl))
+        self._alltime_realized += self._realized_pnl - self._last_persisted_daily
+        self._last_persisted_daily = self._realized_pnl
+        _r_set(self._REALIZED_TODAY_KEY, str(self._realized_pnl))
+        _r_set(self._REALIZED_KEY, str(self._alltime_realized))

@@ -33,7 +33,7 @@ _CAPITAL_BASE = float(os.getenv("CAPITAL_BASE", "10000000"))
 def _redis():
     try:
         import redis
-        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
     except Exception:
         return None
 
@@ -77,7 +77,7 @@ def run() -> Dict[str, Any]:
         )
 
         backtest_results = runner.run_all_strategies(start=start_date, end=end_date)
-        results["strategies_backtested"] = len([r for r in backtest_results if not r.failed])
+        results["strategies_backtested"] = len([res for res in backtest_results if not res.failed])
 
         # Persist rankings
         if r and backtest_results:

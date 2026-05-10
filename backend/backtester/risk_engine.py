@@ -161,16 +161,19 @@ def risk_parity_weights(
     max_iter: int = 500,
 ) -> np.ndarray:
     """
-    Iterative risk-parity (equal risk contribution) weights via Cyclical Coordinate Descent.
-    Returns weight vector summing to 1.
+    Equal Risk Contribution weights via Cyclical Coordinate Descent.
+    Uses full covariance (not just diagonal) so correlations are properly handled.
     """
     n = cov_matrix.shape[0]
     w = np.ones(n) / n
     for _ in range(max_iter):
         w_prev = w.copy()
         for i in range(n):
-            sigma_i = math.sqrt(max(cov_matrix[i, i], 1e-12))
+            # Marginal risk contribution of asset i = (Cov @ w)[i]
+            marginal_risk = float(np.dot(cov_matrix[i], w))
+            sigma_i = math.sqrt(max(marginal_risk, 1e-12))
             w[i] = 1.0 / sigma_i
+        w = np.clip(w, 0, None)
         w /= w.sum()
         if np.max(np.abs(w - w_prev)) < tol:
             break

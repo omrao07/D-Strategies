@@ -1,4 +1,3 @@
-import io
 import os
 import time
 import uuid
@@ -7,9 +6,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from fastapi import FastAPI, UploadFile, File, Body, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, field_validator
 
 import sys
 from pathlib import Path
@@ -23,25 +22,13 @@ if str(ROOT) not in sys.path:
 
 try:
     from orchestration.strategy_manager import Orchestrator
-    from orchestration.ts_utils import load_yaml_or_json, ensure_dir, setup_logging
+    from orchestration.ts_utils import load_yaml_or_json, setup_logging
 except Exception as e:
     raise RuntimeError(
         "Failed to import orchestration modules. "
         "Ensure backend/orchestration/* is on PYTHONPATH."
     ) from e
 
-# Optional modules
-try:
-    from calibrate import Calibrator, ParamSpace, TimeSeriesCV  # type: ignore
-    HAS_CALIBRATE = True
-except Exception:
-    HAS_CALIBRATE = False
-
-try:
-    import prompts  # type: ignore
-    HAS_PROMPTS = True
-except Exception:
-    HAS_PROMPTS = False
 
 # ------------------------------------------------------------------------------
 # App & Logging
@@ -61,11 +48,13 @@ logger = logging.getLogger("api")
 
 app = FastAPI(title="Damodar Orchestrator API", version=APP_VERSION)
 
+_cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PATCH", "DELETE"],
+    allow_headers=["X-Engine-Key", "Content-Type"],
 )
 
 # Wire live WebSocket router
@@ -136,7 +125,8 @@ class BacktestRequest(BaseModel):
     inline_data: Optional[InlineData] = None
     out_dir: Optional[str] = None
 
-    @validator("config", "registry", pre=True)
+    @field_validator("config", "registry", mode="before")
+    @classmethod
     def empty_to_none(cls, v):
         return None if v in ("", {}, []) else v
 
@@ -177,6 +167,16 @@ def resolve_data(
 def health():
     return {"status": "ok", "version": APP_VERSION}
 
+def _safe_path(user_path: Optional[str], allowed_base: Path) -> Path:
+    """Resolve a user-supplied path and ensure it stays within allowed_base."""
+    if not user_path:
+        raise HTTPException(400, "Path is required")
+    resolved = (allowed_base / user_path).resolve()
+    if not str(resolved).startswith(str(allowed_base.resolve())):
+        raise HTTPException(400, f"Path traversal not allowed: {user_path}")
+    return resolved
+
+
 @app.post("/backtest", response_model=BacktestResponse)
 def run_backtest(req: BacktestRequest):
     if not req.config and not req.config_path:
@@ -184,11 +184,26 @@ def run_backtest(req: BacktestRequest):
     if not req.registry and not req.registry_path:
         raise HTTPException(400, "Registry required")
 
-    config = req.config or load_yaml_or_json(req.config_path)
-    registry = req.registry or load_yaml_or_json(req.registry_path)
+    # Validate config/registry paths stay within RUNS_DIR
+    if req.config_path:
+        _safe_path(req.config_path, RUNS_DIR)
+    if req.registry_path:
+        _safe_path(req.registry_path, RUNS_DIR)
 
-    run_dir = Path(req.out_dir) if req.out_dir else new_run_dir("bt")
-    df = resolve_data(req.csv_path, req.inline_data)
+    config = req.config or load_yaml_or_json(str(_safe_path(req.config_path, RUNS_DIR)))
+    registry = req.registry or load_yaml_or_json(str(_safe_path(req.registry_path, RUNS_DIR)))
+
+    # Sandbox out_dir to RUNS_DIR
+    if req.out_dir:
+        run_dir = _safe_path(req.out_dir, RUNS_DIR)
+        run_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        run_dir = new_run_dir("bt")
+
+    # csv_path is not accepted — use inline_data only
+    if req.csv_path:
+        raise HTTPException(400, "csv_path not allowed; submit data via inline_data")
+    df = resolve_data(None, req.inline_data)
 
     orch = Orchestrator(
         config=config,

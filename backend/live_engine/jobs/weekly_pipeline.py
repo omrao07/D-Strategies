@@ -31,7 +31,7 @@ _REPORTS_DIR = os.getenv("REPORTS_DIR", "reports")
 def _redis():
     try:
         import redis
-        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
     except Exception:
         return None
 

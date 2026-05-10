@@ -100,7 +100,7 @@ BASE_WEIGHTS_DOVE = {"EQUITIES": +0.20, "UST_7_10": +0.25, "UST_20Y": +0.20, "GO
 MAX_TILT_SCALE = float(os.getenv("SPI_MAX_TILT_SCALE", "1.0"))
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ utils ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

@@ -92,7 +92,7 @@ FEES_OPT_HK = os.getenv("VTS_FEES_OPT_HK", "fees:vol")
 FEES_FUT_HK = os.getenv("VTS_FEES_FUT_HK", "fees:vix")
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hgetf(hk: str, field: str) -> Optional[float]:

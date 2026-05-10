@@ -100,7 +100,7 @@ VENUE_HINTS = {
 LAST_PRICE_HKEY = os.getenv("CSD_LAST_PRICE_KEY", "last_price")  # HSET symbol -> {"price": ...}
 
 # ------------------------------- Redis -------------------------------
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 def _venue_for(sym: str) -> Optional[str]:
     px = sym.split(".", 1)[0].upper()

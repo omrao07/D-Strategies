@@ -113,7 +113,7 @@ def simulate_open_market(row, px):
     df = px[t].iloc[start:end+1]; 
     if df.empty: return []
     dv = dollar_volume(px[t]["Close"], px[t]["Volume"])
-    adv_series = adv(dv).reindex(df.index).fillna(method="ffill")
+    adv_series = adv(dv).reindex(df.index).ffill()
     cap = (row["max_pct_adv"]/100.0)*adv_series
     size = row["size_usd"] if pd.notna(row["size_usd"]) else cap.mean()*row["window_days"]*0.8
     rem = size; trades=[]

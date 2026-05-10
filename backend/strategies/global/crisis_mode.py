@@ -295,9 +295,9 @@ def composite_stress_index(
 
     # Normalize signals to z and combine (weights heuristic)
     sigs = pd.DataFrame({
-        "z_vol": zscore(out["vol_ewma"].fillna(method="ffill")),
+        "z_vol": zscore(out["vol_ewma"].ffill()),
         "z_dd" : zscore(out["drawdown"].fillna(0.0)),
-        "z_aac": zscore(out["aac"].fillna(method="ffill")),
+        "z_aac": zscore(out["aac"].ffill()),
         "z_ph" : zscore(out["phinkley"].fillna(0.0)),
         "z_risk": out["risk_z_mean"].fillna(0.0)
     })

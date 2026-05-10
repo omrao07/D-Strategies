@@ -28,7 +28,7 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 INCOMING_ORDERS = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
 
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 
 @dataclass
@@ -221,10 +221,11 @@ class ExampleBuyTheDip(Strategy):
 
 
 # ---------------- News handler base ----------------
-class BaseStrategy:
+class BaseStrategy(Strategy):
+    """Concrete base class — provides no-op implementations for all abstract methods."""
+
+    def on_tick(self, tick: Any) -> None:
+        pass
+
     def on_news(self, event: Any) -> None:
-        """
-        Handle incoming news event.
-        Override this in custom strategy classes.
-        """
         pass

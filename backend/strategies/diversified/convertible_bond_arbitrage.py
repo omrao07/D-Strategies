@@ -62,7 +62,7 @@ MIN_ORDER_USD  = float(os.getenv("CBARB_MIN_ORDER_USD", "200"))        # skip du
 RECHECK_SECS   = int(os.getenv("CBARB_RECHECK_SECS", "5"))
 
 # ============================ REDIS ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 def _now_ms() -> int:
     return int(time.time() * 1000)

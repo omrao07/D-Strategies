@@ -68,7 +68,7 @@ def allocate_equities_from_weights(
     Convert weights → dollar and share targets with caps, buffer, and dust filter.
     Returns: {'weights': w, 'dollars': $, 'shares': shares}
     """
-    px = last_prices.astype(float).reindex(weights.index).fillna(method="ffill") # type: ignore
+    px = last_prices.astype(float).reindex(weights.index).ffill() # type: ignore
     w = _normalize_weights(weights, cfg.unit_gross, cfg.max_per_asset)
 
     if not cfg.allow_short:
@@ -116,7 +116,7 @@ def allocate_futures_from_weights(
     Weights → target contracts (rounded), with leverage cap and dust filter.
     `specs`: dict of multipliers; if None, tries cfg.contract_multipliers.
     """
-    px = last_prices.astype(float).reindex(weights.index).fillna(method="ffill") # type: ignore
+    px = last_prices.astype(float).reindex(weights.index).ffill() # type: ignore
     mult = pd.Series(specs or (cfg.contract_multipliers or {}), dtype=float).reindex(px.index).fillna(1.0)
 
     w = _normalize_weights(weights, cfg.unit_gross, cfg.max_per_asset)

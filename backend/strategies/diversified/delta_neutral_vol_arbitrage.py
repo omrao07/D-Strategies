@@ -87,7 +87,7 @@ def _strad_sym(sym: str, tenor: str) -> str:
     return f"STRAD:{sym}:{tenor}"
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ Math (BS greeks) ============================
 def _norm_cdf(x: float) -> float:

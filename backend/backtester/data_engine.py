@@ -469,7 +469,7 @@ def align_multitimeframes(
         if freq == base_freq:
             aligned[freq] = df
             continue
-        reindexed = df.reindex(base_idx, method=method)
+        reindexed = df.reindex(base_idx).ffill() if method == "ffill" else df.reindex(base_idx).bfill() if method == "bfill" else df.reindex(base_idx, method=method)
         aligned[freq] = reindexed
     return aligned
 

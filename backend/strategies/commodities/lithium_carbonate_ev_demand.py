@@ -68,7 +68,7 @@ def run(cfg):
     ).sort_index()
     ev_global["ev_yoy_pct"] = ev_global["total_ev_k"].pct_change(12) * 100  # monthly YoY
 
-    merged = lithium.join(ev_global, how="outer").fillna(method="ffill")
+    merged = lithium.join(ev_global, how="outer").ffill()
 
     signal_records = []
     for date, row in merged.iterrows():

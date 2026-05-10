@@ -39,7 +39,7 @@ RECHECK_SECS = int(os.getenv("INF_RECHECK_SECS", "60"))
 SWAP_KEY_FMT = os.getenv("INF_SWAP_KEY", "infswap:rate")
 BE_KEY_FMT   = os.getenv("INF_BE_KEY",   "breakeven")
 
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 def _hgetf(hashkey: str, field: str) -> Optional[float]:
     val = r.hget(hashkey, field)

@@ -32,12 +32,18 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
 
-_r = redis.Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    password=REDIS_PASSWORD,
-    decode_responses=True,   # JSON strings in/out
-)
+_r = None  # lazy: connected on first use
+
+def _get_r():
+    global _r
+    if _r is None:
+        try:
+            _r = redis.Redis(
+                host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
+            )
+        except Exception:
+            pass
+    return _r
 
 # ---- Helpers ----
 def _dumps(obj: Union[dict, Any]) -> str:
@@ -59,7 +65,7 @@ def publish_stream(stream: str, item: Union[dict, Any]) -> str:
     Add an entry to a Redis Stream.
     Returns the Redis stream entry ID.
     """
-    return _r.xadd(stream, {"json": _dumps(item)}) # type: ignore
+    return _get_r().xadd(stream, {"json": _dumps(item)}) # type: ignore
 
 def consume_stream(
     stream: str,
@@ -75,7 +81,7 @@ def consume_stream(
     """
     last_id = start_id
     while True:
-        res = _r.xread({stream: last_id}, block=block_ms, count=count)
+        res = _get_r().xread({stream: last_id}, block=block_ms, count=count)
         if not res:
             continue
         _, entries = res[0] # type: ignore
@@ -91,13 +97,13 @@ def publish_pubsub(channel: str, item: Union[dict, Any]) -> None:
     """
     Publish a message to a Pub/Sub channel (for websockets/clients).
     """
-    _r.publish(channel, _dumps(item))
+    _get_r().publish(channel, _dumps(item))
 
 def subscribe_pubsub(channel: str) -> Generator[Any, None, None]:
     """
     Subscribe to a Pub/Sub channel. Yields deserialized messages.
     """
-    ps = _r.pubsub()
+    ps = _get_r().pubsub()
     ps.subscribe(channel)
     try:
         for msg in ps.listen():
@@ -111,17 +117,17 @@ def subscribe_pubsub(channel: str) -> Generator[Any, None, None]:
 # State KV (positions, pnl)
 # =========================
 def hgetall(name: str) -> dict:
-    return _r.hgetall(name) or {} # type: ignore
+    return _get_r().hgetall(name) or {} # type: ignore
 
 def hset(name: str, key: str, value: Union[str, dict, Any]) -> None:
-    _r.hset(name, key, _dumps(value) if not isinstance(value, str) else value)
+    _get_r().hset(name, key, _dumps(value) if not isinstance(value, str) else value)
 
 def get(name: str, default: Optional[str] = None) -> Optional[str]:
-    val = _r.get(name)
+    val = _get_r().get(name)
     return val if val is not None else default # type: ignore
 
 def set(name: str, value: Union[str, dict, Any]) -> None:
-    _r.set(name, _dumps(value) if not isinstance(value, str) else value)
+    _get_r().set(name, _dumps(value) if not isinstance(value, str) else value)
 
 # =========================
 # Common topics/channels

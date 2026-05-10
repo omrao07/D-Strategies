@@ -92,7 +92,7 @@ BETA_HKEY   = os.getenv("ILS_BETA_KEY",   "ils:beta")       # HSET ils:beta   <B
 RATE_FMT    = os.getenv("ILS_RATE_FMT",   "rate:risk_free:{ccy}")  # HSET rate:risk_free:USD USD 0.045
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hgetf(hkey: str, field: str) -> Optional[float]:

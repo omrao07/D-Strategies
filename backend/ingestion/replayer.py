@@ -19,6 +19,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--loop", action="store_true", help="Loop forever")
     p.add_argument("--redis-host", default=os.getenv("REDIS_HOST", "localhost"))
     p.add_argument("--redis-port", type=int, default=int(os.getenv("REDIS_PORT", "6379")))
+    p.add_argument("--redis-password", default=os.getenv("REDIS_PASSWORD") or None)
     p.add_argument("--max-rows", type=int, default=None, help="Stop after N rows (debug)")
     return p.parse_args()
 
@@ -78,7 +79,7 @@ def main():
     if not path.exists():
         raise SystemExit(f"[replayer] path not found: {path}")
     dataset = _open_dataset(path)
-    r = redis.Redis(host=args.redis_host, port=args.redis_port, decode_responses=True)
+    r = redis.Redis(host=args.redis_host, port=args.redis_port, password=args.redis_password, decode_responses=True)
     print(f"[replayer] stream={args.stream} path={path} speed={args.speed} loop={args.loop} range=({args.from_ms},{args.to_ms})")
     total = 0
     try:

@@ -174,7 +174,7 @@ class FeatureBuilder:
                 else:
                     g[cfg.target] = px.pct_change(periods=cfg.horizon).shift(-cfg.horizon).fillna(0.0)
             elif cfg.task == "price":
-                g[cfg.target] = px.shift(-cfg.horizon).fillna(method="ffill") - px
+                g[cfg.target] = px.shift(-cfg.horizon).ffill() - px
 
             out.append(g)
         fd = _pd.concat(out, axis=0)

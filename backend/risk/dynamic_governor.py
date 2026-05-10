@@ -541,7 +541,7 @@ def main():
     if redis:
         try:
             host=os.getenv("REDIS_HOST","localhost"); port=int(os.getenv("REDIS_PORT","6379"))
-            r=redis.Redis(host=host, port=port, decode_responses=True)
+            r=redis.Redis(host=host, port=port, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
         except Exception:
             r=None
     tel = Telemetry(r=r)

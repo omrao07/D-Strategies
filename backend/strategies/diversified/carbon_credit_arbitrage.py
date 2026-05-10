@@ -83,7 +83,7 @@ LAST_PRICE_KEY = "last_price"       # HSET symbol -> {"price": ...}
 RATES_FX_HKEY  = "fx:spot"          # HSET "EURUSD" -> 1.0945 etc (optional)
 
 # ====================== Redis / helpers ======================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 def _now_ms() -> int:
     return int(time.time() * 1000)

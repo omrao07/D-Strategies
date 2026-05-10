@@ -78,7 +78,7 @@ class MandatoryRules:
     WF_CONSISTENCY_MIN = 0.6     # fraction of walk-forward windows with positive Sharpe
     REGIME_COVERAGE_MIN = 3      # must have traded in at least 3 distinct regimes
     LOOKAHEAD_VIOLATIONS_MAX = 0
-    IS_OOS_SHARPE_GAP_MAX = 0.8  # IS Sharpe / OOS Sharpe ratio must be < this
+    IS_OOS_SHARPE_GAP_MAX = 0.8  # IS Sharpe - OOS Sharpe difference must be < this
 
     @classmethod
     def check_min_trades(cls, n_trades: int) -> ValidationResult:
@@ -144,19 +144,14 @@ class MandatoryRules:
 
     @classmethod
     def check_is_oos_gap(cls, is_sharpe: float, oos_sharpe: float) -> ValidationResult:
-        if oos_sharpe <= 0:
-            ratio = float("inf")
-            passed = False
-        else:
-            ratio = is_sharpe / max(oos_sharpe, 1e-9)
-            passed = ratio <= cls.IS_OOS_SHARPE_GAP_MAX
-        ratio_display = min(ratio, 99.99)
+        gap = is_sharpe - oos_sharpe
+        passed = gap < cls.IS_OOS_SHARPE_GAP_MAX
         return ValidationResult(
             rule="is_oos_sharpe_gap",
             passed=passed,
-            value=ratio_display,
+            value=round(gap, 4),
             threshold=cls.IS_OOS_SHARPE_GAP_MAX,
-            message=f"IS/OOS Sharpe ratio {ratio_display:.2f} ({'≤' if passed else '>'} {cls.IS_OOS_SHARPE_GAP_MAX})",
+            message=f"IS-OOS Sharpe gap {gap:.3f} ({'<' if passed else '≥'} {cls.IS_OOS_SHARPE_GAP_MAX})",
         )
 
     @classmethod
@@ -447,7 +442,7 @@ class AntiOverfitEngine:
 
         if regimes_traded is None:
             from backend.backtester.signal_engine import detect_regime
-            regime_series = detect_regime(is_returns.append(oos_returns))
+            regime_series = detect_regime(pd.concat([is_returns, oos_returns]))
             regimes_traded = set(regime_series.unique())
 
         leakage = data_leakage_check(signals, prices)

@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from fastapi import APIRouter, BackgroundTasks, HTTPException
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/backtest", tags=["backtest"])
@@ -57,13 +57,15 @@ class BacktestRunRequest(BaseModel):
     strategy_filter: Optional[List[str]] = Field(None, description="Subset of strategy names to run")
     use_registry: bool = Field(True, description="If True, load all strategies from registry")
 
-    @validator("mode")
+    @field_validator("mode")
+    @classmethod
     def validate_mode(cls, v):
         if v not in ("vectorized", "event_driven"):
             raise ValueError("mode must be 'vectorized' or 'event_driven'")
         return v
 
-    @validator("portfolio_method")
+    @field_validator("portfolio_method")
+    @classmethod
     def validate_pm(cls, v):
         valid = {"equal", "vol_parity", "kelly", "hrp", "risk_parity"}
         if v not in valid:

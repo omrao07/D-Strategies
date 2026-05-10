@@ -38,7 +38,7 @@ MAX_GROSS_USD         = float(os.getenv("RISK_MAX_GROSS_USD", "100000"))
 SLIPPAGE_BPS          = float(os.getenv("EXEC_SLIPPAGE_BPS", "0"))   # e.g., "1.5" for 1.5bps
 FEES_BPS              = float(os.getenv("EXEC_FEES_BPS", "0"))       # simple all-in fee model
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 
 # ---------- Helpers ----------
 def _now_ms() -> int:

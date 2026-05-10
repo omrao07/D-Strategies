@@ -51,7 +51,7 @@ EXPOSE 8000 9090 9094 9095
 
 # Healthcheck: verify Redis reachability
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=5 \
-  CMD python -c "import os,redis; r=redis.Redis(host=os.getenv('REDIS_HOST','localhost'), port=int(os.getenv('REDIS_PORT','6379'))); r.ping()" || exit 1
+  CMD python -c "import os,redis; r=redis.Redis(host=os.getenv('REDIS_HOST','localhost'), port=int(os.getenv('REDIS_PORT','6379')), password=os.getenv('REDIS_PASSWORD') or None); r.ping()" || exit 1
 
 # Use shell form so $WORKER_MODULE env expands at runtime
 ENTRYPOINT ["sh","-c","python -m ${WORKER_MODULE}"]

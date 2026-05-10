@@ -28,8 +28,11 @@ WORKDIR /app
 # Copy pyproject + lock (if you have one)
 COPY pyproject.toml ./
 
+# Copy source code
+COPY . .
+
 # Install dependencies (no dev deps by default)
-RUN pip install --no-cache-dir -e . 
+RUN pip install --no-cache-dir -e .
 
 # Default CMD is overridden in child Dockerfiles
 CMD ["python", "--version"]

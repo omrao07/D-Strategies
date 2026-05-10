@@ -512,7 +512,7 @@ def spending_projection(demand: pd.DataFrame, unit_costs: pd.DataFrame, prices: 
             infl = p / p.loc[base_year]
         else:
             infl = p / float(p.iloc[0])
-        infl = infl.reindex(demand["year"].unique()).fillna(method="ffill").fillna(method="bfill")
+        infl = infl.reindex(demand["year"].unique()).ffill().bfill()
     rows = []
     for _, r in demand.iterrows():
         y = int(r["year"]); infl_y = float(infl.loc[y]) if y in infl.index else 1.0

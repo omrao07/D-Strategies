@@ -103,6 +103,20 @@ CREATE TABLE IF NOT EXISTS risk_events (
 SELECT create_hypertable('risk_events', 'ts', if_not_exists => TRUE,
        chunk_time_interval => INTERVAL '30 days');
 
+-- ── SEBI OTR compliance alerts ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS compliance_otr_alerts (
+    id          BIGSERIAL,
+    ts_ms       BIGINT          NOT NULL,
+    window_ms   INTEGER         NOT NULL,
+    bucket      JSONB,
+    orders      INTEGER,
+    trades      INTEGER,
+    otr         NUMERIC(10, 4),
+    slab        NUMERIC(10, 4),
+    UNIQUE (ts_ms, window_ms, bucket)
+);
+CREATE INDEX IF NOT EXISTS idx_compliance_otr_ts ON compliance_otr_alerts (ts_ms DESC);
+
 -- Compression policy: compress ticks older than 7 days
 SELECT add_compression_policy('ticks', INTERVAL '7 days', if_not_exists => TRUE);
 SELECT add_compression_policy('bars',  INTERVAL '30 days', if_not_exists => TRUE);

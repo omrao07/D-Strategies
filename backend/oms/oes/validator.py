@@ -110,7 +110,7 @@ def _redis_ping(host: str, port: int, db: int = 0) -> Tuple[bool, Optional[str]]
     if redis is None:
         return False, "redis-py not installed"
     try:
-        r = redis.Redis(host=host, port=port, db=db, decode_responses=True, socket_connect_timeout=1.5, socket_timeout=2.0)
+        r = redis.Redis(host=host, port=port, db=db, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True, socket_connect_timeout=1.5, socket_timeout=2.0)
         ok = r.ping()
         if not ok:
             return False, "ping=false"
@@ -330,7 +330,7 @@ class Validator:
             return [Check(name="bus.streams", critical=False, passed=False, details="redis-py missing", fix="pip install redis")]
         host = os.getenv("REDIS_HOST", "localhost")
         port = int(os.getenv("REDIS_PORT", "6379"))
-        r = redis.Redis(host=host, port=port, decode_responses=True)
+        r = redis.Redis(host=host, port=port, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
         out: List[Check] = []
         topics = ["orders.incoming", "alpha.ensemble", "derivs.option_chain", "derivs.vol_surface", "ai.insight"]
         try:

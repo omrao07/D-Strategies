@@ -60,7 +60,7 @@ def run(cfg):
                 ("basket_usd" if "basket_usd" in crude.columns else crude.columns[0])
     inr_col = "usdinr" if "usdinr" in inr.columns else inr.columns[0]
 
-    merged = crude[[brent_col]].join(inr[[inr_col]], how="outer").fillna(method="ffill").dropna()
+    merged = crude[[brent_col]].join(inr[[inr_col]], how="outer").ffill().dropna()
 
     base_brent = float(merged[brent_col].iloc[:252].mean()) if len(merged) > 252 else 70.0
     base_inr = float(merged[inr_col].iloc[:252].mean()) if len(merged) > 252 else 70.0

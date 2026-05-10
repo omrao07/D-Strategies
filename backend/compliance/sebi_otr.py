@@ -289,10 +289,11 @@ class OtrMonitor:
         return alerts
 
     def _breach_slab(self, ratio: float) -> Optional[float]:
+        """Return the lowest slab that ratio crosses (emit one alert per slab per breach)."""
         for t in sorted(self.cfg.alert_thresholds):
             if ratio >= t:
-                slab = t
-        return locals().get("slab")
+                return t
+        return None
 
     def _bucket_dict(self, key: Tuple) -> Dict[str, Any]:
         return {g: key[i] for i, g in enumerate(self.cfg.group_by)}
@@ -312,6 +313,42 @@ class OtrMonitor:
     def _emit_alert(self, alert: Dict[str, Any]) -> None:
         if publish_stream:
             publish_stream("compliance.otr.alerts", alert)
+        self._persist_alert_to_db(alert)
+
+    def _persist_alert_to_db(self, alert: Dict[str, Any]) -> None:
+        """Persist OTR alert to TimescaleDB compliance table (best-effort)."""
+        db_url = __import__("os").getenv("DATABASE_URL", "")
+        if not db_url:
+            return
+        try:
+            import psycopg2  # type: ignore
+            import json as _json
+            conn = psycopg2.connect(db_url, connect_timeout=5)
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO compliance_otr_alerts
+                            (ts_ms, window_ms, bucket, orders, trades, otr, slab)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT DO NOTHING
+                        """,
+                        (
+                            alert.get("ts_ms"),
+                            alert.get("window_ms"),
+                            _json.dumps(alert.get("bucket", {})),
+                            alert.get("orders"),
+                            alert.get("trades"),
+                            alert.get("otr"),
+                            alert.get("slab"),
+                        ),
+                    )
+            conn.close()
+        except ImportError:
+            pass  # psycopg2 not installed — CSV-only mode
+        except Exception as exc:
+            import logging as _log
+            _log.getLogger(__name__).warning("OTR alert DB persist failed: %s", exc)
 
     # ---- CSV reporting ----
     def write_csv(self) -> Optional[str]:

@@ -51,7 +51,7 @@ CFG_DIR  = BASE_DIR / "backend" / "config"
 REG_FILE = CFG_DIR / "register.yaml"
 FEEDS_DIR = CFG_DIR / "feeds"
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 
 # ---------------- Utils ----------------
 def _now_ms() -> int:

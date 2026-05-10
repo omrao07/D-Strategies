@@ -105,7 +105,7 @@ FX_SPOT_HKEY    = os.getenv("CTA_FX_SPOT_KEY",    "fx:spot")
 ROUTE_COST_KEY  = "route_cost"  # per-route override: HGET route_cost:<ORIG>-<DEST> cost -> usd_per_unit
 
 # ============================== REDIS ==============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================== HELPERS ==============================
 def _prefix(sym: str) -> str:

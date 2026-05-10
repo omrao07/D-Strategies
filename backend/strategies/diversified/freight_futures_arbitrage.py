@@ -95,7 +95,7 @@ BETA_HKEY       = os.getenv("FFA_BETA_KEY", "ffa:beta")               # HSET ffa
 BASIS_HKEY      = os.getenv("FFA_BASIS_KEY", "ffa:basis")             # HSET ffa:basis <PAIRKEY> <pts_guard>
 
 # ============================== Redis ==============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================== helpers ==============================
 def _hget_price(sym: str) -> Optional[float]:

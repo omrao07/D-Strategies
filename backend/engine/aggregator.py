@@ -39,7 +39,7 @@ log = logging.getLogger("aggregator")
 logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO), format="%(asctime)s %(levelname)s %(message)s")
 
 # Redis (for quick KV updates OMS/API may use)
-_r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+_r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 
 
 def _load_region_configs() -> List[Dict[str, Any]]:

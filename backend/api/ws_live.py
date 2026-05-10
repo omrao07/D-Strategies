@@ -26,7 +26,15 @@ except ImportError:
     AsyncRedis = None  # type: ignore
     _HAVE_REDIS = False
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+_REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+_REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
+# Prefer explicit REDIS_URL if set; otherwise build from components
+REDIS_URL = os.getenv("REDIS_URL") or (
+    f"redis://:{_REDIS_PASSWORD}@{_REDIS_HOST}:{_REDIS_PORT}/0"
+    if _REDIS_PASSWORD
+    else f"redis://{_REDIS_HOST}:{_REDIS_PORT}/0"
+)
 BROADCAST_INTERVAL_MS = int(os.getenv("WS_BROADCAST_INTERVAL_MS", "500"))
 
 

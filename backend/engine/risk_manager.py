@@ -58,7 +58,7 @@ RISK_MAX_DAILY_LOSS_PER_STRAT = float(os.getenv("RISK_MAX_DAILY_LOSS_PER_STRAT",
 INCOMING_STREAM = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
 OUT_STREAM = STREAM_ORDERS
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 
 # ---------------- Helpers ----------------
 def _now_ms() -> int:

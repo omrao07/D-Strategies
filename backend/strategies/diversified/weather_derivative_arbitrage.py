@@ -82,7 +82,7 @@ META_HK    = os.getenv("WX_META_HK",    "wx:meta")
 FEES_HK    = os.getenv("WX_FEES_HK",    "fees:wx")      # HSET fees:wx OTC 8 (bps)
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _hget_json(hk: str, field: str) -> Optional[dict]:

@@ -23,23 +23,44 @@ You can call allocate() on a schedule (e.g., every minute) or on demand.
 
 from __future__ import annotations
 import json, time, math, os
-import redis
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
-# --- Config (can be moved to settings.py) ---
+# --- Config ---
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
 
-# Target portfolio risk (volatility targeting) in annualized terms
-TARGET_VOL = float(os.getenv("ALLOC_TARGET_VOL", "0.12"))         # 12% annualized target
-MIN_VOL_FLOOR = float(os.getenv("ALLOC_MIN_VOL_FLOOR", "0.02"))   # avoid division by tiny vol
-MAX_WEIGHT_PER_STRAT = float(os.getenv("ALLOC_MAX_W", "0.15"))    # 15% cap
-GLOBAL_GROSS_CAP = float(os.getenv("ALLOC_GROSS_CAP", "1.0"))     # <= 1.0 of capital base
-DRAWDOWN_CUTOFF = float(os.getenv("ALLOC_DD_CUTOFF", "0.10"))     # 10% DD -> strong de-weight
-DRAWDOWN_MIN_FACTOR = float(os.getenv("ALLOC_DD_MINF", "0.25"))   # min keep 25% of computed weight
-SIGNAL_TILT = float(os.getenv("ALLOC_SIGNAL_TILT", "0.5"))        # 0..1; 0 = ignore signal, 1 = full tilt
+TARGET_VOL = float(os.getenv("ALLOC_TARGET_VOL", "0.12"))
+MIN_VOL_FLOOR = float(os.getenv("ALLOC_MIN_VOL_FLOOR", "0.02"))
+MAX_WEIGHT_PER_STRAT = float(os.getenv("ALLOC_MAX_W", "0.15"))
+GLOBAL_GROSS_CAP = float(os.getenv("ALLOC_GROSS_CAP", "1.0"))
+DRAWDOWN_CUTOFF = float(os.getenv("ALLOC_DD_CUTOFF", "0.10"))
+DRAWDOWN_MIN_FACTOR = float(os.getenv("ALLOC_DD_MINF", "0.25"))
+SIGNAL_TILT = float(os.getenv("ALLOC_SIGNAL_TILT", "0.5"))
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+_r_client: Optional[object] = None
+
+def _get_r():
+    global _r_client
+    if _r_client is None:
+        try:
+            import redis as _redis_mod
+            _r_client = _redis_mod.Redis(
+                host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
+            )
+        except Exception:
+            _r_client = None
+    return _r_client
+
+# alias for backward compat with code that accesses module-level r
+class _RedisProxy:
+    def __getattr__(self, name):
+        client = _get_r()
+        if client is None:
+            raise RuntimeError("Redis not available")
+        return getattr(client, name)
+
+r = _RedisProxy()
 
 # ---- Helpers ----
 def _hget_json_map(key: str) -> Dict[str, dict]:

@@ -53,7 +53,7 @@ CATALOG_FILE = REPO_ROOT / "backend" / "strategies" / "catalog.yaml"
 # Redis (for enable/disable flags)
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
 
 # In‑memory registry
 _STRATS: Dict[str, Strategy] = {}

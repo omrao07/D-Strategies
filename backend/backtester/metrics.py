@@ -145,11 +145,12 @@ def sharpe(daily_returns: np.ndarray, rf_daily: float = 0.0, periods_per_year: i
 
 def sortino(daily_returns: np.ndarray, rf_daily: float = 0.0, periods_per_year: int = _TRADING_DAYS) -> float:
     r = daily_returns[~np.isnan(daily_returns)] - rf_daily
-    downside = r[r < 0]
-    downside_std = np.std(downside, ddof=1) if len(downside) > 1 else _EPS
-    if downside_std < _EPS:
+    # Downside deviation: sqrt of mean squared negative excess returns (semi-deviation)
+    downside_sq = np.minimum(r, 0.0) ** 2
+    downside_dev = float(np.sqrt(np.mean(downside_sq) * periods_per_year))
+    if downside_dev < _EPS:
         return 0.0
-    return float(r.mean() / downside_std * np.sqrt(periods_per_year))
+    return float(r.mean() * periods_per_year / downside_dev)
 
 
 def calmar(equity_curve: np.ndarray, periods_per_year: int = _TRADING_DAYS) -> float:
@@ -201,21 +202,32 @@ def compute_trade_metrics(
     if orders_df is None or orders_df.empty:
         return TradeMetrics()
 
-    # Match buys and sells per symbol to get round-trip trades
+    # Match buys and sells per symbol to get round-trip trades (long and short)
     trades = []
     for (strat, sym), grp in orders_df.groupby(["strategy", "symbol"]):
         grp = grp.sort_values("ts")
-        queue: List[dict] = []
+        long_q: List[dict] = []   # pending buy openers
+        short_q: List[dict] = []  # pending sell openers
         for _, row in grp.iterrows():
-            entry = {"ts": row["ts"], "price": row.get("fill_price", 0),
-                     "qty": row.get("qty", 0), "side": row.get("side", "buy")}
-            if row.get("side") == "buy":
-                queue.append(entry)
-            elif queue:
-                opener = queue.pop(0)
-                pnl = (entry["price"] - opener["price"]) * min(opener["qty"], entry["qty"])
-                hold = (pd.Timestamp(entry["ts"]) - pd.Timestamp(opener["ts"])).days
-                trades.append({"pnl": pnl, "hold_bars": max(hold, 1)})
+            fill = {"ts": row["ts"], "price": row.get("fill_price", 0),
+                    "qty": row.get("qty", 0), "side": row.get("side", "buy")}
+            side = row.get("side")
+            if side == "buy":
+                if short_q:  # close short
+                    opener = short_q.pop(0)
+                    pnl = (opener["price"] - fill["price"]) * min(opener["qty"], fill["qty"])
+                    hold = (pd.Timestamp(fill["ts"]) - pd.Timestamp(opener["ts"])).days
+                    trades.append({"pnl": pnl, "hold_bars": max(hold, 1)})
+                else:
+                    long_q.append(fill)
+            elif side == "sell":
+                if long_q:  # close long
+                    opener = long_q.pop(0)
+                    pnl = (fill["price"] - opener["price"]) * min(opener["qty"], fill["qty"])
+                    hold = (pd.Timestamp(fill["ts"]) - pd.Timestamp(opener["ts"])).days
+                    trades.append({"pnl": pnl, "hold_bars": max(hold, 1)})
+                else:
+                    short_q.append(fill)
 
     if not trades:
         return TradeMetrics(n_trades=len(orders_df))

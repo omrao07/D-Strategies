@@ -62,7 +62,7 @@ def run(cfg):
     sales_nat = sales.groupby("date")[sales_col].sum().sort_index()
 
     # Replacement ratio: scrapped / new sales (1M lag)
-    merged = scrap_nat_df.join(sales_nat.rename("new_sales"), how="outer").fillna(method="ffill")
+    merged = scrap_nat_df.join(sales_nat.rename("new_sales"), how="outer").ffill()
     merged["replacement_ratio"] = merged["total_scrapped"] / merged["new_sales"].shift(1).replace(0, np.nan)
 
     # Vehicle cycle: scrappage by category vs sales

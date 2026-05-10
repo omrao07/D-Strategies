@@ -34,6 +34,7 @@ import pyarrow.parquet as pq
 # ---- Env / defaults ----
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
 
 DEFAULT_STREAMS = ["trades.crypto"]  # you can pass others via CLI
 DEFAULT_OUTDIR = Path("data/recordings")
@@ -46,7 +47,7 @@ CLICKHOUSE_DB   = os.getenv("CLICKHOUSE_DB", "market_data")
 CLICKHOUSE_TABLE_PREFIX = os.getenv("REC_CH_TABLE_PREFIX", "rec")
 
 # ---- Redis client ----
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True)
 
 
 # ---------- Helpers ----------

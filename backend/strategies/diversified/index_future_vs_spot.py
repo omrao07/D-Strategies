@@ -90,7 +90,7 @@ DIV_YIELD_HKEY  = os.getenv("IFVS_DIV_YIELD_KEY",  "div:yield")       # HSET div
 DIV_PV_HKEY     = os.getenv("IFVS_DIV_PV_KEY",     "div:pv:{fut}")    # HSET div:pv:<FUT_SYM> <SPOT_SYM> <PVdiv>
 
 # ============================ Redis ============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================ helpers ============================
 def _now_date() -> dt.date:

@@ -44,7 +44,7 @@ class HealthReport:
 
 def check_redis() -> HealthStatus:
     try:
-        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
         t0 = time.time()
         pong = r.ping()
         dt = (time.time() - t0) * 1000

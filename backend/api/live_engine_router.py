@@ -9,8 +9,28 @@ import logging
 import time
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+import os
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
+
+# ── Auth ──────────────────────────────────────────────────────────────────────
+_ENGINE_API_KEY = os.environ.get("ENGINE_API_KEY", "")
+_key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
+
+def _require_key(key: str = Security(_key_header)) -> None:
+    if not _ENGINE_API_KEY:
+        raise HTTPException(500, "ENGINE_API_KEY not configured on server")
+    if key != _ENGINE_API_KEY:
+        raise HTTPException(403, "Invalid or missing X-Engine-Key")
+
+# ── Shared Redis helper (with password) ───────────────────────────────────────
+def _get_redis():
+    import redis as _redis_mod
+    from backend.live_engine.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+    return _redis_mod.Redis(
+        host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
+    )
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/live", tags=["live-engine"])
@@ -57,7 +77,7 @@ class OrderOverrideRequest(BaseModel):
 
 # ── Scheduler routes ──────────────────────────────────────────────────────────
 
-@router.post("/start")
+@router.post("/start", dependencies=[Depends(_require_key)])
 def start_scheduler():
     """Start the live engine scheduler (all automated jobs)."""
     sched = _get_scheduler()
@@ -68,7 +88,7 @@ def start_scheduler():
     return {"status": "started"}
 
 
-@router.post("/stop")
+@router.post("/stop", dependencies=[Depends(_require_key)])
 def stop_scheduler():
     """Gracefully stop the scheduler."""
     sched = _get_scheduler()
@@ -83,7 +103,7 @@ def scheduler_status():
     return sched.status()
 
 
-@router.post("/trigger")
+@router.post("/trigger", dependencies=[Depends(_require_key)])
 def trigger_job(req: JobTriggerRequest, bg: BackgroundTasks):
     """Manually trigger any named job immediately."""
     sched = _get_scheduler()
@@ -99,13 +119,8 @@ def trigger_job(req: JobTriggerRequest, bg: BackgroundTasks):
 def portfolio_state():
     """Return current live portfolio snapshot from Redis."""
     try:
-        import redis as _redis
-        import os, json
-        r = _redis.Redis(
-            host=os.getenv("REDIS_HOST", "localhost"),
-            port=int(os.getenv("REDIS_PORT", "6379")),
-            decode_responses=True,
-        )
+        import json
+        r = _get_redis()
         raw = r.get("live:portfolio_state")
         if raw:
             return json.loads(raw)
@@ -114,28 +129,35 @@ def portfolio_state():
         raise HTTPException(503, f"Redis unavailable: {exc}")
 
 
+def _engine_tracker():
+    """Return the engine singleton's PnLTracker, not a new instance."""
+    try:
+        from backend.live_engine.engine_state import state
+        if state.tracker:
+            return state.tracker
+    except Exception:
+        pass
+    from backend.live_engine.pnl_tracker import PnLTracker
+    return PnLTracker()
+
+
 @router.get("/positions")
 def positions():
-    """Return all open positions from PnL tracker."""
     try:
-        from backend.live_engine.pnl_tracker import PnLTracker
-        tracker = PnLTracker()
-        return tracker.get_all_positions()
+        return _engine_tracker().get_all_positions()
     except Exception as exc:
         raise HTTPException(503, str(exc))
 
 
 @router.get("/pnl")
 def daily_pnl():
-    """Return today's realized + unrealized PnL."""
     try:
-        from backend.live_engine.pnl_tracker import PnLTracker
-        tracker = PnLTracker()
+        t = _engine_tracker()
         return {
-            "daily_pnl": tracker.get_daily_pnl(),
-            "total_equity": tracker.get_total_equity(),
-            "drawdown": tracker.get_drawdown(),
-            "peak_equity": tracker.get_peak_equity(),
+            "daily_pnl": t.get_daily_pnl(),
+            "total_equity": t.get_total_equity(),
+            "drawdown": t.get_drawdown(),
+            "peak_equity": t.get_peak_equity(),
         }
     except Exception as exc:
         raise HTTPException(503, str(exc))
@@ -143,11 +165,8 @@ def daily_pnl():
 
 @router.get("/trades")
 def recent_trades(limit: int = 50):
-    """Return recent trade log."""
     try:
-        from backend.live_engine.pnl_tracker import PnLTracker
-        tracker = PnLTracker()
-        return tracker.get_trade_log(limit=limit)
+        return _engine_tracker().get_trade_log(limit=limit)
     except Exception as exc:
         raise HTTPException(503, str(exc))
 
@@ -201,12 +220,15 @@ def live_quote(symbol: str):
 
 # ── Manual order ─────────────────────────────────────────────────────────────
 
-@router.post("/order")
+@router.post("/order", dependencies=[Depends(_require_key)])
 def place_manual_order(req: OrderOverrideRequest):
     """Place a manual order through the full risk-checked order router."""
     try:
-        from backend.live_engine.order_router import OrderRouter, OrderRequest
-        router_inst = OrderRouter()
+        from backend.live_engine.engine_state import state
+        from backend.live_engine.order_router import OrderRequest
+        router_inst = state.router
+        if router_inst is None:
+            raise HTTPException(503, "Engine router not initialized")
         order = OrderRequest(
             strategy=req.strategy,
             symbol=req.symbol.upper(),
@@ -219,42 +241,39 @@ def place_manual_order(req: OrderOverrideRequest):
         if order_id:
             return {"status": "accepted", "order_id": order_id}
         return {"status": "rejected", "reason": "Risk gate or broker rejection"}
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(500, str(exc))
 
 
-@router.post("/kill-switch")
+@router.post("/kill-switch", dependencies=[Depends(_require_key)])
 def emergency_kill_switch():
     """Emergency: cancel all open orders and halt trading."""
     try:
-        import redis as _redis, os
-        r = _redis.Redis(
-            host=os.getenv("REDIS_HOST", "localhost"),
-            port=int(os.getenv("REDIS_PORT", "6379")),
-            decode_responses=True,
-        )
+        r = _get_redis()
         r.set("risk:kill_switch_active", "1")
         r.set("risk:daily_trading_halted", "1")
-        from backend.live_engine.order_router import OrderRouter
-        OrderRouter().cancel_all_orders()
+        # Use the engine singleton's router — not a new instance
+        from backend.live_engine.engine_state import state
+        if state.router:
+            state.router.cancel_all_orders()
         log.critical("KILL SWITCH ACTIVATED via API")
         return {"status": "kill_switch_activated", "ts": time.time()}
     except Exception as exc:
         raise HTTPException(500, str(exc))
 
 
-@router.post("/kill-switch/reset")
+@router.post("/kill-switch/reset", dependencies=[Depends(_require_key)])
 def reset_kill_switch():
     """Reset the kill switch (use after manual review)."""
     try:
-        import redis as _redis, os
-        r = _redis.Redis(
-            host=os.getenv("REDIS_HOST", "localhost"),
-            port=int(os.getenv("REDIS_PORT", "6379")),
-            decode_responses=True,
-        )
+        r = _get_redis()
         r.delete("risk:kill_switch_active")
         r.delete("risk:daily_trading_halted")
+        from backend.live_engine.engine_state import state
+        if state.router:
+            state.router.resume()
         log.warning("Kill switch RESET via API")
         return {"status": "kill_switch_reset", "ts": time.time()}
     except Exception as exc:
@@ -265,36 +284,33 @@ def reset_kill_switch():
 
 @router.get("/strategies")
 def list_strategies():
-    """List all registered strategies and their enabled/disabled state."""
     try:
-        from backend.live_engine.strategy_runner import StrategyRunner
-        runner = StrategyRunner()
-        runner.load_strategies()
-        return {
-            "count": runner.strategy_count(),
-            "strategies": list(runner._strategies.keys()),
-        }
+        from backend.live_engine.engine_state import state
+        if state.runner:
+            names = list(state.runner._strategies.keys())
+            return {"count": len(names), "strategies": names}
+        return {"count": 0, "strategies": []}
     except Exception as exc:
         raise HTTPException(503, str(exc))
 
 
-@router.post("/strategies/{name}/enable")
+@router.post("/strategies/{name}/enable", dependencies=[Depends(_require_key)])
 def enable_strategy(name: str):
+    """Enable a strategy — sets Redis key checked by the live engine runner."""
     try:
-        from backend.live_engine.strategy_runner import StrategyRunner
-        runner = StrategyRunner()
-        runner.enable_strategy(name)
+        r = _get_redis()
+        r.delete(f"strategy:disabled:{name}")
         return {"status": "enabled", "strategy": name}
     except Exception as exc:
         raise HTTPException(500, str(exc))
 
 
-@router.post("/strategies/{name}/disable")
+@router.post("/strategies/{name}/disable", dependencies=[Depends(_require_key)])
 def disable_strategy(name: str):
+    """Disable a strategy — sets Redis key checked by the live engine runner."""
     try:
-        from backend.live_engine.strategy_runner import StrategyRunner
-        runner = StrategyRunner()
-        runner.disable_strategy(name)
+        r = _get_redis()
+        r.set(f"strategy:disabled:{name}", "1")
         return {"status": "disabled", "strategy": name}
     except Exception as exc:
         raise HTTPException(500, str(exc))

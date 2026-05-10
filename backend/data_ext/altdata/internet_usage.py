@@ -164,7 +164,7 @@ class InternetUsageIndex:
         self._r = None
         if _redis is not None:
             try:
-                self._r = _redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+                self._r = _redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
             except Exception:
                 self._r = None
 
@@ -241,7 +241,7 @@ class InternetUsageIndex:
             # per-region smoothing/z/yoy/anomaly
             outs = []
             for rgn, g in df.sort_values("date").groupby("region", dropna=False):
-                vals = g["value_0_100"].fillna(method="ffill").fillna(0).tolist()
+                vals = g["value_0_100"].ffill().fillna(0).tolist()
                 sm = _movavg(vals, self.smoothing_days)
                 zz = _zscore(sm)
                 yy = _yoy(g["date"].tolist(), sm)

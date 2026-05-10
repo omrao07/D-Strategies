@@ -88,7 +88,7 @@ OPT_MID_HASH    = os.getenv("EXO_OPT_MID_HASH", f"opt:mid:{TENOR}")  # "<SYM>:<K
 PAYOFF_KEY      = os.getenv("EXO_PAYOFF_KEY", f"exot:payoff:{SYM}:{TENOR}")
 
 # ============================== Redis ==============================
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True) if _HAVE_REDIS else None
+r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
 
 # ============================== Helpers ==============================
 def _price_underlier(sym: str) -> Optional[float]:

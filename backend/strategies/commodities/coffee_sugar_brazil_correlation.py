@@ -50,7 +50,7 @@ def run(cfg):
     arabica_col = "arabica_usd_lb" if "arabica_usd_lb" in coffee.columns else coffee.columns[0]
     sugar_col = "sugar_no11_usd_lb" if "sugar_no11_usd_lb" in sugar.columns else sugar.columns[0]
 
-    merged = brl[[brl_col]].join(coffee[[arabica_col]], how="outer").join(sugar[[sugar_col]], how="outer").fillna(method="ffill").dropna()
+    merged = brl[[brl_col]].join(coffee[[arabica_col]], how="outer").join(sugar[[sugar_col]], how="outer").ffill().dropna()
 
     merged["brl_yoy_pct"] = merged[brl_col].pct_change(252) * 100
     merged["brl_zscore"] = (merged[brl_col] - merged[brl_col].rolling(252).mean()) / \

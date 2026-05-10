@@ -35,7 +35,7 @@ _REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 def _redis():
     try:
         import redis
-        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), decode_responses=True)
+        return redis.Redis(host=_REDIS_HOST, port=int(_REDIS_PORT), password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
     except Exception:
         return None
 
@@ -185,7 +185,7 @@ def _rerank_strategies() -> int:
         from backend.engine.registry import auto_register_strategies, HUB
 
         auto_register_strategies()
-        strategy_names = list(HUB.strategies._store.keys())
+        strategy_names = list(HUB.strategies._items.keys())
         if not strategy_names:
             return 0
 
@@ -247,7 +247,7 @@ def _run_anti_overfit_checks() -> None:
                     continue
                 rets = pd.Series([float(x) for x in raw])
                 results = MandatoryRules.run_all(rets, rets.iloc[:len(rets)//2])
-                if not all(r.passed for r in results):
+                if not all(chk.passed for chk in results):
                     failed.append(name)
                     r.hset("strategy:anti_overfit_failed", name, "1")
                 else:
