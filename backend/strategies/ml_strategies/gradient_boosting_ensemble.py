@@ -67,7 +67,7 @@ def compute_features(sub: pd.DataFrame, macro: pd.DataFrame = None) -> pd.DataFr
     # Macro factors
     if macro is not None:
         for col in macro.columns:
-            sub[f"macro_{col}"] = macro[col].reindex(sub.index, method="ffill")
+            sub[f"macro_{col}"] = macro[col].reindex(sub.index).ffill()
     # Target
     sub["fwd_ret"] = c.pct_change(FORWARD_DAYS).shift(-FORWARD_DAYS)
     sub["label"] = (sub["fwd_ret"] > 0).astype(int)
@@ -170,7 +170,7 @@ def run(cfg):
             continue
         pos = sig_df[sig_df["ticker"] == ticker].set_index("date")["signal"].map(SIG_POS).fillna(0)
         ret_s = prices_wide[ticker].dropna()
-        pos_daily = pos.reindex(ret_s.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_s.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_s).rename(ticker))
 
     if all_daily:

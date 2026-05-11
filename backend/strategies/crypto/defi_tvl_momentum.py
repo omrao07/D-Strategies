@@ -97,14 +97,14 @@ def run(cfg):
 
         fwd7 = ret_wide[ticker].rolling(7).sum().shift(-7)
         tvl_z = sub["tvl_zscore_30d"].dropna()
-        aligned = tvl_z.reindex(ret_wide.index, method="ffill").dropna().align(fwd7.dropna(), join="inner")
+        aligned = tvl_z.reindex(ret_wide.index).ffill().dropna().align(fwd7.dropna(), join="inner")
         if len(aligned[0]) > 15:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
             corr_records.append({"protocol": protocol, "ticker": ticker,
                                   "tvl_fwd7d_corr": float(r), "pvalue": float(p), "n": len(aligned[0])})
 
         pos = sub["tvl_zscore_30d"].apply(lambda z: 1 if z > cfg.zscore_threshold else (-1 if z < -cfg.zscore_threshold else 0))
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

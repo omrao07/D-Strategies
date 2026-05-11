@@ -123,7 +123,7 @@ def run(cfg):
             lambda r: 1 if r["is_cascade"] and r["cascade_type"] == "long_cascade"
                       else (-1 if r["is_cascade"] and r["cascade_type"] == "short_cascade" else 0), axis=1
         )
-        pos_daily = pos.reindex(ret.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret.index).ffill().shift(1)
         strat = pos_daily * ret
         all_daily.append(strat.rename(asset))
 

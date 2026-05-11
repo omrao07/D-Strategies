@@ -144,7 +144,7 @@ def run(cfg):
                     (-1 if any(i in t for i in EU_INDUSTRIALS + EU_UTILITIES) else 0)
         if direction == 0:
             continue
-        pos_daily = (pos * direction).reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = (pos * direction).reindex(ret_wide.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

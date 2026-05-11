@@ -91,7 +91,7 @@ def run(cfg):
 
     # Cu/Au ratio vs sector returns
     sector_records = []
-    cu_au_sig = sig_df.set_index("date")["signal"].reindex(ret_wide.index, method="ffill")
+    cu_au_sig = sig_df.set_index("date")["signal"].reindex(ret_wide.index).ffill()
     for ticker in ret_wide.columns:
         for sig in ["risk_on", "risk_off", "neutral"]:
             mask = cu_au_sig == sig

@@ -101,8 +101,8 @@ def run(cfg):
     signal_records = []
     for date in all_dates:
         risk = float(geo_risk_rolling.loc[date]) if date in geo_risk_rolling.index else 0
-        brent_z = float(oil["brent_zscore"].reindex([date], method="ffill").iloc[0]) if date in oil.index else np.nan
-        brent_mom = float(oil["brent_mom_21d"].reindex([date], method="ffill").iloc[0]) if date in oil.index else np.nan
+        brent_z = float(oil["brent_zscore"].reindex([date]).ffill().iloc[0]) if date in oil.index else np.nan
+        brent_mom = float(oil["brent_mom_21d"].reindex([date]).ffill().iloc[0]) if date in oil.index else np.nan
 
         if risk > 7 and not np.isnan(brent_mom) and brent_mom > 5:
             signal = "strong_buy_energy"
@@ -117,7 +117,7 @@ def run(cfg):
 
         signal_records.append({
             "date": date, "geo_risk_score": float(risk),
-            "brent_usd": float(oil[brent_col].reindex([date], method="ffill").iloc[0]) if date in oil.index else None,
+            "brent_usd": float(oil[brent_col].reindex([date]).ffill().iloc[0]) if date in oil.index else None,
             "brent_zscore": float(brent_z) if not np.isnan(brent_z) else None,
             "signal": signal
         })
@@ -132,7 +132,7 @@ def run(cfg):
     all_daily = []
     for ticker in ret_wide.columns:
         if any(e in ticker.lower() for e in OIL_BENEFICIARIES):
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

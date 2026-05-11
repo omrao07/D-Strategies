@@ -109,7 +109,7 @@ def resample_monthly(df: pd.DataFrame, how: str="mean", ffill_q: bool=True) -> p
     """Resample to month-end; forward-fill up to 2 months (for quarterly)."""
     out = df.set_index("date").resample("M").agg(how)
     if ffill_q:
-        out = out.fillna(method="ffill", limit=2)
+        out = out.ffill(limit=2)
     return out.reset_index()
 
 def roll_corr(x: pd.Series, y: pd.Series, window: int) -> pd.Series:

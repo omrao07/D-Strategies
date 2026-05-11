@@ -139,7 +139,7 @@ def run(cfg):
     impact_records = []
 
     if stock_ret is not None:
-        sig_aligned = comp_df["signal"].reindex(stock_ret.index, method="ffill")
+        sig_aligned = comp_df["signal"].reindex(stock_ret.index).ffill()
         fwd_ret = stock_ret.rolling(10).sum().shift(-10) * 100
 
         for ticker, cat in all_tickers:
@@ -158,7 +158,7 @@ def run(cfg):
         fmcg_avail = [t for t in FMCG_STOCKS if t in stocks_wide.columns]
         if fmcg_avail:
             basket = stocks_wide[fmcg_avail].pct_change().mean(axis=1)
-            pos = (comp_df["signal"] == "positive_agri").astype(float).shift(1).reindex(basket.index, method="ffill")
+            pos = (comp_df["signal"] == "positive_agri").astype(float).shift(1).reindex(basket.index).ffill()
             strat_ret = (pos * basket).dropna()
             cum = (1 + strat_ret).cumprod()
             cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

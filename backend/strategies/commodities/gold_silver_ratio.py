@@ -112,7 +112,7 @@ def run(cfg):
                "light_long_silver": (0.5, -0.5), "light_long_gold": (-0.5, 0.5), "neutral": (0, 0)}
     gold_pos = metals["gsr_regime"].apply(lambda r: SIG_POS.get(classify_gsr_regime(metals.loc[metals.index == r.name, "gsr"].iloc[0] if isinstance(r, pd.Series) else r), (0, 0))[0] if not isinstance(r, float) else SIG_POS.get("neutral", (0, 0))[0])
     # Simpler approach:
-    sig_series = sig_df.set_index("date")["signal"].reindex(metals.index, method="ffill")
+    sig_series = sig_df.set_index("date")["signal"].reindex(metals.index).ffill()
     pos_gold = sig_series.map({s: v[0] for s, v in SIG_POS.items()}).fillna(0)
     pos_silver = sig_series.map({s: v[1] for s, v in SIG_POS.items()}).fillna(0)
     strat = (pos_gold.shift(1) * gold_ret + pos_silver.shift(1) * silver_ret).dropna()

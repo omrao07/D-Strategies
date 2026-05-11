@@ -97,7 +97,7 @@ def run(cfg):
 
     # Asset returns by regime
     regime_returns = []
-    cpi_daily = cpi_df.set_index("date")["regime"].reindex(ret_wide.index, method="ffill")
+    cpi_daily = cpi_df.set_index("date")["regime"].reindex(ret_wide.index).ffill()
     for ticker in ret_wide.columns:
         for regime in ASSET_REGIME_MAP:
             regime_mask = cpi_daily == regime
@@ -118,7 +118,7 @@ def run(cfg):
         def get_weight(regime):
             return ASSET_REGIME_MAP.get(regime, {}).get(ticker, 0)
         pos = cpi_regime_daily.apply(get_weight)
-        pos_aligned = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_aligned = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
         strat = pos_aligned * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

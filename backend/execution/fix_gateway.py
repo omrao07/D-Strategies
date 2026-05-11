@@ -42,9 +42,10 @@ TOPIC_STREAMS: Dict[str, str] = {
 
 # ---------- App ----------
 app = FastAPI(title=APP_NAME, version="1.0")
+_cors_allow = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ALLOW_ORIGINS", "*").split(","),
+    allow_origins=_cors_allow,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

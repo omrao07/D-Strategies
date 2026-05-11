@@ -113,7 +113,7 @@ def run(cfg):
             basis_sig_series = sub["basis_zscore"].apply(
                 lambda z: -1 if z > cfg.basis_threshold else (1 if z < -cfg.basis_threshold else 0)
             )
-            pos_daily = basis_sig_series.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = basis_sig_series.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             strat = pos_daily * ret_wide[ticker]
             all_daily.append(strat.rename(country))
 

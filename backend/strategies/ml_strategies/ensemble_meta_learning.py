@@ -59,7 +59,7 @@ def run(cfg):
             continue
 
         ret_s = ret_wide[ticker].dropna()
-        sub = sub.reindex(ret_s.index, method="ffill").dropna(subset=feat_cols)
+        sub = sub.reindex(ret_s.index).ffill().dropna(subset=feat_cols)
         fwd_ret = ret_s.rolling(FORWARD_DAYS).sum().shift(-FORWARD_DAYS).reindex(sub.index)
         sub["label"] = (fwd_ret > 0).astype(int)
         sub = sub.dropna(subset=feat_cols + ["label"])
@@ -134,7 +134,7 @@ def run(cfg):
             continue
         pos = sig_df[sig_df["ticker"] == ticker].set_index("date")["meta_signal"].map(SIG_POS).fillna(0)
         ret_s = ret_wide[ticker].dropna()
-        pos_daily = pos.reindex(ret_s.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_s.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_s).rename(ticker))
 
     if all_daily:

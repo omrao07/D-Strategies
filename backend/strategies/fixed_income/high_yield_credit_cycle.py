@@ -96,7 +96,7 @@ def run(cfg):
     for ticker in ret_wide.columns:
         for horizon in [5, 21, 63]:
             fwd = ret_wide[ticker].rolling(horizon).sum().shift(-horizon)
-            oas_chg = spreads["oas_30d_chg"].reindex(ret_wide.index, method="ffill").dropna()
+            oas_chg = spreads["oas_30d_chg"].reindex(ret_wide.index).ffill().dropna()
             aligned = oas_chg.align(fwd.dropna(), join="inner")
             if len(aligned[0]) > 20:
                 r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -110,7 +110,7 @@ def run(cfg):
     SIGNAL_POS = {"max_risk_on": 1, "risk_on": 0.5, "neutral": 0, "reduce_risk": -0.5, "risk_off": -1, "distressed_buy": 1}
     all_daily = []
     for ticker in ret_wide.columns:
-        pos = spreads["signal"].map(SIGNAL_POS).fillna(0).reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos = spreads["signal"].map(SIGNAL_POS).fillna(0).reindex(ret_wide.index).ffill().shift(1).fillna(0)
         strat = pos * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

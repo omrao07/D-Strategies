@@ -161,8 +161,8 @@ def run(cfg):
             {"long_y_short_x": 1, "neutral": 0, "exit": 0, "short_y_long_x": -1}
         ).fillna(0)
         beta_series = sub.set_index("date")["beta"]
-        pos_d = pos_series.reindex(ret_y.index, method="ffill").shift(1).fillna(0)
-        beta_d = beta_series.reindex(ret_y.index, method="ffill").fillna(1)
+        pos_d = pos_series.reindex(ret_y.index).ffill().shift(1).fillna(0)
+        beta_d = beta_series.reindex(ret_y.index).ffill().fillna(1)
         pair_ret = pos_d * (ret_y - beta_d * ret_x)
         pair_daily[pair_name] = pair_ret
 

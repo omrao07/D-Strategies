@@ -137,8 +137,21 @@ def _engine_tracker():
             return state.tracker
     except Exception:
         pass
+    # Fallback: fresh instance hydrated from Redis so daily PnL is correct
     from backend.live_engine.pnl_tracker import PnLTracker
-    return PnLTracker()
+    tracker = PnLTracker()
+    try:
+        r = _get_redis()
+        raw_daily = r.get("pnl:realized_today")
+        if raw_daily:
+            tracker._realized_pnl = float(raw_daily)
+            tracker._last_persisted_daily = tracker._realized_pnl
+        raw_alltime = r.get("pnl:realized_alltime")
+        if raw_alltime:
+            tracker._alltime_realized = float(raw_alltime)
+    except Exception:
+        pass
+    return tracker
 
 
 @router.get("/positions")

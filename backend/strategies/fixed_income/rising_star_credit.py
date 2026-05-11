@@ -125,7 +125,7 @@ def run(cfg):
             pre = bonds[(bonds.get("issuer", pd.Series()) == issuer) if "issuer" in bonds.columns else (bonds["ticker"] == issuer)] if "issuer" in bonds.columns or "ticker" in bonds.columns else pd.DataFrame()
             if not pre.empty:
                 pre = pre.set_index("date").sort_index()
-                pre_score = pre.reindex(method="ffill")["upgrade_score"].get(dg_date, np.nan)
+                pre_score = pre.ffill()["upgrade_score"].get(dg_date, np.nan)
             else:
                 pre_score = np.nan
             upgrade_ret_records.append({

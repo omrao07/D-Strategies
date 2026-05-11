@@ -163,7 +163,7 @@ def run(cfg):
     avail_basket = [t for t in LOGISTICS_BASKET if t in stocks_wide.columns]
     if avail_basket and pos_list:
         basket_ret = stocks_wide[avail_basket].pct_change().mean(axis=1)
-        pos_s = pd.Series(pos_list, index=composite.index).shift(1).reindex(basket_ret.index, method="ffill").fillna(0)
+        pos_s = pd.Series(pos_list, index=composite.index).shift(1).reindex(basket_ret.index).ffill().fillna(0)
         strat_ret = (pos_s * basket_ret).dropna()
         cum = (1 + strat_ret).cumprod()
         cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

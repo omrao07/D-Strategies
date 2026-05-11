@@ -121,7 +121,7 @@ def run(cfg):
     SIG_POS = {"follow_gap_up": 1, "fade_gap_up": -0.5, "neutral": 0,
                "fade_gap_down": 0.5, "follow_gap_down": -1}
     pos = sig_df.set_index("date")["signal"].map(SIG_POS).fillna(0)
-    pos_daily = pos.reindex(nse_ret.index, method="ffill").shift(1).fillna(0)
+    pos_daily = pos.reindex(nse_ret.index).ffill().shift(1).fillna(0)
     port = (pos_daily * nse_ret).dropna()
     cum = (1 + port).cumprod()
     cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

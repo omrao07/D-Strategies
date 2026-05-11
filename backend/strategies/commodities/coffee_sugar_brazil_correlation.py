@@ -116,8 +116,8 @@ def run(cfg):
     sugar_ret = merged[sugar_col].pct_change().dropna()
     pos_arabica = sig_df.set_index("date")["coffee_signal"].map({"buy": 1, "neutral": 0, "sell": -1}).fillna(0)
     pos_sugar = sig_df.set_index("date")["sugar_signal"].map({"buy": 1, "neutral": 0, "sell": -1}).fillna(0)
-    port = (pos_arabica.shift(1).reindex(arabica_ret.index, method="ffill") * arabica_ret +
-            pos_sugar.shift(1).reindex(sugar_ret.index, method="ffill") * sugar_ret).dropna() / 2
+    port = (pos_arabica.shift(1).reindex(arabica_ret.index).ffill() * arabica_ret +
+            pos_sugar.shift(1).reindex(sugar_ret.index).ffill() * sugar_ret).dropna() / 2
     cum = (1 + port).cumprod()
     cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))
     sharpe = float(port.mean() / port.std() * np.sqrt(252)) if port.std() > 0 else None

@@ -97,7 +97,7 @@ def run(cfg):
     # Regime-average returns
     regime_records = []
     for ticker in ret_wide.columns:
-        merged = yields["regime"].reindex(ret_wide.index, method="ffill").to_frame()
+        merged = yields["regime"].reindex(ret_wide.index).ffill().to_frame()
         merged[ticker] = ret_wide[ticker]
         for regime, grp in merged.groupby("regime"):
             regime_records.append({
@@ -115,7 +115,7 @@ def run(cfg):
     # Backtest: regime-based allocation
     all_daily = []
     for ticker in ret_wide.columns:
-        sig = yields["signal"].reindex(ret_wide.index, method="ffill")
+        sig = yields["signal"].reindex(ret_wide.index).ffill()
         pos = sig.map({"max_defensive": -1, "defensive": -0.5, "neutral": 0,
                        "re_steepening_buy": 0.5, "risk_on": 1}).fillna(0)
         strat = pos.shift(1) * ret_wide[ticker]

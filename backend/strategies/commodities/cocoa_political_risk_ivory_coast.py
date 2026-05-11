@@ -128,7 +128,7 @@ def run(cfg):
         {"buy_cocoa_supply_risk": 1.5, "buy_cocoa_risk": 1, "buy_cocoa_cheap": 0.5,
          "neutral": 0, "sell_cocoa_extended": -1}
     ).fillna(0)
-    pos_daily = pos.reindex(cocoa_ret.index, method="ffill").shift(1).fillna(0)
+    pos_daily = pos.reindex(cocoa_ret.index).ffill().shift(1).fillna(0)
     port = (pos_daily * cocoa_ret).dropna()
     cum = (1 + port).cumprod()
     cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

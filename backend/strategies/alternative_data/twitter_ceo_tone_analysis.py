@@ -118,7 +118,7 @@ def run(cfg):
         # Backtest
         pos = sub_tone.apply(lambda r: 1 if (not np.isnan(r["tone_zscore"]) and r["tone_zscore"] > cfg.tone_threshold and r["tone_trend"] > 0)
                              else (-1 if (not np.isnan(r["tone_zscore"]) and r["tone_zscore"] < -cfg.tone_threshold and r["tone_trend"] < 0) else 0), axis=1)
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

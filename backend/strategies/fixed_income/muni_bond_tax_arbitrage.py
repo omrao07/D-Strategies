@@ -40,7 +40,7 @@ def compute_tey(muni_yield: float, tax_rate: float) -> float:
 
 def get_treasury_yield(row: pd.Series, treasury: pd.DataFrame, date) -> float:
     maturity = row.get("maturity_yr", 10)
-    tsy = treasury.reindex(method="ffill").loc[:date].iloc[-1] if date in treasury.index or len(treasury) > 0 else pd.Series()
+    tsy = treasury.ffill().loc[:date].iloc[-1] if date in treasury.index or len(treasury) > 0 else pd.Series()
     if maturity <= 7:
         return float(tsy.get("y5", np.nan))
     elif maturity <= 15:

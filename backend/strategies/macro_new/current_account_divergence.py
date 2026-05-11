@@ -88,7 +88,7 @@ def run(cfg):
         # Correlation with FX appreciation
         if fx_pair and fx_pair in fx_wide.columns:
             fx_ret = fx_wide[fx_pair].pct_change().dropna()
-            ca_z_daily = sub["ca_zscore"].reindex(fx_ret.index, method="ffill").dropna()
+            ca_z_daily = sub["ca_zscore"].reindex(fx_ret.index).ffill().dropna()
             fwd_fx = fx_ret.rolling(63).sum().shift(-63)
             aligned = ca_z_daily.align(fwd_fx.dropna(), join="inner")
             if len(aligned[0]) > 10:
@@ -99,7 +99,7 @@ def run(cfg):
         # Backtest on equity ETF
         if ticker and ticker in ret_wide.columns:
             pos = sub["ca_zscore"].apply(lambda z: 1 if (not np.isnan(z) and z > 1) else (-1 if (not np.isnan(z) and z < -1) else 0))
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             strat = pos_daily * ret_wide[ticker]
             all_daily.append(strat.rename(country))
 

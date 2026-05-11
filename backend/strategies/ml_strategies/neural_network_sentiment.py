@@ -101,7 +101,7 @@ def build_features(prices_sub: pd.DataFrame, sentiment_sub: pd.DataFrame) -> pd.
     feat["vol_21d"] = ret.rolling(21).std()
     feat["price_z21"] = (c - c.rolling(21).mean()) / c.rolling(21).std().replace(0, np.nan)
     if not sentiment_sub.empty:
-        sent = sentiment_sub.reindex(prices_sub.index, method="ffill")
+        sent = sentiment_sub.reindex(prices_sub.index).ffill()
         for col in ["sentiment_score", "confidence", "volume_mentions"]:
             if col in sent.columns:
                 feat[col] = sent[col]
@@ -186,7 +186,7 @@ def run(cfg):
             continue
         pos = sig_df[sig_df["ticker"] == ticker].set_index("date")["signal"].map(SIG_POS).fillna(0)
         ret_s = price_wide[ticker].dropna()
-        pos_daily = pos.reindex(ret_s.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_s.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_s).rename(ticker))
 
     if all_daily:

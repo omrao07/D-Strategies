@@ -82,7 +82,7 @@ def run(cfg):
     corr_records = []
     for ticker in ret_wide.columns:
         fwd_21 = ret_wide[ticker].rolling(21).sum().shift(-21)
-        bs_z = global_bs["bs_zscore"].reindex(ret_wide.index, method="ffill").dropna()
+        bs_z = global_bs["bs_zscore"].reindex(ret_wide.index).ffill().dropna()
         aligned = bs_z.align(fwd_21.dropna(), join="inner")
         if len(aligned[0]) > 20:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -96,7 +96,7 @@ def run(cfg):
     all_daily = []
     for ticker in ret_wide.columns:
         pos_val = global_bs["regime"].map(REGIME_POS).fillna(0)
-        pos_daily = pos_val.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos_val.reindex(ret_wide.index).ffill().shift(1).fillna(0)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

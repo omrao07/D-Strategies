@@ -98,7 +98,7 @@ def run(cfg):
 
         ret = price_series.pct_change().dropna()
         fwd4w = ret.rolling(20).sum().shift(-20)
-        crowd_z = sub["crowding_zscore"].reindex(ret.index, method="ffill").dropna()
+        crowd_z = sub["crowding_zscore"].reindex(ret.index).ffill().dropna()
         aligned = crowd_z.align(fwd4w.dropna(), join="inner")
         if len(aligned[0]) > 10:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -108,7 +108,7 @@ def run(cfg):
         pos = sub["crowding_zscore"].apply(
             lambda z: -1 if z > cfg.extreme_long else (1 if z < -cfg.extreme_long else 0)
         )
-        pos_daily = pos.reindex(ret.index, method="ffill").shift(5)  # 5-day lag for COT release
+        pos_daily = pos.reindex(ret.index).ffill().shift(5)  # 5-day lag for COT release
         strat = pos_daily * ret
         all_daily.append(strat.rename(asset))
 

@@ -126,7 +126,7 @@ def run(cfg):
     all_daily = []
     for ticker in ret_wide.columns:
         if any(r in ticker.lower() for r in REALTY_TICKERS + HOME_LOAN_TICKERS):
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

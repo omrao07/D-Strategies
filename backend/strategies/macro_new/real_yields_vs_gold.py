@@ -106,7 +106,7 @@ def run(cfg):
 
     for ticker in ret_wide.columns:
         pos_asset = aligned["signal"].map({"buy_gold": -0.5, "sell_gold": 0.5, "neutral": 0}).fillna(0)
-        pos_daily = pos_asset.reindex(ret_wide.index, method="ffill").shift(1)
+        pos_daily = pos_asset.reindex(ret_wide.index).ffill().shift(1)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

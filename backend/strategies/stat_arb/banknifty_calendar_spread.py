@@ -75,7 +75,7 @@ def run(cfg):
     merged["spread"] = merged["m2"] - merged["m1"]
 
     if cfg.rbi_file and os.path.exists(cfg.rbi_file):
-        rbi_daily = rbi_df[rate_col].reindex(merged.index, method="ffill")
+        rbi_daily = rbi_df[rate_col].reindex(merged.index).ffill()
         merged["fair_spread"] = merged.apply(
             lambda r: fair_calendar_spread(r["spot"], float(rbi_daily.get(r.name, RISK_FREE)),
                                             r["dte_m1"], r["dte_m2"]), axis=1

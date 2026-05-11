@@ -46,7 +46,7 @@ def run(cfg):
 
     # Build SI lookup: ticker → most recent si_ratio per date
     si_wide = si.pivot_table(index="date", columns="ticker", values="si_ratio", aggfunc="last")
-    si_wide = si_wide.reindex(prices.index, method="ffill")
+    si_wide = si_wide.reindex(prices.index).ffill()
 
     signals = []
     for date in returns.index[1:]:

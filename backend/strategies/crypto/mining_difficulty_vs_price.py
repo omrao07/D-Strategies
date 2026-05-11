@@ -139,7 +139,7 @@ def run(cfg):
          "sell_overheated": -1, "caution_diff_crash": -0.5, "neutral": 0}
     ).fillna(0)
     ret = merged["btc_price"].pct_change().dropna()
-    pos_aligned = pos.reindex(ret.index, method="ffill").shift(1).fillna(0)
+    pos_aligned = pos.reindex(ret.index).ffill().shift(1).fillna(0)
     strat = pos_aligned * ret
     cum = (1 + strat).cumprod()
     cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

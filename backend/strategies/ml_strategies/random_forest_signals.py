@@ -95,7 +95,7 @@ def run(cfg):
             fac_sub = factors[factors["ticker"] == ticker].set_index("date")
             for col in ["eps_surprise", "iv_pct", "analyst_revisions"]:
                 if col in fac_sub.columns:
-                    sub[col] = fac_sub[col].reindex(sub.index, method="ffill")
+                    sub[col] = fac_sub[col].reindex(sub.index).ffill()
                     if col not in FEATURE_COLS:
                         FEATURE_COLS.append(col)
 
@@ -155,7 +155,7 @@ def run(cfg):
         if ticker not in ret_wide.columns:
             continue
         pos = sig_df[sig_df["ticker"] == ticker].set_index("date")["signal"].map(SIG_POS).fillna(0)
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

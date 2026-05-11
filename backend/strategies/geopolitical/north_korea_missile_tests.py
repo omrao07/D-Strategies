@@ -102,8 +102,8 @@ def run(cfg):
     signal_records = []
     for date in all_dates:
         risk = float(dprk_risk.loc[date]) if date in dprk_risk.index else 0
-        risk_z = (risk - dprk_risk.rolling(252).mean().reindex([date], method="ffill").iloc[0]) / \
-                 (dprk_risk.rolling(252).std().reindex([date], method="ffill").iloc[0] + 1e-10) \
+        risk_z = (risk - dprk_risk.rolling(252).mean().reindex([date]).ffill().iloc[0]) / \
+                 (dprk_risk.rolling(252).std().reindex([date]).ffill().iloc[0] + 1e-10) \
                  if date in dprk_risk.index else 0
 
         is_test_day = bool((tests["date"] - date).abs().min() <= pd.Timedelta(days=1)) if len(tests) > 0 else False
@@ -143,7 +143,7 @@ def run(cfg):
         direction = 1 if is_defense else (-1 if is_risk_off else 0)
         if direction == 0:
             continue
-        pos_daily = (pos * direction).reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = (pos * direction).reindex(ret_wide.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

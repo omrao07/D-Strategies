@@ -90,14 +90,14 @@ def run(cfg):
     for ticker in price_wide.columns:
         ret = price_wide[ticker].pct_change().dropna()
         fwd5 = ret.rolling(5).sum().shift(-5)
-        gas_z_daily = gas["gas_zscore"].reindex(ret.index, method="ffill").dropna()
+        gas_z_daily = gas["gas_zscore"].reindex(ret.index).ffill().dropna()
         aligned = gas_z_daily.align(fwd5.dropna(), join="inner")
         if len(aligned[0]) > 20:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
             corr_records.append({"ticker": ticker, "gas_fwd5d_corr": float(r), "pvalue": float(p), "n": len(aligned[0])})
 
         # Backtest per ticker
-        sig = gas["signal_eth"].reindex(ret.index, method="ffill")
+        sig = gas["signal_eth"].reindex(ret.index).ffill()
         pos = sig.map({"buy": 1, "sell": -1, "neutral": 0}).fillna(0).shift(1)
         strat = pos * ret
         all_daily.append(strat.rename(ticker))

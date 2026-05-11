@@ -92,7 +92,7 @@ def run(cfg):
 
         # Correlation: viral score vs 10-day forward return
         fwd10 = ret_wide[ticker].rolling(10).sum().shift(-10)
-        vs_daily = sub["score_zscore"].reindex(ret_wide.index, method="ffill").dropna()
+        vs_daily = sub["score_zscore"].reindex(ret_wide.index).ffill().dropna()
         aligned = vs_daily.align(fwd10.dropna(), join="inner")
         if len(aligned[0]) > 8:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -102,7 +102,7 @@ def run(cfg):
         sig_series = sub["score_zscore"].apply(
             lambda z: 1 if (not np.isnan(z) and z > cfg.viral_zscore) else 0
         )
-        sig_daily = sig_series.reindex(ret_wide.index, method="ffill").shift(1)
+        sig_daily = sig_series.reindex(ret_wide.index).ffill().shift(1)
         strat = sig_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

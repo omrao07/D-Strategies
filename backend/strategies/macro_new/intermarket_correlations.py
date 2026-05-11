@@ -144,9 +144,9 @@ def run(cfg):
     tlt_col = "tlt" if "tlt" in ret_wide.columns else None
 
     if spy_col and tlt_col:
-        pos_spy = stock_bond_sig.reindex(ret_wide.index, method="ffill").map(
+        pos_spy = stock_bond_sig.reindex(ret_wide.index).ffill().map(
             {"risk_on": 1, "neutral": 0.5, "defensive_rebalance": -0.5}).fillna(0).shift(1)
-        pos_tlt = stock_bond_sig.reindex(ret_wide.index, method="ffill").map(
+        pos_tlt = stock_bond_sig.reindex(ret_wide.index).ffill().map(
             {"risk_on": -0.5, "neutral": 0.5, "defensive_rebalance": 1}).fillna(0).shift(1)
         port = (pos_spy * ret_wide[spy_col] + pos_tlt * ret_wide[tlt_col]).dropna()
         cum = (1 + port).cumprod()

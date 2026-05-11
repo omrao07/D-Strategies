@@ -4,8 +4,9 @@ from __future__ import annotations
 import os, time, json, hashlib, uuid
 from typing import Any, Dict, List, Optional, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, Query
-from pydantic import BaseModel, Field, validator
+from fastapi import APIRouter, Depends, HTTPException, Security, WebSocket, WebSocketDisconnect, Query
+from fastapi.security.api_key import APIKeyHeader
+from pydantic import BaseModel, Field, field_validator
 
 # ---------- Optional deps (Redis & Prometheus) ----------
 USE_REDIS = True
@@ -22,8 +23,23 @@ except Exception:
 
 router = APIRouter()
 
+# ---------- Auth ----------
+_ENGINE_API_KEY = os.getenv("ENGINE_API_KEY", "")
+_key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
+
+def _require_key(key: str = Security(_key_header)) -> None:
+    if not _ENGINE_API_KEY:
+        raise HTTPException(500, "ENGINE_API_KEY not configured on server")
+    if key != _ENGINE_API_KEY:
+        raise HTTPException(403, "Invalid or missing X-Engine-Key")
+
 # ---------- Env / Defaults ----------
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_rhost = os.getenv("REDIS_HOST", "localhost")
+_rport = os.getenv("REDIS_PORT", "6379")
+_rpass = os.getenv("REDIS_PASSWORD", "")
+REDIS_URL = os.getenv("REDIS_URL") or (
+    f"redis://:{_rpass}@{_rhost}:{_rport}/0" if _rpass else f"redis://{_rhost}:{_rport}/0"
+)
 INCOMING_ORDERS = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")   # pre-risk
 ORDERS_UPDATES  = os.getenv("ORDERS_UPDATES_STREAM", "orders.updates")   # OMS emits acks/fills here
 ORDERS_HASH     = os.getenv("ORDERS_HASH", "orders.hash")                # optional mirror
@@ -58,18 +74,17 @@ class OrderCreate(BaseModel):
     meta: Dict[str, Any] = Field(default_factory=dict)
     ts_ms: Optional[int] = None
 
-    @validator("symbol")
+    @field_validator("symbol")
+    @classmethod
     def _sym(cls, v: str) -> str:
         v = v.strip().upper()
         if not v:
             raise ValueError("symbol required")
         return v
 
-    @validator("type")
-    def _type_guard(cls, v: str, values):
-        if v != "limit" and values.get("limit_price"):
-            # ignore stray limit_price on non-limit types
-            values["limit_price"] = None
+    @field_validator("type")
+    @classmethod
+    def _type_guard(cls, v: str) -> str:
         return v
 
 class OrderReplace(BaseModel):
@@ -157,7 +172,7 @@ async def _xadd(r: AsyncRedis, stream: str, payload: Dict[str, Any]) -> None: # 
 
 # ---------- Routes ----------
 @router.post("/orders", response_model=Order)
-async def place_order(p: OrderCreate, r: Optional[AsyncRedis] = Depends(get_redis)) -> Order: # type: ignore
+async def place_order(p: OrderCreate, _auth: None = Depends(_require_key), r: Optional[AsyncRedis] = Depends(get_redis)) -> Order: # type: ignore
     now_ms = int(time.time() * 1000)
     if await _halted(r):
         raise HTTPException(status_code=423, detail="Trading halted by governor")
@@ -208,6 +223,7 @@ async def list_orders(
     symbol: Optional[str] = None,
     status: Optional[str] = None,
     strategy: Optional[str] = None,
+    _auth: None = Depends(_require_key),
     r: Optional[AsyncRedis] = Depends(get_redis), # type: ignore
 ) -> List[Order]:
     # Prefer Redis hash (mirror) if present; otherwise memory.
@@ -244,7 +260,7 @@ async def list_orders(
     return out
 
 @router.get("/orders/{order_id}", response_model=Order)
-async def get_order(order_id: str, r: Optional[AsyncRedis] = Depends(get_redis)) -> Order: # type: ignore
+async def get_order(order_id: str, _auth: None = Depends(_require_key), r: Optional[AsyncRedis] = Depends(get_redis)) -> Order: # type: ignore
     it = None
     if r:
         try:
@@ -267,7 +283,7 @@ async def get_order(order_id: str, r: Optional[AsyncRedis] = Depends(get_redis))
     )
 
 @router.post("/orders/{order_id}/cancel")
-async def cancel_order(order_id: str, r: Optional[AsyncRedis] = Depends(get_redis)) -> Dict[str, Any]: # type: ignore
+async def cancel_order(order_id: str, _auth: None = Depends(_require_key), r: Optional[AsyncRedis] = Depends(get_redis)) -> Dict[str, Any]: # type: ignore
     now = int(time.time() * 1000)
     payload = {"id": order_id, "op": "cancel", "ts_ms": now, "source": "api.orders"}
     if r:
@@ -283,7 +299,7 @@ async def cancel_order(order_id: str, r: Optional[AsyncRedis] = Depends(get_redi
     return {"ok": True, "id": order_id, "status": "canceled", "ts_ms": now}
 
 @router.post("/orders/{order_id}/replace")
-async def replace_order(order_id: str, req: OrderReplace, r: Optional[AsyncRedis] = Depends(get_redis)) -> Dict[str, Any]: # type: ignore
+async def replace_order(order_id: str, req: OrderReplace, _auth: None = Depends(_require_key), r: Optional[AsyncRedis] = Depends(get_redis)) -> Dict[str, Any]: # type: ignore
     now = int(time.time() * 1000)
     patch = {"id": order_id, "op": "replace", "ts_ms": now, "source": "api.orders"}
     if req.qty is not None: patch["qty"] = float(req.qty)

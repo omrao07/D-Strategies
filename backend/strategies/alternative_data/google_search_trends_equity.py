@@ -77,7 +77,7 @@ def run(cfg):
 
         # Lead-lag: SVI leads stock return by 4-8 weeks
         fwd8 = ret_wide[ticker].rolling(40).sum()
-        svi_daily = adj_svi.reindex(ret_wide.index, method="ffill")
+        svi_daily = adj_svi.reindex(ret_wide.index).ffill()
         aligned = svi_daily.dropna().align(fwd8.dropna(), join="inner")
         if len(aligned[0]) > 20:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -85,7 +85,7 @@ def run(cfg):
 
         # Backtest: long on SVI spike, short on crash
         pos_weekly = zscore.apply(lambda z: 1 if z > cfg.zscore_threshold else (-1 if z < -cfg.zscore_threshold else 0))
-        pos_daily = pos_weekly.reindex(ret_wide.index, method="ffill").shift(5)
+        pos_daily = pos_weekly.reindex(ret_wide.index).ffill().shift(5)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

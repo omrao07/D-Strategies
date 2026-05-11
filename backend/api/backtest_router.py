@@ -21,12 +21,23 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional, Union
 
+import os
 import numpy as np
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, Field, field_validator
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/backtest", tags=["backtest"])
+
+_ENGINE_API_KEY = os.getenv("ENGINE_API_KEY", "")
+_key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
+
+def _require_key(key: str = Security(_key_header)) -> None:
+    if not _ENGINE_API_KEY:
+        raise HTTPException(500, "ENGINE_API_KEY not configured on server")
+    if key != _ENGINE_API_KEY:
+        raise HTTPException(403, "Invalid or missing X-Engine-Key")
 
 # In-memory job store (replace with Redis in production)
 _jobs: Dict[str, Dict] = {}
@@ -185,7 +196,7 @@ def _execute_backtest(req: BacktestRunRequest) -> Dict:
 # ── Synchronous run ───────────────────────────────────────────────────────────
 
 @router.post("/run")
-def run_backtest_sync(req: BacktestRunRequest):
+def run_backtest_sync(req: BacktestRunRequest, _auth: None = Depends(_require_key)):
     """
     Run backtest synchronously. Returns full summary.
     Use /run/async for long runs (> 30 seconds).
@@ -200,7 +211,7 @@ def run_backtest_sync(req: BacktestRunRequest):
 # ── Asynchronous run (background task) ───────────────────────────────────────
 
 @router.post("/run/async")
-def run_backtest_async(req: BacktestRunRequest, background_tasks: BackgroundTasks):
+def run_backtest_async(req: BacktestRunRequest, background_tasks: BackgroundTasks, _auth: None = Depends(_require_key)):
     """
     Kick off a backtest in the background. Returns a run_id immediately.
     Poll GET /backtest/status/{run_id} for progress.
@@ -276,7 +287,7 @@ def list_strategies():
 # ── Walk-forward standalone ───────────────────────────────────────────────────
 
 @router.post("/walk-forward")
-def standalone_walk_forward(req: WalkForwardRequest):
+def standalone_walk_forward(req: WalkForwardRequest, _auth: None = Depends(_require_key)):
     """Run walk-forward validation on a provided daily returns series."""
     try:
         import numpy as np
@@ -329,7 +340,7 @@ def standalone_walk_forward(req: WalkForwardRequest):
 # ── Monte Carlo standalone ────────────────────────────────────────────────────
 
 @router.post("/monte-carlo")
-def standalone_monte_carlo(req: MonteCarloRequest):
+def standalone_monte_carlo(req: MonteCarloRequest, _auth: None = Depends(_require_key)):
     """Run Monte Carlo bootstrap on a provided daily returns series."""
     try:
         import numpy as np

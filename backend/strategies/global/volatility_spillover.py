@@ -132,7 +132,7 @@ def load_returns(path: str, is_return: bool=False, tickers: Optional[List[str]]=
     # drop all-NaN cols & rows
     piv = piv.dropna(axis=1, how="all").dropna(how="all")
     # forward-fill small gaps (optional mild)
-    piv = piv.fillna(method="ffill", limit=2).dropna()
+    piv = piv.ffill(limit=2).dropna()
     piv.index.name = "date"
     # enforce column order & names
     piv.columns = [str(c).upper() for c in piv.columns]

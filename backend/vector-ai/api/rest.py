@@ -105,10 +105,11 @@ class Correlation(BaseModel):
 
 app = FastAPI(title="Vector-AI REST", version="1.0.0")
 
-# CORS (open by default; restrict in prod)
+# CORS — restrict origins in prod via CORS_ORIGINS env var
+_cors_origins = [o.strip() for o in __import__("os").getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], allow_credentials=True,
+    allow_origins=_cors_origins, allow_credentials=True,
     allow_methods=["*"], allow_headers=["*"],
 )
 

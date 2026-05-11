@@ -123,7 +123,7 @@ def run(cfg):
     all_daily = []
     for ticker in ret_wide.columns:
         if any(e in ticker.lower() for e in EMS_TICKERS):
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

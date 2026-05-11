@@ -100,7 +100,7 @@ def run(cfg):
     ev_yoy_series = ev_global["ev_yoy_pct"].dropna()
     for lag_months in [3, 6, 9, 12]:
         fwd_li = li_ret.rolling(lag_months * 21).sum().shift(-lag_months * 21)
-        ev_aligned = ev_yoy_series.reindex(li_ret.index, method="ffill").dropna()
+        ev_aligned = ev_yoy_series.reindex(li_ret.index).ffill().dropna()
         aligned = ev_aligned.align(fwd_li.dropna(), join="inner")
         if len(aligned[0]) > 15:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -115,7 +115,7 @@ def run(cfg):
     for ticker in ret_wide.columns:
         if any(m in ticker.lower() for m in LITHIUM_MINER_TICKERS):
             pos = sig_df.set_index("date")["signal"].map({"buy_miners": 1, "neutral": 0, "sell_miners": -1}).fillna(0)
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             strat = pos_daily * ret_wide[ticker]
             all_daily.append(strat.rename(ticker))
 

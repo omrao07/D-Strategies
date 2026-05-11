@@ -7,8 +7,9 @@ import json
 import hashlib
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, Query
-from pydantic import BaseModel, Field, validator
+from fastapi import APIRouter, Depends, HTTPException, Security, WebSocket, WebSocketDisconnect, Query
+from fastapi.security.api_key import APIKeyHeader
+from pydantic import BaseModel, Field, field_validator
 
 # ---- Optional deps (Redis & Prometheus) -------------------------------------
 USE_REDIS = True
@@ -25,8 +26,23 @@ except Exception:
 
 router = APIRouter()
 
+# ---- Auth -------------------------------------------------------------------
+_ENGINE_API_KEY = os.getenv("ENGINE_API_KEY", "")
+_key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
+
+def _require_key(key: str = Security(_key_header)) -> None:
+    if not _ENGINE_API_KEY:
+        raise HTTPException(500, "ENGINE_API_KEY not configured on server")
+    if key != _ENGINE_API_KEY:
+        raise HTTPException(403, "Invalid or missing X-Engine-Key")
+
 # ---- Env / Defaults ---------------------------------------------------------
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_rhost = os.getenv("REDIS_HOST", "localhost")
+_rport = os.getenv("REDIS_PORT", "6379")
+_rpass = os.getenv("REDIS_PASSWORD", "")
+REDIS_URL = os.getenv("REDIS_URL") or (
+    f"redis://:{_rpass}@{_rhost}:{_rport}/0" if _rpass else f"redis://{_rhost}:{_rport}/0"
+)
 ALERTS_STREAM = os.getenv("ALERTS_STREAM", "alerts.stream")
 ALERTS_ACK_HASH = os.getenv("ALERTS_ACK_HASH", "alerts.ack")
 MAX_STREAM_LEN = int(os.getenv("ALERTS_MAX_STREAM_LEN", "5000"))
@@ -54,7 +70,8 @@ class AlertCreate(BaseModel):
     meta: Dict[str, Any] = Field(default_factory=dict)
     ts_ms: Optional[int] = Field(None, description="Client timestamp (ms epoch)")
 
-    @validator("severity")
+    @field_validator("severity")
+    @classmethod
     def _sev(cls, v: str) -> str:
         v = v.lower()
         if v not in {"info", "warn", "critical"}:
@@ -181,7 +198,7 @@ async def _read_recent_redis(r: AsyncRedis, count: int = 100) -> List[Dict[str, 
 
 # ---- Routes -----------------------------------------------------------------
 @router.post("/alerts", response_model=Alert)
-async def create_alert(payload: AlertCreate, r: Optional[AsyncRedis] = Depends(get_redis)) -> Alert: # type: ignore
+async def create_alert(payload: AlertCreate, _auth: None = Depends(_require_key), r: Optional[AsyncRedis] = Depends(get_redis)) -> Alert: # type: ignore
     server_recv_ms = int(time.time() * 1000)
     data = payload.dict()
     data["ts_ms"] = data.get("ts_ms") or server_recv_ms
@@ -236,7 +253,7 @@ async def list_alerts(
 
 
 @router.post("/alerts/{alert_id}/ack", response_model=AckResponse)
-async def ack_alert(alert_id: str, r: Optional[AsyncRedis] = Depends(get_redis)) -> AckResponse: # type: ignore
+async def ack_alert(alert_id: str, _auth: None = Depends(_require_key), r: Optional[AsyncRedis] = Depends(get_redis)) -> AckResponse: # type: ignore
     ts = int(time.time() * 1000)
     # best-effort: record ack in redis; update memory mirror
     if r:

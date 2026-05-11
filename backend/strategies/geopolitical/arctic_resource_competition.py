@@ -101,7 +101,7 @@ def run(cfg):
 
     signal_records = []
     for date in ret_wide.index:
-        openness = float(ice["openness_score"].reindex([date], method="ffill").iloc[0]) \
+        openness = float(ice["openness_score"].reindex([date]).ffill().iloc[0]) \
                    if len(ice["openness_score"].dropna()) > 0 and date >= ice.index.min() else 0
         inv_pipeline = float(investment_pipeline.loc[date]) if date in investment_pipeline.index else 0
         is_nav_season = date.month in SUMMER_MONTHS
@@ -140,7 +140,7 @@ def run(cfg):
         is_beneficiary = any(b in t for beneficiaries in ARCTIC_BENEFICIARIES.values() for b in beneficiaries)
         if not is_beneficiary:
             continue
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

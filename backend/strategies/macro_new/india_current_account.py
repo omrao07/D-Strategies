@@ -103,7 +103,7 @@ def run(cfg):
     daily_usdinr = usdinr[[usdinr_col]].rename(columns={usdinr_col: "usdinr"})
 
     data = daily_nifty.join(daily_usdinr).join(daily_oil)
-    data["cad_gdp"] = cad_monthly.reindex(data.index, method="ffill")
+    data["cad_gdp"] = cad_monthly.reindex(data.index).ffill()
     data["oil_implied_cad"] = data.apply(
         lambda r: estimate_quarterly_cad(r["brent"], r.get("cad_gdp", -2.0)), axis=1
     )

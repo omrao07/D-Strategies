@@ -61,8 +61,8 @@ def run(cfg):
     for currency in rates_wide.columns:
         if currency.upper() == "USD":
             continue
-        rate_series = rates_wide[currency].reindex(fx_wide.index, method="ffill")
-        usd_rate_series = usd_rate.reindex(fx_wide.index, method="ffill")
+        rate_series = rates_wide[currency].reindex(fx_wide.index).ffill()
+        usd_rate_series = usd_rate.reindex(fx_wide.index).ffill()
         carry_diff = rate_series - usd_rate_series  # positive = higher than USD → invest here
 
         # Find corresponding FX pair
@@ -86,7 +86,7 @@ def run(cfg):
             continue
 
         fx_series = fx_wide[fx_pair].dropna()
-        carry_ret = compute_carry_return(fx_series, carry_diff.reindex(fx_series.index, method="ffill").fillna(0))
+        carry_ret = compute_carry_return(fx_series, carry_diff.reindex(fx_series.index).ffill().fillna(0))
         carry_returns[currency] = carry_ret
 
     rank_df = pd.DataFrame(rank_records).dropna(subset=["carry_vs_usd_pct"])
@@ -101,7 +101,7 @@ def run(cfg):
     carry_df = pd.DataFrame(carry_returns)
     n_long = min(cfg.n_long, len(carry_df.columns) // 2)
 
-    vix_daily = vix.reindex(carry_df.index, method="ffill")
+    vix_daily = vix.reindex(carry_df.index).ffill()
     vix_high = vix_daily > cfg.vix_unwind_threshold
 
     portfolio_daily = []

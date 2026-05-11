@@ -147,7 +147,7 @@ def run(cfg):
         is_fmcg = any(f in ticker.lower() for f in ["fmcg", "hul", "idf", "rural"])
         if not is_fmcg:
             continue
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

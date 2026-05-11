@@ -99,7 +99,7 @@ def run(cfg):
     corr_records = []
     for lag_months in [1, 3, 6]:
         fwd_ret = nifty_ret.rolling(lag_months * 21).sum().shift(-lag_months * 21)
-        pnote_monthly = pnote_z.resample("ME").last().reindex(fwd_ret.index, method="ffill").dropna()
+        pnote_monthly = pnote_z.resample("ME").last().reindex(fwd_ret.index).ffill().dropna()
         aligned = pnote_monthly.align(fwd_ret.dropna(), join="inner")
         if len(aligned[0]) > 10:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -113,7 +113,7 @@ def run(cfg):
     SIG_POS = {"strong_buy": 1.5, "mild_buy": 0.5, "neutral": 0,
                "regulatory_risk_neutral": 0, "mild_sell": -0.5, "sell": -1}
     pos = sig_df.set_index("date")["signal"].map(SIG_POS).fillna(0)
-    pos_daily = pos.reindex(nifty_ret.index, method="ffill").shift(1).fillna(0)
+    pos_daily = pos.reindex(nifty_ret.index).ffill().shift(1).fillna(0)
     port = (pos_daily * nifty_ret).dropna()
     cum = (1 + port).cumprod()
     cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

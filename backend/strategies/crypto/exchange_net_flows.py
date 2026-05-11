@@ -98,7 +98,7 @@ def run(cfg):
         # Correlation with 1/3/7 day forward returns
         for horizon in [1, 3, 7]:
             fwd = ret.rolling(horizon).sum().shift(-horizon)
-            flow_z_daily = sub["flow_zscore"].reindex(ret.index, method="ffill").dropna()
+            flow_z_daily = sub["flow_zscore"].reindex(ret.index).ffill().dropna()
             aligned = flow_z_daily.align(fwd.dropna(), join="inner")
             if len(aligned[0]) > 15:
                 r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -107,7 +107,7 @@ def run(cfg):
 
         # Backtest
         pos = sub["flow_zscore"].apply(lambda z: 1 if z > cfg.zscore_threshold else (-1 if z < -cfg.zscore_threshold else 0))
-        pos_daily = pos.reindex(ret.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret.index).ffill().shift(1)
         strat = pos_daily * ret
         all_daily.append(strat.rename(asset))
 

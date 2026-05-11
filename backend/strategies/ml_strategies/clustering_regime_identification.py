@@ -133,7 +133,7 @@ def run(cfg):
         all_daily = []
         for ticker in returns.columns:
             ret_s = returns[ticker].dropna()
-            pos_daily = pos.reindex(ret_s.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_s.index).ffill().shift(1).fillna(0)
             all_daily.append((pos_daily * ret_s).rename(ticker))
 
         if all_daily:

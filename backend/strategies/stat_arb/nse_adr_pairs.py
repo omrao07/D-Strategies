@@ -81,7 +81,7 @@ def run(cfg):
         merged = pd.DataFrame({
             "nse_inr": nse_wide[nse_ticker],
             "adr_usd": ticker_adr[adr_col],
-            "usdinr": usdinr[usdinr_col].reindex(nse_wide.index, method="ffill"),
+            "usdinr": usdinr[usdinr_col].reindex(nse_wide.index).ffill(),
         }).dropna()
 
         if len(merged) < 30:

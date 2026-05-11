@@ -115,7 +115,7 @@ def run(cfg):
             pos = sig_df.set_index("date")["signal"].map(
                 {"buy_ree_miners": 1, "neutral": 0, "sell_ree_miners": -1}
             ).fillna(0)
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             strat = pos_daily * ret_wide[ticker]
             all_daily.append(strat.rename(ticker))
 

@@ -70,7 +70,7 @@ def run(cfg):
             continue
 
         for date, row in sub.iterrows():
-            loan_row = loans.reindex(method="ffill").loc[:date].iloc[-1] if len(loans) > 0 else pd.Series()
+            loan_row = loans.ffill().loc[:date].iloc[-1] if len(loans) > 0 else pd.Series()
             loan_spread = float(row.get("loan_portfolio_spread_bps", loan_row.get("loan_spread_bps", 400)))
             aaa_spread = float(row.get("aaa_tranche_spread_bps", 150))
             bb_spread = float(row.get("bb_tranche_spread_bps", 550))

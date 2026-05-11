@@ -101,7 +101,7 @@ def run(cfg):
         # Correlation: funding z-score vs 1/3-day forward return (contrarian)
         for horizon in [1, 3]:
             fwd = ret.rolling(horizon).sum().shift(-horizon)
-            f_z = sub["funding_zscore"].reindex(ret.index, method="ffill").dropna()
+            f_z = sub["funding_zscore"].reindex(ret.index).ffill().dropna()
             aligned = f_z.align(fwd.dropna(), join="inner")
             if len(aligned[0]) > 20:
                 r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -112,7 +112,7 @@ def run(cfg):
         pos = sub["funding_zscore"].apply(
             lambda z: -1 if z > cfg.extreme_zscore else (1 if z < -cfg.extreme_zscore else 0)
         )
-        pos_daily = pos.reindex(ret.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret.index).ffill().shift(1)
         strat = pos_daily * ret
         all_daily.append(strat.rename(asset))
 

@@ -289,11 +289,12 @@ class OtrMonitor:
         return alerts
 
     def _breach_slab(self, ratio: float) -> Optional[float]:
-        """Return the lowest slab that ratio crosses (emit one alert per slab per breach)."""
+        """Return the highest slab that ratio crosses (reflects true severity level)."""
+        result = None
         for t in sorted(self.cfg.alert_thresholds):
             if ratio >= t:
-                return t
-        return None
+                result = t
+        return result
 
     def _bucket_dict(self, key: Tuple) -> Dict[str, Any]:
         return {g: key[i] for i, g in enumerate(self.cfg.group_by)}

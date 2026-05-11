@@ -22,21 +22,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
-# --- Pydantic v1/v2 compatibility shim ---------------------------------------
-try:
-    from pydantic import BaseModel, Field, root_validator, validator # type: ignore
-    PydV2 = False
-except Exception:  # pydantic v2
-    from pydantic import BaseModel, Field, model_validator # type: ignore
-    PydV2 = True
-    def root_validator(*args, **kwargs):  # no-op shim for v2
-        def _wrap(fn):
-            return fn
-        return _wrap
-    def validator(*args, **kwargs):
-        def _wrap(fn):
-            return fn
-        return _wrap
+# --- Pydantic imports (v2) ---------------------------------------------------
+from pydantic import BaseModel, Field, field_validator, model_validator  # type: ignore
 
 __all__ = [
     "SCHEMA_VERSION",
@@ -109,7 +96,8 @@ class CompanyId(BaseModel):
     industry: Optional[str] = Field(None)
     currency: Currency = Field(Currency.USD, description="Reporting / presentation currency")
 
-    @validator("ticker")
+    @field_validator("ticker")
+    @classmethod
     def _ticker_norm(cls, v: str) -> str:
         v = (v or "").strip().upper()
         if not v:
@@ -151,7 +139,8 @@ class Fundamentals(BaseModel):
     currency: Currency = Currency.USD
     source: Optional[str] = Field(None, description="Where this row came from (file/feed)")
 
-    @validator("shares_diluted")
+    @field_validator("shares_diluted")
+    @classmethod
     def _shares_pos(cls, v):
         if v is not None and v <= 0:
             raise ValueError("shares_diluted must be > 0 when provided")
@@ -167,12 +156,11 @@ class MarketSnapshot(BaseModel):
     currency: Currency = Currency.USD
     source: Optional[str] = None
 
-    @root_validator
-    def _compute_mcap(cls, values):
-        price, shares, mcap = values.get("price"), values.get("shares_outstanding"), values.get("market_cap")
-        if mcap is None and price is not None and shares is not None:
-            values["market_cap"] = price * shares
-        return values
+    @model_validator(mode="after")
+    def _compute_mcap(self) -> "MarketSnapshot":
+        if self.market_cap is None and self.price is not None and self.shares_outstanding is not None:
+            self.market_cap = self.price * self.shares_outstanding
+        return self
 
 
 # -----------------------------------------------------------------------------
@@ -215,19 +203,17 @@ class DCFInputsSchema(BaseModel):
     shares_outstanding: float = 1.0
     currency: Currency = Currency.USD
 
-    @root_validator
-    def _tv_requirements(cls, values):
-        tm = values.get("terminal_method")
-        if tm == TerminalMethod.MULTIPLE:
-            if values.get("exit_multiple") is None or values.get("ebitda_terminal") is None:
+    @model_validator(mode="after")
+    def _tv_requirements(self) -> "DCFInputsSchema":
+        if self.terminal_method == TerminalMethod.MULTIPLE:
+            if self.exit_multiple is None or self.ebitda_terminal is None:
                 raise ValueError("Exit multiple terminal needs exit_multiple and ebitda_terminal")
-        # basic stability: g < wacc for perpetuity
-        if tm == TerminalMethod.PERPETUITY:
-            g = float(values.get("terminal_growth") or 0.0)
-            wacc = float(values.get("wacc"))
+        if self.terminal_method == TerminalMethod.PERPETUITY:
+            g = float(self.terminal_growth or 0.0)
+            wacc = float(self.wacc)
             if g >= wacc:
                 raise ValueError("terminal_growth must be < wacc for perpetuity method")
-        return values
+        return self
 
 
 class DCFResultSchema(BaseModel):
@@ -319,11 +305,11 @@ class ValuationPackage(BaseModel):
     tags: List[Tag] = Field(default_factory=list)
     source: Optional[str] = None
 
-    @validator("currency", always=True)
-    def _ensure_currency(cls, v, values):
-        # Harmonize currency with company default if not set elsewhere
-        comp: CompanyId = values.get("company")
-        return v or (comp.currency if comp else Currency.USD)
+    @model_validator(mode="after")
+    def _ensure_currency(self) -> "ValuationPackage":
+        if not self.currency:
+            self.currency = self.company.currency if self.company else Currency.USD
+        return self
 
     def ensure_consistency(self) -> None:
         """

@@ -92,7 +92,7 @@ def run(cfg):
             })
 
         # Backtest on preferred sectors for this country's PMI
-        pmi_daily = sub["regime"].reindex(ret_wide.index, method="ffill")
+        pmi_daily = sub["regime"].reindex(ret_wide.index).ffill()
         for ticker in ret_wide.columns:
             preferred_regimes = [r for r, tickers in SECTOR_PREFERENCES.items() if ticker in tickers]
             if preferred_regimes:

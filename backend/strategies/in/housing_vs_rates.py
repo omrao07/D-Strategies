@@ -114,7 +114,7 @@ def resample_monthly(df: pd.DataFrame, how: str="mean", ffill_q: bool=True) -> p
     agg = "mean" if how=="mean" else "sum"
     out = df.set_index("date").resample("M").agg(agg)
     if ffill_q:
-        out = out.fillna(method="ffill", limit=2)
+        out = out.ffill(limit=2)
     out = out.reset_index()
     return out
 

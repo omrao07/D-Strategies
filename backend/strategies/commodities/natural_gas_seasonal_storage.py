@@ -117,7 +117,7 @@ def run(cfg):
     # Backtest
     SIG_POS = {"buy_strong": 2, "buy": 1, "neutral": 0, "sell": -1, "sell_strong": -2}
     pos = sig_df.set_index("date")["signal"].map(SIG_POS).fillna(0)
-    pos_daily = pos.reindex(ng_ret.index, method="ffill").shift(1).fillna(0)
+    pos_daily = pos.reindex(ng_ret.index).ffill().shift(1).fillna(0)
     strat = pos_daily * ng_ret
     cum = (1 + strat.dropna()).cumprod()
     cum.to_frame("cumulative").to_csv(os.path.join(cfg.outdir, "backtest.csv"))

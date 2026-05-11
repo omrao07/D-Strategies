@@ -104,7 +104,7 @@ def run(cfg):
         for lag_months in [3, 6, 9, 12]:
             lag_days = lag_months * 21
             fwd_ret = crop_ret.rolling(lag_days).sum().shift(-lag_days)
-            enso_aligned = enso_series.reindex(crop_ret.index, method="ffill").dropna()
+            enso_aligned = enso_series.reindex(crop_ret.index).ffill().dropna()
             aligned = enso_aligned.align(fwd_ret.dropna(), join="inner")
             if len(aligned[0]) > 20:
                 r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -121,7 +121,7 @@ def run(cfg):
         if sig_col not in sig_df.columns:
             continue
         crop_ret = crop_wide[crop].pct_change().dropna()
-        pos_series = sig_df.set_index("date")[sig_col].reindex(crop_ret.index, method="ffill")
+        pos_series = sig_df.set_index("date")[sig_col].reindex(crop_ret.index).ffill()
         pos = pos_series.map({"bullish": 1, "neutral": 0, "bearish": -1}).fillna(0)
         strat = pos.shift(1) * crop_ret
         all_daily.append(strat.rename(crop))

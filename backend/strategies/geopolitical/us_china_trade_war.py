@@ -108,7 +108,7 @@ def run(cfg):
     signal_records = []
     for date in all_dates:
         esc = float(esc_rolling.loc[date]) if date in esc_rolling.index else 0
-        deficit_z = float(trade["deficit_zscore"].reindex([date], method="ffill").iloc[0]) if len(trade["deficit_zscore"].dropna()) > 0 else np.nan
+        deficit_z = float(trade["deficit_zscore"].reindex([date]).ffill().iloc[0]) if len(trade["deficit_zscore"].dropna()) > 0 else np.nan
 
         if esc > 1.5:
             signal = "sell_china_exposed_buy_domestic"
@@ -139,7 +139,7 @@ def run(cfg):
         is_exposed = any(c in ticker.lower() for c in CHINA_EXPOSED)
         if not is_exposed:
             continue
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

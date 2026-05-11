@@ -124,7 +124,7 @@ def run(cfg):
         roll_total = m1_ret + roll_yield_daily.fillna(0)
 
         fwd5 = m1_ret.rolling(5).sum().shift(-5)
-        ry_series = wide["roll_yield_zscore"].reindex(m1_ret.index, method="ffill").dropna()
+        ry_series = wide["roll_yield_zscore"].reindex(m1_ret.index).ffill().dropna()
         aligned = ry_series.align(fwd5.dropna(), join="inner")
         if len(aligned[0]) > 20:
             r, p = stats.pearsonr(aligned[0].values, aligned[1].values)

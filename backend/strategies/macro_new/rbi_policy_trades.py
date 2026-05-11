@@ -134,13 +134,13 @@ def run(cfg):
     dates = nifty.index
     data = pd.DataFrame(index=dates)
     data["nifty"] = nifty[nifty_col]
-    data["usdinr"] = usdinr[usdinr_col].reindex(dates, method="ffill")
-    data["repo_rate"] = rbi["repo_rate"].reindex(dates, method="ffill")
+    data["usdinr"] = usdinr[usdinr_col].reindex(dates).ffill()
+    data["repo_rate"] = rbi["repo_rate"].reindex(dates).ffill()
 
     cpi_col = "cpi_yoy" if "cpi_yoy" in cpi.columns else cpi.columns[0]
     core_col = "core_cpi_yoy" if "core_cpi_yoy" in cpi.columns else cpi_col
-    data["cpi"] = cpi[cpi_col].reindex(dates, method="ffill")
-    data["core_cpi"] = cpi[core_col].reindex(dates, method="ffill")
+    data["cpi"] = cpi[cpi_col].reindex(dates).ffill()
+    data["core_cpi"] = cpi[core_col].reindex(dates).ffill()
 
     # Rate trend (change over last 6 months)
     data["rate_trend"] = data["repo_rate"].diff(126)  # 126 trading days ~ 6 months

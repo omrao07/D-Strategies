@@ -98,7 +98,7 @@ def run(cfg):
             for lag_weeks in [4, 12, 24]:
                 fwd_miner = ret_wide[ticker].rolling(lag_weeks * 5).sum().shift(-lag_weeks * 5)
                 ur_weekly = uranium_ret.resample("W").sum()
-                ur_daily = ur_weekly.reindex(fwd_miner.index, method="ffill").dropna()
+                ur_daily = ur_weekly.reindex(fwd_miner.index).ffill().dropna()
                 aligned = ur_daily.align(fwd_miner.dropna(), join="inner")
                 if len(aligned[0]) > 15:
                     r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -115,7 +115,7 @@ def run(cfg):
     for ticker in ret_wide.columns:
         if any(m in ticker.lower() for m in URANIUM_MINER_TICKERS):
             pos = sig_df.set_index("date")["signal"].map(SIG_POS).fillna(0)
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             strat = pos_daily * ret_wide[ticker]
             all_daily.append(strat.rename(ticker))
 

@@ -120,7 +120,7 @@ def run(cfg):
             )
 
             fwd_1d = ret.shift(-1)
-            strat_ret = (pos.reindex(ret.index, method="ffill") * ret).dropna()
+            strat_ret = (pos.reindex(ret.index).ffill() * ret).dropna()
             if len(strat_ret) >= 20:
                 all_port.append(strat_ret.rename(ticker_upper))
 

@@ -88,7 +88,7 @@ def run(cfg):
     fiscal_df.to_csv(os.path.join(cfg.outdir, "fiscal_signals.csv"), index=False)
 
     # Sector returns by fiscal regime
-    regime_daily = fiscal_df.set_index("date")["regime"].reindex(ret_wide.index, method="ffill")
+    regime_daily = fiscal_df.set_index("date")["regime"].reindex(ret_wide.index).ffill()
     sector_records = []
     for ticker in ret_wide.columns:
         for regime in SECTOR_FISCAL_MAP:

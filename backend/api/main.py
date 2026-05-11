@@ -6,12 +6,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, field_validator
 
 import sys
-from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]  # backend/
 if str(ROOT) not in sys.path:
@@ -47,6 +47,15 @@ logging.basicConfig(
 logger = logging.getLogger("api")
 
 app = FastAPI(title="Damodar Orchestrator API", version=APP_VERSION)
+
+_ENGINE_API_KEY = os.getenv("ENGINE_API_KEY", "")
+_key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
+
+def _require_key(key: str = Security(_key_header)) -> None:
+    if not _ENGINE_API_KEY:
+        raise HTTPException(500, "ENGINE_API_KEY not configured on server")
+    if key != _ENGINE_API_KEY:
+        raise HTTPException(403, "Invalid or missing X-Engine-Key")
 
 _cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 app.add_middleware(
@@ -178,7 +187,7 @@ def _safe_path(user_path: Optional[str], allowed_base: Path) -> Path:
 
 
 @app.post("/backtest", response_model=BacktestResponse)
-def run_backtest(req: BacktestRequest):
+def run_backtest(req: BacktestRequest, _auth: None = Depends(_require_key)):
     if not req.config and not req.config_path:
         raise HTTPException(400, "Config required")
     if not req.registry and not req.registry_path:
@@ -222,7 +231,7 @@ def run_backtest(req: BacktestRequest):
     )
 
 @app.post("/echo")
-def echo(payload: Dict[str, Any]):
+def echo(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
     return {"received": payload, "ts": time.time()}
 
 
@@ -239,7 +248,7 @@ class VecBacktestRequest(BaseModel):
 
 
 @app.post("/backtest/run")
-def run_vec_backtest(req: VecBacktestRequest):
+def run_vec_backtest(req: VecBacktestRequest, _auth: None = Depends(_require_key)):
     """
     Run vectorized backtest via backend.backtester.vectorized_backtester.
     Returns BacktestResult.summary() dict.

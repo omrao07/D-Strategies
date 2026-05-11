@@ -134,7 +134,7 @@ def run(cfg):
         if idx_col is None:
             continue
         ret_series = ret_wide[idx_col].dropna()
-        pos_daily = sub_sig.reindex(ret_series.index, method="ffill").shift(1).fillna(0)
+        pos_daily = sub_sig.reindex(ret_series.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * ret_series).rename(idx_name))
 
     if all_daily:

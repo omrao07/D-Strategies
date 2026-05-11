@@ -90,7 +90,7 @@ def run(cfg):
 
         # Backtest: contrarian signal
         pos = sub["frenzy_score"].apply(lambda z: -1 if z > cfg.frenzy_threshold else (1 if z < -cfg.frenzy_threshold else 0))
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

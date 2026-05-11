@@ -113,7 +113,7 @@ def run(cfg):
         pos = phase_series.map({"trough": 2, "early_bull": 1.5, "mid_bull": 1, "late_bull": 0,
                                  "early_bear": -0.5, "mid_bear": -1, "transition": 0}).fillna(0)
         ret = series.pct_change().dropna()
-        pos_aligned = pos.reindex(ret.index, method="ffill").shift(1).fillna(0)
+        pos_aligned = pos.reindex(ret.index).ffill().shift(1).fillna(0)
         strat = pos_aligned * ret
         all_daily.append(strat.rename(comm))
 

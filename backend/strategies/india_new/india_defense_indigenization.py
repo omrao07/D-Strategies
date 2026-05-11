@@ -68,7 +68,7 @@ def run(cfg):
         ret_s = ret_wide[ticker].dropna()
         for lag in [1, 3, 6, 12]:
             fwd_ret = ret_s.rolling(lag * 21).sum().shift(-lag * 21)
-            budget_daily = budget_yoy.reindex(ret_s.index, method="ffill").dropna()
+            budget_daily = budget_yoy.reindex(ret_s.index).ffill().dropna()
             aligned = budget_daily.align(fwd_ret.dropna(), join="inner")
             if len(aligned[0]) > 10:
                 r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -119,7 +119,7 @@ def run(cfg):
     all_daily = []
     for ticker in ret_wide.columns:
         if any(d in ticker.lower() for d in DEFENSE_TICKERS):
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

@@ -80,7 +80,7 @@ def run(cfg):
 
         pos = feats["zscore_52w"].apply(lambda z: 1 if z > cfg.zscore_threshold else (-1 if z < -cfg.zscore_threshold else 0))
         # Weekly postings → need to forward-fill to daily return series
-        pos_daily = pos.reindex(ret_wide.index, method="ffill")
+        pos_daily = pos.reindex(ret_wide.index).ffill()
         strat = pos_daily.shift(5) * ret_wide[entity]  # 5-day execution lag
         all_daily.append(strat.rename(entity))
 

@@ -97,7 +97,7 @@ def run(cfg):
             lambda r: 1 if (not np.isnan(r.get("spend_zscore", np.nan)) and r.get("spend_zscore", 0) > cfg.zscore_threshold and (r.get("acceleration", 0) or 0) > 0)
                       else (-1 if (not np.isnan(r.get("spend_zscore", np.nan)) and r.get("spend_zscore", 0) < -cfg.zscore_threshold and (r.get("acceleration", 0) or 0) < 0) else 0), axis=1
         )
-        pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1)
+        pos_daily = pos.reindex(ret_wide.index).ffill().shift(1)
         strat = pos_daily * ret_wide[ticker]
         all_daily.append(strat.rename(ticker))
 

@@ -109,7 +109,7 @@ def run(cfg):
         ret_s = ret_wide[ticker].dropna()
         for lag_months in [1, 2, 3, 6]:
             fwd_ret = ret_s.rolling(lag_months * 21).sum().shift(-lag_months * 21)
-            upi_monthly = upi_yoy.reindex(ret_s.index, method="ffill").dropna()
+            upi_monthly = upi_yoy.reindex(ret_s.index).ffill().dropna()
             aligned = upi_monthly.align(fwd_ret.dropna(), join="inner")
             if len(aligned[0]) > 15:
                 r, p = stats.pearsonr(aligned[0].values, aligned[1].values)
@@ -129,7 +129,7 @@ def run(cfg):
     all_daily = []
     for ticker in ret_wide.columns:
         if any(d in ticker.lower() for d in DIGITAL_BENEFICIARIES):
-            pos_daily = pos.reindex(ret_wide.index, method="ffill").shift(1).fillna(0)
+            pos_daily = pos.reindex(ret_wide.index).ffill().shift(1).fillna(0)
             all_daily.append((pos_daily * ret_wide[ticker]).rename(ticker))
 
     if all_daily:

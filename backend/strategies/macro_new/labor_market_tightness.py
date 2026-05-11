@@ -95,7 +95,7 @@ def run(cfg):
     labor_df.to_csv(os.path.join(cfg.outdir, "labor_signals.csv"), index=False)
 
     # Sector returns by labor regime
-    regime_daily = labor["regime"].reindex(ret_wide.index, method="ffill")
+    regime_daily = labor["regime"].reindex(ret_wide.index).ffill()
     sector_records = []
     for ticker in ret_wide.columns:
         for regime in SECTOR_MAP:

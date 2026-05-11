@@ -105,9 +105,10 @@ RATE_MAX_PUB       = int(os.getenv("RATE_MAX_PUB_PER_MIN","120"))
 # ---------- App ----------
 app = FastAPI(title="WS Gateway", version="1.0")
 
+_cors_origins = ALLOWED_ORIGINS if ALLOWED_ORIGINS != ["*"] else ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if ALLOWED_ORIGINS == ["*"] else ALLOWED_ORIGINS,
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -100,7 +100,7 @@ def run(cfg):
 
     signal_records = []
     for date in semi_ret.index:
-        t_score = float(tension_rolling.reindex([date], method="ffill").iloc[0]) if date in tension_rolling.index or len(tension_rolling) > 0 else 0
+        t_score = float(tension_rolling.reindex([date]).ffill().iloc[0]) if date in tension_rolling.index or len(tension_rolling) > 0 else 0
 
         if t_score > 7:
             signal = "sell_taiwan_dependent_buy_domestic_fabs"
@@ -132,7 +132,7 @@ def run(cfg):
                     (-1 if any(d in t for d in TAIWAN_DEPENDENT) else 0)
         if direction == 0:
             continue
-        pos_daily = (pos * direction).reindex(semi_ret.index, method="ffill").shift(1).fillna(0)
+        pos_daily = (pos * direction).reindex(semi_ret.index).ffill().shift(1).fillna(0)
         all_daily.append((pos_daily * semi_ret[ticker]).rename(ticker))
 
     if all_daily:
