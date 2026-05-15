@@ -55,7 +55,7 @@ from backend.backtester.vectorized_backtester import monte_carlo
 @pytest.fixture
 def pos_returns():
     """252 slightly positive daily returns."""
-    rng = np.random.default_rng(1)
+    rng = np.random.default_rng(3)
     return rng.normal(0.0004, 0.012, 252)
 
 

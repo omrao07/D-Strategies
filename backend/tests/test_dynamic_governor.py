@@ -18,7 +18,7 @@ import math
 import importlib
 import pytest # type: ignore
 
-dg = importlib.import_module("dynamic_governor")
+dg = importlib.import_module("backend.risk.dynamic_governor")
 
 # Helpers to get a params base we can safely mutate in tests
 def base_params():
@@ -89,9 +89,10 @@ def test_liquidity_floor_caps_gross():
     assert dec_bad["target_gross"] <= dec_ok["target_gross"]
 
 def test_news_halt_triggers():
-    dec, params = decide(news_level=params()["halt_on_news_level"]) # type: ignore
+    _params = base_params()
+    dec, _ = decide(news_level=_params["halt_on_news_level"])
     assert dec["halt_trading"] is True
-    assert dec["cooldown_sec"] >= params()["cooldown_sec"] # type: ignore
+    assert dec["cooldown_sec"] >= _params["cooldown_sec"]
 
 def test_circuit_breaker_halt():
     dec, _ = decide(circuit_breaker=True)

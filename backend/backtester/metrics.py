@@ -139,6 +139,11 @@ def sharpe(daily_returns: np.ndarray, rf_daily: float = 0.0, periods_per_year: i
     r = daily_returns[~np.isnan(daily_returns)] - rf_daily
     sigma = np.std(r, ddof=1)
     if sigma < _EPS:
+        mean = float(r.mean()) if len(r) > 0 else 0.0
+        if mean > _EPS:
+            return float("inf")
+        if mean < -_EPS:
+            return float("-inf")
         return 0.0
     return float(r.mean() / sigma * np.sqrt(periods_per_year))
 
@@ -498,8 +503,8 @@ def detect_lookahead(
         for h in range(1, horizon + 1):
             if h >= len(prices):
                 break
-            # future returns
-            future_ret = prices.pct_change(h).shift(-h).values
+            # future returns — use first price column, ensure 1D
+            future_ret = prices.iloc[:, 0].pct_change(h).shift(-h).values
             valid = ~(np.isnan(sig) | np.isnan(future_ret))
             if valid.sum() < 30:
                 continue

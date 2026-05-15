@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pytest # type: ignore
 
-agent_mod = importlib.import_module("rl_execution_agent")
+agent_mod = importlib.import_module("backend.execution.rl_execution_agent")
 
 # --------- Fakes / Test Harness ---------------------------------------
 

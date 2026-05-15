@@ -679,7 +679,7 @@ class BacktestEngine:
                             fill_dict = {
                                 "ts": batch.ts, "strategy": strat_name, "symbol": sym,
                                 "side": side, "qty": res.fill_qty, "fill_price": res.fill_price,
-                                "fee": fee, "is_partial": res.partial,
+                                "fee": fee, "is_partial": getattr(res, "partial", getattr(res, "is_partial", False)),
                                 "impact_bps": 0.0, "order_type": order_type,
                                 "fill_step": res.fill_step,
                             }
@@ -1259,3 +1259,138 @@ def optimize_strategy_weights(report: BacktestReport) -> pd.Series:
     pos = sharpes.clip(lower=0)
     total = pos.sum()
     return pos / total if total > 0 else pd.Series(1.0 / len(pos), index=pos.index)
+
+
+# ── Public aliases / thin wrappers for test-facing API ───────────────────────
+
+@dataclass
+class Fill:
+    """Immutable fill record returned by MarketSimulator and BacktestBook."""
+    order_id: str
+    strategy: str
+    symbol: str
+    side: str          # 'buy' | 'sell'
+    qty: float
+    fill_price: float
+    fee: float
+    ts: datetime.datetime
+    is_partial: bool = False
+
+
+class BacktestBook:
+    """
+    Public portfolio accounting book for tests and simple strategies.
+    Accepts Fill objects (see above) and maintains cash / positions / P&L.
+    """
+
+    def __init__(self, capital: float, short_fee_bps: float = 0.0):
+        self.initial_capital = float(capital)
+        self.cash = float(capital)
+        self.short_fee_bps = short_fee_bps
+        self.positions: Dict[str, float] = {}
+        self.avg_cost: Dict[str, float] = {}
+        self._last_prices: Dict[str, float] = {}
+        self._prev_equity = float(capital)
+        self.realized_pnl = 0.0
+
+    def apply_fill(self, fill: Fill) -> None:
+        sym, side, qty = fill.symbol, fill.side, fill.qty
+        price, fee = fill.fill_price, fill.fee
+        prev_qty = self.positions.get(sym, 0.0)
+        prev_avg = self.avg_cost.get(sym, price)
+        signed_qty = qty if side == "buy" else -qty
+        if prev_qty == 0 or (prev_qty > 0) == (signed_qty > 0):
+            new_qty = prev_qty + signed_qty
+            if abs(new_qty) > 1e-9:
+                self.avg_cost[sym] = (abs(prev_qty) * prev_avg + qty * price) / abs(new_qty)
+        else:
+            closed = min(abs(signed_qty), abs(prev_qty))
+            pnl = closed * (price - prev_avg) * (1 if prev_qty > 0 else -1)
+            self.realized_pnl += pnl
+            new_qty = prev_qty + signed_qty
+        self.positions[sym] = new_qty
+        if abs(new_qty) < 1e-9:
+            self.positions.pop(sym, None)
+            self.avg_cost.pop(sym, None)
+        if side == "buy":
+            self.cash -= price * qty + fee
+        else:
+            self.cash += price * qty - fee
+
+    def mark_to_market(self, prices: Dict[str, float]) -> None:
+        self._last_prices.update(prices)
+
+    def equity(self) -> float:
+        return self.cash + sum(
+            q * self._last_prices.get(s, self.avg_cost.get(s, 0))
+            for s, q in self.positions.items()
+        )
+
+    def gross_exposure(self) -> float:
+        return sum(
+            abs(q) * self._last_prices.get(s, self.avg_cost.get(s, 0))
+            for s, q in self.positions.items()
+        )
+
+    def daily_pnl(self) -> float:
+        eq = self.equity()
+        pnl = eq - self._prev_equity
+        self._prev_equity = eq
+        return pnl
+
+
+class MarketSimulator:
+    """
+    Simple single-bar market simulator: fills orders against a Bar snapshot.
+    Used by event-driven backtests and test harnesses.
+    """
+
+    def __init__(
+        self,
+        fee_bps: float = 0.5,
+        slippage_bps: float = 0.0,
+        max_participation_rate: float = 0.25,
+    ):
+        self.fee_bps = fee_bps
+        self.slippage_bps = slippage_bps
+        self.max_participation_rate = max_participation_rate
+
+    def fill_order(self, order: Dict, bar: Any, ts: Any) -> Optional[Fill]:
+        side = order["side"]
+        qty_requested = float(order["qty"])
+        mid = float(bar.close)
+
+        # participation cap
+        adv = max(1.0, float(getattr(bar, "adv_20", 0) or bar.volume or 1.0))
+        max_fill = adv * self.max_participation_rate
+        fill_qty = min(qty_requested, max_fill)
+        is_partial = fill_qty < qty_requested - 1e-9
+
+        # slippage: buy worse, sell worse
+        slip_frac = self.slippage_bps / 1e4
+        if side == "buy":
+            fill_px = mid * (1.0 + slip_frac)
+        else:
+            fill_px = mid * (1.0 - slip_frac)
+
+        # limit check
+        order_type = order.get("order_type", "market")
+        limit_px = order.get("limit_price")
+        if order_type == "limit" and limit_px is not None:
+            if side == "buy" and fill_px > limit_px:
+                return None
+            if side == "sell" and fill_px < limit_px:
+                return None
+
+        fee = fill_qty * fill_px * self.fee_bps / 1e4
+        return Fill(
+            order_id=order.get("order_id", ""),
+            strategy=order.get("strategy", ""),
+            symbol=bar.symbol,
+            side=side,
+            qty=fill_qty,
+            fill_price=fill_px,
+            fee=fee,
+            ts=ts,
+            is_partial=is_partial,
+        )

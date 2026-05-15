@@ -14,6 +14,7 @@ Run: pytest -q tests/test_end_to_end.py
 
 import json
 import math
+import sys
 import time
 import threading
 import queue
@@ -141,7 +142,8 @@ class RiskGate(threading.Thread):
         self.running = True
     def run(self):
         while self.running and not BUS.stop:
-            for _, order in BUS.consume(self.incoming, block_ms=200, count=50):
+            for _, raw in BUS.consume(self.incoming, block_ms=200, count=50):
+                order = json.loads(raw) if isinstance(raw, str) else raw
                 # trivial checks: qty > 0 and side in {buy,sell}
                 if order.get("qty", 0) > 0 and order.get("side") in ("buy","sell"):
                     BUS.publish(self.outgoing, order)
@@ -158,11 +160,13 @@ class PaperOMS(threading.Thread):
         last_px = {}
         while self.running and not BUS.stop:
             progressed = False
-            for _, mk in BUS.consume(self.marks, block_ms=10, count=100):
+            for _, raw_mk in BUS.consume(self.marks, block_ms=10, count=100):
+                mk = json.loads(raw_mk) if isinstance(raw_mk, str) else raw_mk
                 last_px[mk["symbol"]] = mk["price"]
                 self.xr.update_mark(mk["symbol"], mk["price"])
                 progressed = True
-            for _, o in BUS.consume(self.incoming, block_ms=10, count=100):
+            for _, raw_o in BUS.consume(self.incoming, block_ms=10, count=100):
+                o = json.loads(raw_o) if isinstance(raw_o, str) else raw_o
                 # immediate fill at (mark or limit/market)
                 px = o.get("limit_price") or last_px.get(o["symbol"], o.get("mark_price") or 100.0)
                 fill = {

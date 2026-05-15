@@ -180,13 +180,87 @@ class CandleAggregator:
     Expected input tick schema (flexible):
         {"ts_ms": 1699999999999, "symbol": "AAPL", "price": 187.12, "size": 100}
      or {"t":..., "s":"BTCUSDT", "p":..., "q": ...}
+
+    Also supports a simple single-symbol API for testing:
+        agg = CandleAggregator(symbol="AAPL", interval_ms=60000)
+        agg.ingest({"ts": ..., "price": ..., "size": ...})
+        agg.finalize_until(ts_end)
+        candles = agg.drain()
     """
-    def __init__(self, intervals: List[str] = ["1s","1m"], *, redis_url: Optional[str] = None):
-        self.sink = _Sink(redis_url)
-        self.aggs: Dict[str, _IntervalAgg] = {iv: _IntervalAgg(iv, self.sink) for iv in intervals}
+    def __init__(
+        self,
+        symbol: str = "",
+        interval_ms: int = 0,
+        intervals: List[str] = ["1s", "1m"],
+        *,
+        redis_url: Optional[str] = None,
+    ):
+        self._simple_symbol = symbol.upper() if symbol else ""
+        self._simple_interval_ms = int(interval_ms) if interval_ms else 0
+
+        if self._simple_interval_ms > 0:
+            # Simple single-symbol in-memory mode
+            self._candles: List[Dict[str, Any]] = []
+            self._live_candle: Optional[Dict[str, Any]] = None
+            self.sink = None
+            self.aggs = {}
+        else:
+            self.sink = _Sink(redis_url)
+            self.aggs: Dict[str, _IntervalAgg] = {iv: _IntervalAgg(iv, self.sink) for iv in intervals}
+            self._candles = []
+            self._live_candle = None
+
+    def _bucket_start(self, ts: int) -> int:
+        ms = self._simple_interval_ms
+        return ts - (ts % ms) if ms > 0 else ts
+
+    def ingest(self, tick: Dict[str, Any]) -> None:
+        """Simple single-symbol ingest (test-compatible API)."""
+        if self._simple_interval_ms > 0:
+            ts = int(tick.get("ts") or tick.get("ts_ms") or tick.get("t") or 0)
+            px = float(tick.get("price") or tick.get("p") or 0.0)
+            sz = float(tick.get("size") or tick.get("q") or tick.get("qty") or 0.0)
+            if px <= 0:
+                return
+            bstart = self._bucket_start(ts)
+            if self._live_candle is None or self._live_candle["ts"] != bstart:
+                if self._live_candle is not None:
+                    self._candles.append(self._live_candle)
+                self._live_candle = {"ts": bstart, "o": px, "h": px, "l": px, "c": px, "v": sz}
+            else:
+                c = self._live_candle
+                c["h"] = max(c["h"], px)
+                c["l"] = min(c["l"], px)
+                c["c"] = px
+                c["v"] += sz
+        else:
+            self.on_tick(tick)
+
+    def finalize_until(self, ts_end: int) -> None:
+        """Finalize all candles with start < ts_end."""
+        if self._simple_interval_ms > 0:
+            if self._live_candle is not None and self._live_candle["ts"] < ts_end:
+                self._candles.append(self._live_candle)
+                self._live_candle = None
+        else:
+            for agg in self.aggs.values():
+                agg.time_roll(ts_end)
+
+    def drain(self) -> List[Dict[str, Any]]:
+        """Return and clear accumulated candles."""
+        result = list(self._candles)
+        self._candles.clear()
+        return result
+
+    def get_candles(self) -> List[Dict[str, Any]]:
+        """Return accumulated candles without clearing."""
+        result = list(self._candles)
+        if self._live_candle is not None:
+            result.append(dict(self._live_candle))
+        return result
 
     def on_tick(self, tick: Dict[str, Any]) -> None:
-        sym = (tick.get("symbol") or tick.get("s") or "").upper()
+        sym = (tick.get("symbol") or tick.get("s") or self._simple_symbol or "").upper()
         if not sym: return
         px  = float(tick.get("price") or tick.get("p") or 0.0)
         if px <= 0: return
@@ -194,6 +268,10 @@ class CandleAggregator:
         ts  = int(tick.get("ts_ms") or tick.get("t") or now_ms())
         for agg in self.aggs.values():
             agg.add_trade(symbol=sym, ts_ms=ts, price=px, size=qty)
+
+    # alias for on_tick
+    def add(self, tick: Dict[str, Any]) -> None:
+        self.ingest(tick)
 
     def roll(self) -> None:
         """Call periodically (e.g., each second) to finalize ended buckets."""

@@ -101,9 +101,18 @@ class Allocator:
                             fixed = False
                     if fixed:
                         break
-            w = _normalize(w)
-            w = np.clip(w, bounds.lb, bounds.ub)
-            return _normalize(w)
+            # Iterative clip+normalize to respect box bounds while summing to 1
+            for _ in range(50):
+                s = float(w.sum())
+                if abs(s) < 1e-12:
+                    w = np.ones(len(w)) * bounds.lb
+                    break
+                w_new = np.clip(w / s, bounds.lb, bounds.ub)
+                if np.allclose(w_new, w / s, atol=1e-10):
+                    w = w_new
+                    break
+                w = w_new
+            return w
 
         for _ in range(iters):
             grad = Q @ w - mu

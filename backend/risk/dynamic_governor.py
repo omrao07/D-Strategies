@@ -566,5 +566,134 @@ def main():
     else:
         _probe()
 
+
+# ── Functional API (module-level decide + DEFAULT_PARAMS) ─────────────────────
+
+DEFAULT_PARAMS: Dict[str, Any] = {
+    "base_gross": 1.00,
+    "max_gross": 2.00,
+    "min_gross": 0.10,
+    "base_net": 0.00,
+    "vol_floor": 10.0,
+    "vol_ceiling": 40.0,
+    "vol_clip_min": 0.25,
+    "dd_curve": [
+        [0.05, 0.80],
+        [0.10, 0.60],
+        [0.15, 0.40],
+        [0.20, 0.20],
+    ],
+    "liq_floor": 0.2,
+    "liq_min_gross": 0.25,
+    "halt_on_news_level": 3,
+    "circuit_breaker_halt": True,
+    "cooldown_sec": 900,
+}
+
+
+def decide(state: Dict[str, Any], params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Functional interface for tests and simple callers.
+
+    Parameters
+    ----------
+    state  : dict with keys vol_pct, drawdown, circuit_breaker, liquidity,
+             news_level, time_since_shock_sec, target_hint, ...
+    params : dict matching DEFAULT_PARAMS structure
+
+    Returns
+    -------
+    dict with target_gross, target_net, halt_trading, cooldown_sec, reasons
+    """
+    p = {**DEFAULT_PARAMS, **params}
+    reasons: list = []
+
+    vol = float(state.get("vol_pct", 0.0))
+    drawdown = float(state.get("drawdown", 0.0))
+    circuit_breaker = bool(state.get("circuit_breaker", False))
+    news_level = int(state.get("news_level", 0))
+    time_since_shock = float(state.get("time_since_shock_sec", 1e9))
+    liquidity = float(state.get("liquidity", 1.0))
+    target_hint = state.get("target_hint")
+
+    gross = float(p["base_gross"])
+    net = float(p["base_net"])
+    halt = False
+    cooldown_sec = int(p["cooldown_sec"])
+    cooldown = 0
+
+    # Volatility scaling
+    vol_floor = float(p["vol_floor"])
+    vol_ceiling = float(p["vol_ceiling"])
+    vol_clip_min = float(p["vol_clip_min"])
+    if vol > vol_floor:
+        if vol >= vol_ceiling:
+            vol_mult = vol_clip_min
+        else:
+            frac = (vol - vol_floor) / max(1e-6, vol_ceiling - vol_floor)
+            vol_mult = 1.0 - frac * (1.0 - vol_clip_min)
+        gross *= vol_mult
+        reasons.append(f"vol_scale:{vol_mult:.2f}")
+
+    # Drawdown curve
+    dd_mult = 1.0
+    for threshold, mult in sorted(p["dd_curve"], key=lambda x: x[0]):
+        if drawdown >= threshold:
+            dd_mult = mult
+    if dd_mult < 1.0:
+        gross *= dd_mult
+        reasons.append(f"drawdown_scale:{dd_mult:.2f}")
+
+    # Liquidity floor: hard cap when below floor
+    liq_floor = float(p.get("liq_floor", 0.2))
+    liq_min_gross = float(p.get("liq_min_gross", 0.25))
+    if liquidity < liq_floor:
+        gross = min(gross, liq_min_gross)
+        reasons.append(f"liquidity_floor:cap={liq_min_gross:.2f}")
+
+    # Circuit breaker
+    if circuit_breaker:
+        halt = True
+        cooldown = cooldown_sec * 2
+        reasons.append("circuit_breaker")
+
+    # News halt
+    if news_level >= int(p.get("halt_on_news_level", 3)):
+        halt = True
+        cooldown = max(cooldown, cooldown_sec)
+        reasons.append(f"news_level:{news_level}")
+
+    # Cooldown recovery after shock
+    if time_since_shock < cooldown_sec:
+        remaining = cooldown_sec - int(time_since_shock)
+        cooldown = max(cooldown, remaining)
+        gross *= 0.5
+        reasons.append("cooldown_recovery")
+
+    # External hint (supports both scalar and dict)
+    if target_hint is not None:
+        if isinstance(target_hint, dict):
+            if "gross" in target_hint:
+                gross = float(target_hint["gross"])
+            if "net" in target_hint:
+                net = float(target_hint["net"])
+        else:
+            try:
+                gross = float(target_hint)
+            except Exception:
+                pass
+        reasons.append("target_hint_override")
+
+    # Clamp
+    gross = max(float(p["min_gross"]), min(float(p["max_gross"]), gross))
+
+    return {
+        "target_gross": gross,
+        "target_net": net,
+        "halt_trading": halt,
+        "cooldown_sec": cooldown,
+        "reasons": reasons,
+    }
+
 if __name__ == "__main__":
     main()
