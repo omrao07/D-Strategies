@@ -42,22 +42,24 @@ except ImportError:
 
         def detect(self, current: np.ndarray):
             cur = np.asarray(current)
+            if len(cur) == 0:
+                raise ValueError("current array must not be empty")
 
             if self.method == "ks":
                 from scipy.stats import ks_2samp
                 stat, p = ks_2samp(self.ref, cur)
                 return DriftResult(
-                    drifted=p < self.alpha,
-                    statistic=stat,
+                    drifted=bool(p < self.alpha),
+                    statistic=float(stat),
                     threshold=self.alpha,
-                    p_value=p
+                    p_value=float(p)
                 )
 
             if self.method == "psi":
                 psi = population_stability_index(self.ref, cur)
                 return DriftResult(
-                    drifted=psi > 0.25,
-                    statistic=psi,
+                    drifted=bool(psi > 0.25),
+                    statistic=float(psi),
                     threshold=0.25,
                     p_value=None
                 )

@@ -71,8 +71,8 @@ def run_exec(
     start = time.time()
 
     if isinstance(cmd, str):
-        # shell=False still works if we pass as string only on Windows? Better split.
-        argv = shlex.split(cmd, posix=os.name != "nt")
+        # naive split preserves quotes as literals (no shell stripping)
+        argv = cmd.split()
     else:
         argv = list(cmd)
 
@@ -161,7 +161,7 @@ def run_exec(
             killed = True
             return proc.wait()
 
-    code = wait_with_timeout() if timeout else proc.wait()
+    code = wait_with_timeout() if timeout is not None else proc.wait()
 
     # Join readers (briefly)
     t_out.join(timeout=0.5)
@@ -174,6 +174,16 @@ def run_exec(
     else:
         so = b"".join(stdout_parts).decode("utf-8", errors="replace")  # type: ignore[assignment]
         se = b"".join(stderr_parts).decode("utf-8", errors="replace")  # type: ignore[assignment]
+
+    # Hard-truncate at the byte cap (reader may have buffered one full line over the limit)
+    if max_output_bytes is not None:
+        so_b = so.encode("utf-8")
+        se_b = se.encode("utf-8")
+        if len(so_b) + len(se_b) > max_output_bytes:
+            truncated = True
+            so = so_b[:max_output_bytes].decode("utf-8", errors="ignore")
+            remaining = max_output_bytes - len(so_b)
+            se = se_b[:max(0, remaining)].decode("utf-8", errors="ignore")
 
     end = time.time()
     return ExecResult(

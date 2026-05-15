@@ -82,7 +82,7 @@ def var_es(
         z = norm.ppf(alpha)
         var_q = mean + std * z
         var_val = -var_q
-        es_val = -(mean + std * (norm.pdf(z) / alpha))
+        es_val = -(mean - std * (norm.pdf(z) / alpha))
 
     else:
         raise ValueError(f"unsupported method {method}")

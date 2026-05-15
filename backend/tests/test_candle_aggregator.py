@@ -99,9 +99,9 @@ def get_api(mod):
 def ticks_simple():
     """
     4 ticks within one minute (60000ms). All times are ms since epoch.
-    Start boundary at t0 = 1_700_000_000_000 (multiple of 1000 for tidiness).
+    t0 = 1_700_000_040_000 is chosen so that t0 % 60_000 == 0 (minute boundary).
     """
-    t0 = 1_700_000_000_000
+    t0 = 1_700_000_040_000  # divisible by 60000: t0 % 60000 == 0
     return [
         {"ts": t0 + 5_000,  "price": 100.0, "size": 2.0},  # open = 100
         {"ts": t0 + 15_000, "price": 102.0, "size": 1.0},  # high = 102

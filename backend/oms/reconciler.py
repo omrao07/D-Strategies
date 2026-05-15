@@ -42,11 +42,94 @@ def _utc_ms() -> int:
 
 
 class Reconciler:
-    def __init__(self, broker: str = "paper", auto_fix: bool = False, poll_s: int = 30):
+    def __init__(self, broker: str = "paper", auto_fix: bool = False, poll_s: int = 30,
+                 base_ccy: str = "USD", qty_tol: float = 1e-6, notional_tol: float = 0.01, **kw):
         self.broker = broker
         self.auto_fix = auto_fix
         self.poll_s = poll_s
+        self.base_ccy = base_ccy
+        self.qty_tol = qty_tol
+        self.notional_tol = notional_tol
         self._running = False
+
+    def reconcile(self, orders: List[Dict], fills: List[Dict],
+                  positions: List[Dict], cash: List[Dict],
+                  fx: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
+        seen_fids: set = set()
+        unique_fills: List[Dict] = []
+        dupe_fills: List[Dict] = []
+        for f in fills:
+            fid = f.get("fid")
+            if fid and fid in seen_fids:
+                dupe_fills.append(f)
+            else:
+                if fid:
+                    seen_fids.add(fid)
+                unique_fills.append(f)
+
+        order_fills: Dict[str, List] = {}
+        for f in unique_fills:
+            order_fills.setdefault(f.get("oid", ""), []).append(f)
+
+        orders_view: List[Dict] = []
+        breaks: List[Dict] = []
+        for o in orders:
+            oid = o.get("oid", "")
+            order_qty = float(o.get("qty", 0))
+            status = o.get("status", "open")
+            filled_qty = sum(float(f.get("qty", 0)) for f in order_fills.get(oid, []))
+            open_qty = max(0.0, order_qty - filled_qty)
+            if open_qty < self.qty_tol:
+                open_qty = 0.0
+            final_status = "filled" if open_qty == 0 else status
+            if status in ("canceled", "cancelled", "CANCELED"):
+                final_status = status
+                if filled_qty > 0 and open_qty > 0:
+                    breaks.append({"kind": "open_qty_on_canceled", "oid": oid})
+            orders_view.append({**o, "filled_qty": filled_qty, "open_qty": open_qty, "status": final_status})
+
+        fill_pos: Dict[str, float] = {}
+        for f in unique_fills:
+            sym = f.get("symbol", "")
+            sign = 1 if f.get("side", "buy") == "buy" else -1
+            fill_pos[sym] = fill_pos.get(sym, 0.0) + sign * float(f.get("qty", 0))
+
+        pos_view: List[Dict] = []
+        for p in positions:
+            sym = p.get("symbol", "")
+            expected = float(p.get("qty", 0))
+            actual = fill_pos.get(sym, 0.0)
+            if abs(expected - actual) > self.qty_tol:
+                breaks.append({"kind": "qty_mismatch", "symbol": sym,
+                               "expected": expected, "actual": actual})
+            pos_view.append({**p})
+
+        fill_cash: Dict[str, float] = {}
+        for f in unique_fills:
+            ccy = f.get("ccy", "USD")
+            sign = -1 if f.get("side", "buy") == "buy" else 1
+            fill_cash[ccy] = fill_cash.get(ccy, 0.0) + sign * float(f.get("qty", 0)) * float(f.get("px", 0))
+
+        for c in cash:
+            ccy = c.get("ccy", "USD")
+            expected = float(c.get("amount", 0))
+            actual = fill_cash.get(ccy, 0.0)
+            if abs(expected - actual) > self.notional_tol:
+                breaks.append({"kind": "notional_mismatch", "ccy": ccy,
+                               "expected": expected, "actual": actual})
+
+        cash_base: Optional[float] = None
+        if fx and cash:
+            cash_base = sum(float(c.get("amount", 0)) * fx.get(c.get("ccy", "USD"), 1.0) for c in cash)
+
+        return {
+            "breaks": breaks,
+            "duplicates": dupe_fills,
+            "orders_view": orders_view,
+            "pos_view": pos_view,
+            "cash_base": cash_base,
+            "metrics": {"base_ccy": self.base_ccy},
+        }
 
     def reconcile_once(self) -> Dict[str, Any]:
         report = {"ts_ms": _utc_ms(), "broker": self.broker, "mismatches": []}

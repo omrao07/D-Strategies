@@ -60,7 +60,7 @@ def severity_bucket(score: int, max_score: int) -> str:
     t = score / max(1, max_score)
     if t < 0.2:
         return "low"
-    if t < 0.44:
+    if t < 0.40:
         return "moderate"
     if t < 0.68:
         return "high"
@@ -186,7 +186,7 @@ class RiskRegister:
         risks = self.list()
         max_score = self.L * self.C
         total = len(risks)
-        open_ = sum(1 for r in risks if r.status != "closed")
+        open_ = sum(1 for r in risks if r.status == "open")
         critical = sum(1 for r in risks if severity_bucket(r.score, max_score) == "critical")
         avg_score = (sum(r.score for r in risks) / total) if total else 0.0
         return {"count": total, "open": open_, "critical": critical, "avg_score": avg_score}
@@ -196,12 +196,12 @@ class RiskRegister:
     def review_interval_days(score: int, max_score: int) -> int:
         """
         Example SLA:
-          1..20% -> 90d, 20..44% -> 60d, 44..68% -> 30d, >68% -> 7d
+          1..20% -> 90d, 20..40% -> 60d, 40..68% -> 30d, >68% -> 7d
         """
         t = score / max(1, max_score)
         if t <= 0.20:
             return 90
-        if t <= 0.44:
+        if t < 0.40:
             return 60
         if t <= 0.68:
             return 30

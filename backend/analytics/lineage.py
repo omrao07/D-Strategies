@@ -1,7 +1,8 @@
 # backend/infra/lineage.py
 from __future__ import annotations
 
-import os, io, json, time, hashlib, inspect, typing as T
+import os, io, json, time, hashlib, inspect, typing as T, uuid as _uuid
+from collections import deque
 from dataclasses import dataclass, asdict, field
 from pathlib import Path
 from contextlib import contextmanager
@@ -94,6 +95,216 @@ class LineageGraph:
             lines.append(f'  "{esc(e.src)}" -> "{esc(e.dst)}" [label="{esc(e.relation)}"];')
         lines.append("}")
         return "\n".join(lines)
+
+    # ── High-level data-lineage API ───────────────────────────────────────────
+
+    def clear(self) -> None:
+        self.nodes.clear()
+        self.edges.clear()
+
+    def add_dataset(self, name: str, *, schema: dict | None = None,
+                    tags: list | None = None, props: dict | None = None) -> str:
+        nid = f"ds::{name}"
+        if nid not in self.nodes:
+            self.nodes[nid] = {"id": nid, "type": "dataset", "name": name,
+                               "schema": schema or {}, "tags": tags or [], "props": props or {}}
+        return nid
+
+    def add_job(self, name: str, *, owner: str | None = None,
+                props: dict | None = None) -> str:
+        nid = f"job::{name}"
+        if nid not in self.nodes:
+            self.nodes[nid] = {"id": nid, "type": "job", "name": name,
+                               "owner": owner, "props": props or {}}
+        return nid
+
+    def add_run(self, job_id: str, *, ts: int | None = None,
+                version: str | None = None, props: dict | None = None) -> str:
+        nid = f"run::{_uuid.uuid4().hex[:8]}"
+        self.nodes[nid] = {"id": nid, "type": "run", "job_id": job_id,
+                           "ts": ts if ts is not None else now_ms(),
+                           "version": version, "props": props or {}}
+        self.edges.append(Edge(src=job_id, dst=nid, relation="executed", meta={}))
+        return nid
+
+    def link_read(self, run_id: str, dataset_id: str, *,
+                  columns: list | None = None) -> None:
+        self.edges.append(Edge(src=run_id, dst=dataset_id, relation="reads",
+                               meta={"columns": columns or []}))
+
+    def link_write(self, run_id: str, dataset_id: str, *,
+                   columns: list | None = None) -> None:
+        self.edges.append(Edge(src=run_id, dst=dataset_id, relation="writes",
+                               meta={"columns": columns or []}))
+
+    def get(self, entity_id: str) -> dict:
+        return dict(self.nodes.get(entity_id, {}))
+
+    def upstream(self, dataset_id: str, *, depth: int | None = None,
+                 as_of: int | None = None) -> dict:
+        result: dict = {}
+        queue = deque([(dataset_id, 0)])
+        seen: set = set()
+        while queue:
+            did, d = queue.popleft()
+            if did in seen:
+                continue
+            seen.add(did)
+            if depth is not None and d > depth:
+                continue
+            for e in self.edges:
+                if e.dst == did and e.relation == "writes":
+                    run_id = e.src
+                    run_ts = self.nodes.get(run_id, {}).get("ts", 0)
+                    if as_of is not None and run_ts > as_of:
+                        continue
+                    for re in self.edges:
+                        if re.src == run_id and re.relation == "reads":
+                            inp = re.dst
+                            if inp not in result:
+                                result[inp] = dict(self.nodes.get(inp, {"id": inp}))
+                                queue.append((inp, d + 1))
+        return result
+
+    def downstream(self, dataset_id: str, *, depth: int | None = None,
+                   as_of: int | None = None) -> dict:
+        result: dict = {}
+        queue = deque([(dataset_id, 0)])
+        seen: set = set()
+        while queue:
+            did, d = queue.popleft()
+            if did in seen:
+                continue
+            seen.add(did)
+            if depth is not None and d > depth:
+                continue
+            for e in self.edges:
+                if e.dst == did and e.relation == "reads":
+                    run_id = e.src
+                    run_ts = self.nodes.get(run_id, {}).get("ts", 0)
+                    if as_of is not None and run_ts > as_of:
+                        continue
+                    for we in self.edges:
+                        if we.src == run_id and we.relation == "writes":
+                            out = we.dst
+                            if out not in result:
+                                result[out] = dict(self.nodes.get(out, {"id": out}))
+                                queue.append((out, d + 1))
+        return result
+
+    def impact_of(self, dataset_id: str, *, as_of: int | None = None) -> dict:
+        return self.downstream(dataset_id, as_of=as_of)
+
+    def lineage_path(self, src_dataset_id: str, dst_dataset_id: str, *,
+                     as_of: int | None = None) -> list:
+        queue = deque([(src_dataset_id, [src_dataset_id])])
+        visited: set = set()
+        while queue:
+            current, path = queue.popleft()
+            if current == dst_dataset_id:
+                return path
+            if current in visited:
+                continue
+            visited.add(current)
+            for e in self.edges:
+                if e.dst == current and e.relation == "reads":
+                    run_id = e.src
+                    run_ts = self.nodes.get(run_id, {}).get("ts", 0)
+                    if as_of is not None and run_ts > as_of:
+                        continue
+                    for we in self.edges:
+                        if we.src == run_id and we.relation == "writes":
+                            out = we.dst
+                            queue.append((out, path + [run_id, out]))
+        return []
+
+    def runs_for(self, job_id: str) -> list:
+        run_ids = [e.dst for e in self.edges
+                   if e.src == job_id and e.relation == "executed"]
+        return [dict(self.nodes[rid]) for rid in run_ids if rid in self.nodes]
+
+    def detect_cycles(self) -> list:
+        ds_nodes = {nid for nid, n in self.nodes.items() if n.get("type") == "dataset"}
+        adj: dict = {d: [] for d in ds_nodes}
+        for run_id, n in self.nodes.items():
+            if n.get("type") != "run":
+                continue
+            reads = [e.dst for e in self.edges if e.src == run_id and e.relation == "reads"]
+            writes = [e.dst for e in self.edges if e.src == run_id and e.relation == "writes"]
+            for r in reads:
+                for w in writes:
+                    if r in adj and w not in adj[r]:
+                        adj[r].append(w)
+        cycles: list = []
+        visited: set = set()
+        rec_stack: set = set()
+
+        def dfs(node: str, path: list) -> bool:
+            visited.add(node)
+            rec_stack.add(node)
+            for nb in adj.get(node, []):
+                if nb not in visited:
+                    if dfs(nb, path + [nb]):
+                        return True
+                elif nb in rec_stack:
+                    idx = path.index(nb) if nb in path else 0
+                    cycles.append(path[idx:] + [nb])
+                    return True
+            rec_stack.discard(node)
+            return False
+        
+        
+        for node in ds_nodes:
+            if node not in visited:
+                dfs(node, [node])
+        return cycles
+
+    def delete(self, entity_id: str) -> None:
+        self.nodes.pop(entity_id, None)
+        self.edges = [e for e in self.edges
+                      if e.src != entity_id and e.dst != entity_id]
+
+    def prune(self, before_ts: int) -> int:
+        to_del = [nid for nid, n in self.nodes.items()
+                  if n.get("type") == "run" and n.get("ts", 0) < before_ts]
+        for nid in to_del:
+            self.delete(nid)
+        return len(to_del)
+
+    def export_json(self) -> dict:
+        return {"nodes": list(self.nodes.values()),
+                "edges": [asdict(e) for e in self.edges]}
+
+    def import_json(self, blob: dict | list | str) -> None:
+        if isinstance(blob, str):
+            blob = json.loads(blob)
+        if isinstance(blob, dict):
+            for n in blob.get("nodes", []):
+                nid = n.get("id") or n.get("name", "")
+                if nid:
+                    self.nodes[nid] = n
+            for e in blob.get("edges", []):
+                self.edges.append(Edge(src=e["src"], dst=e["dst"],
+                                       relation=e["relation"],
+                                       meta=e.get("meta", {})))
+
+    def column_lineage(self, dataset_id: str) -> dict:
+        result: dict = {}
+        for e in self.edges:
+            if e.dst == dataset_id and e.relation == "writes":
+                run_id = e.src
+                cols = e.meta.get("columns", []) if isinstance(e.meta, dict) else []
+                reading = [re for re in self.edges
+                           if re.src == run_id and re.relation == "reads"]
+                for col in cols:
+                    if col not in result:
+                        result[col] = []
+                    for re in reading:
+                        result[col].append({
+                            "src_dataset": re.dst, "run": run_id,
+                            "src_cols": re.meta.get("columns", []) if isinstance(re.meta, dict) else []
+                        })
+        return result
 
 # -------- store & broker -----------------------------------------------------
 class LineageStore:

@@ -101,17 +101,28 @@ class Allocator:
                             fixed = False
                     if fixed:
                         break
-            # Iterative clip+normalize to respect box bounds while summing to 1
-            for _ in range(50):
+            # Project onto {w: sum=1, lb<=w_i<=ub} via iterative redistribution
+            lb, ub = bounds.lb, bounds.ub
+            for _ in range(200):
                 s = float(w.sum())
-                if abs(s) < 1e-12:
-                    w = np.ones(len(w)) * bounds.lb
+                if s > 1e-12:
+                    w = w / s  # normalize
+                excess = float(w.sum()) - 1.0
+                saturated_lo = w <= lb + 1e-14
+                saturated_hi = w >= ub - 1e-14
+                free = ~saturated_lo & ~saturated_hi
+                if free.sum() > 0:
+                    w[free] -= excess / free.sum()
+                w = np.clip(w, lb, ub)
+                if abs(float(w.sum()) - 1.0) < 1e-12 and np.all(w >= lb - 1e-12) and np.all(w <= ub + 1e-12):
                     break
-                w_new = np.clip(w / s, bounds.lb, bounds.ub)
-                if np.allclose(w_new, w / s, atol=1e-10):
-                    w = w_new
-                    break
-                w = w_new
+            # Final correction: renormalize free variables to hit sum=1 exactly
+            remainder = 1.0 - float(w.sum())
+            free = (w > lb + 1e-10) & (w < ub - 1e-10)
+            if free.sum() > 0 and abs(remainder) > 0:
+                adj = remainder / free.sum()
+                w[free] += adj
+                w = np.clip(w, lb, ub)
             return w
 
         for _ in range(iters):

@@ -77,17 +77,17 @@ class API:
             return True
         return hasattr(self.mod, name)
 
-    def call(self, name, *args, **kw):
-        if self.obj and hasattr(self.obj, name):
-            return getattr(self.obj, name)(*args, **kw)
-        if hasattr(self.mod, name):
-            return getattr(self.mod, name)(*args, **kw)
-        raise AttributeError(name)
+    def call(self, _method, *args, **kw):
+        if self.obj and hasattr(self.obj, _method):
+            return getattr(self.obj, _method)(*args, **kw)
+        if hasattr(self.mod, _method):
+            return getattr(self.mod, _method)(*args, **kw)
+        raise AttributeError(_method)
 
 # ---------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def api():
     mod = load_module()
     return API(mod)

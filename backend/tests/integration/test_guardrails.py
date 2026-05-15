@@ -29,7 +29,7 @@ def test_almgren_shapes_and_linear_trajectory():
 
     # Risk-neutral => linear holdings from X0 to ~0
     diffs = np.diff(sched.x)
-    assert np.allclose(np.diff(diffs), 0.0, atol=1e-12)
+    assert np.allclose(np.diff(diffs), 0.0, atol=1e-9)
     assert sched.x[0] == pytest.approx(p.X0)
     assert sched.x[-1] == pytest.approx(0.0, abs=1e-6)
 

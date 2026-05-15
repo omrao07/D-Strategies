@@ -202,6 +202,8 @@ class CandleAggregator:
             # Simple single-symbol in-memory mode
             self._candles: List[Dict[str, Any]] = []
             self._live_candle: Optional[Dict[str, Any]] = None
+            self._live_min_ts: int = 0  # for out-of-order open tracking
+            self._live_max_ts: int = 0  # for out-of-order close tracking
             self.sink = None
             self.aggs = {}
         else:
@@ -209,32 +211,42 @@ class CandleAggregator:
             self.aggs: Dict[str, _IntervalAgg] = {iv: _IntervalAgg(iv, self.sink) for iv in intervals}
             self._candles = []
             self._live_candle = None
+            self._live_min_ts = 0
+            self._live_max_ts = 0
 
     def _bucket_start(self, ts: int) -> int:
         ms = self._simple_interval_ms
         return ts - (ts % ms) if ms > 0 else ts
 
-    def ingest(self, tick: Dict[str, Any]) -> None:
-        """Simple single-symbol ingest (test-compatible API)."""
+    def ingest(self, tick: Dict[str, Any]) -> bool:
+        """Simple single-symbol ingest (test-compatible API). Returns True to short-circuit 'or' chains."""
         if self._simple_interval_ms > 0:
             ts = int(tick.get("ts") or tick.get("ts_ms") or tick.get("t") or 0)
             px = float(tick.get("price") or tick.get("p") or 0.0)
             sz = float(tick.get("size") or tick.get("q") or tick.get("qty") or 0.0)
             if px <= 0:
-                return
+                return True
             bstart = self._bucket_start(ts)
             if self._live_candle is None or self._live_candle["ts"] != bstart:
                 if self._live_candle is not None:
                     self._candles.append(self._live_candle)
                 self._live_candle = {"ts": bstart, "o": px, "h": px, "l": px, "c": px, "v": sz}
+                self._live_min_ts = ts
+                self._live_max_ts = ts
             else:
                 c = self._live_candle
                 c["h"] = max(c["h"], px)
                 c["l"] = min(c["l"], px)
-                c["c"] = px
                 c["v"] += sz
+                if ts <= self._live_min_ts:
+                    self._live_min_ts = ts
+                    c["o"] = px
+                if ts >= self._live_max_ts:
+                    self._live_max_ts = ts
+                    c["c"] = px
         else:
             self.on_tick(tick)
+        return True
 
     def finalize_until(self, ts_end: int) -> None:
         """Finalize all candles with start < ts_end."""

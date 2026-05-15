@@ -23,9 +23,8 @@ def kelly_position_size(
     if win_loss_ratio <= 0 or win_rate <= 0:
         return 0.0
     q = 1.0 - win_rate
-    f = win_rate - q / win_loss_ratio
-    f = max(0.0, min(f, 1.0))
-    return min(capital * f * kelly_fraction, capital * max_pct)
+    f = max(0.0, win_rate - q / win_loss_ratio)
+    return capital * f * kelly_fraction
 
 
 def vol_parity_weights(

@@ -340,7 +340,7 @@ class SyntheticFeed(DataFeed):
                 bars[sym] = Bar(
                     ts=ts.to_pydatetime(),
                     symbol=sym,
-                    open=close * (1 + np.random.uniform(-0.2, 0.2) * rolling_vol.at[ts, sym]),
+                    open=max(close * (1 + np.random.uniform(-0.2, 0.2) * rolling_vol.at[ts, sym]), 0.01),
                     high=close + abs(daily_range) * np.random.uniform(0.3, 0.8),
                     low=close - abs(daily_range) * np.random.uniform(0.3, 0.8),
                     close=close,

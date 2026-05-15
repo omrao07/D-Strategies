@@ -96,12 +96,39 @@ class SpiralConfig:
 # ---------------------------- Engine ----------------------------
 
 class LiquiditySpiral:
-    def __init__(self, buckets: Dict[str, Bucket], cfg: Optional[SpiralConfig] = None):
-        if not buckets:
-            raise ValueError("At least one bucket required")
-        self.b = buckets
-        self.cfg = cfg or SpiralConfig()
+    def __init__(self, buckets_or_cfg=None, cfg: Optional[SpiralConfig] = None):
+        # Detect API mode: dict of Bucket objects (old) vs plain config dict (new)
+        if isinstance(buckets_or_cfg, dict) and (
+            not buckets_or_cfg or not any(isinstance(v, Bucket) for v in buckets_or_cfg.values())
+        ):
+            # New simple API: plain config dict
+            self._simple_mode = True
+            self._simple_cfg = dict(buckets_or_cfg or {})
+            self._state: Optional[Dict] = None
+            self.b: Dict[str, Bucket] = {}
+            self.cfg = SpiralConfig()
+        else:
+            # Old bucket API
+            self._simple_mode = False
+            buckets = buckets_or_cfg or {}
+            if not buckets:
+                raise ValueError("At least one bucket required")
+            self.b = buckets
+            self.cfg = cfg or SpiralConfig()
         self.trail: List[Dict] = []
+
+    def reset(self, state: Dict) -> None:
+        """Load portfolio state (simple API). state: {cash, positions, params}."""
+        import copy as _copy
+        if "positions" in state:
+            self._state = _copy.deepcopy(state)
+            self.trail = []
+        elif "prices" in state and self._state is not None:
+            # Frame dict: update prices in current state
+            prices = state.get("prices", {})
+            for sym, pos in (self._state.get("positions") or {}).items():
+                if sym in prices:
+                    pos["px"] = float(prices[sym])
 
     # ---- one step ----
     def step(self, exo: Dict[str, Shock], publish: bool = False) -> Dict[str, Dict]:
@@ -220,13 +247,89 @@ class LiquiditySpiral:
         return snap
 
     # ---- run multiple steps ----
-    def run(self, steps: int, exo_seq: Optional[List[Dict[str, Shock]]] = None, publish: bool = False) -> List[Dict]:
-        N = min(steps, self.cfg.max_steps)
+    def run(self, shock_or_steps=None, max_rounds: int = 10, **kw) -> List[Dict]:
+        if self._simple_mode:
+            return self._run_simple(shock_or_steps or {}, max_rounds)
+        # Old bucket API: first arg is steps (int)
+        steps = shock_or_steps if isinstance(shock_or_steps, int) else max_rounds
+        exo_seq = kw.get("exo_seq")
+        publish = kw.get("publish", False)
+        N = min(int(steps), self.cfg.max_steps)
         out = []
         for t in range(N):
             exo = exo_seq[t] if (exo_seq and t < len(exo_seq)) else {}
             out.append(self.step(exo, publish=publish))
         return out
+
+    def _run_simple(self, shock: Dict, max_rounds: int) -> List[Dict]:
+        import copy as _copy
+        state = _copy.deepcopy(self._state) if self._state else {}
+        positions: Dict[str, Dict] = {s: dict(p) for s, p in (state.get("positions") or {}).items()}
+        cash = float(state.get("cash") or 0.0)
+        params = dict(state.get("params") or {})
+
+        sale_frac   = float(shock.get("sale_frac", 0.0))
+        adv_drop    = float(shock.get("adv_drop", 0.0))
+        impact_mult = float(shock.get("impact_mult", 1.0))
+        cb_cap      = shock.get("circuit_breaker_dd_cap")
+        if cb_cap is not None:
+            cb_cap = float(cb_cap)
+
+        impact_k    = params.get("impact_k") or {}
+        impact_alpha = float(params.get("impact_alpha") or 0.65)
+        illiquid_hc  = float(params.get("illiquid_haircut") or 0.25)
+        margin_req   = float(params.get("margin_req_pct") or 0.20)
+        half_spread  = params.get("half_spread_bps") or {}
+
+        def _nav():
+            # Mark-to-market (no haircut) for drawdown tracking
+            return cash + sum(p["qty"] * p["px"] for p in positions.values())
+
+        initial_nav = _nav()
+        total_realized = 0.0
+        frames: List[Dict] = []
+
+        cur_sale_frac = sale_frac
+        for _ in range(max_rounds):
+            round_sold: Dict[str, float] = {s: 0.0 for s in positions}
+
+            for sym, pos in positions.items():
+                qty = pos["qty"]
+                if qty <= 0 or cur_sale_frac <= 0:
+                    continue
+                adv_eff = max(1.0, float(pos.get("adv") or 1.0) * (1.0 - adv_drop))
+                k = float((impact_k.get(sym) if isinstance(impact_k, dict) else impact_k) or 0.10)
+                hs = float((half_spread.get(sym) if isinstance(half_spread, dict) else half_spread) or 1.0)
+
+                sell_qty = qty * cur_sale_frac
+                frac = k * impact_mult * (sell_qty / adv_eff) ** impact_alpha
+                slip = hs / 10000.0
+                exec_px = pos["px"] * (1.0 - frac - slip)
+                pos["px"]  = max(0.0, pos["px"] * (1.0 - frac))
+                proceeds   = sell_qty * exec_px
+                pos["qty"] -= sell_qty
+                cash      += proceeds
+                total_realized += proceeds - sell_qty * pos["px"]
+                round_sold[sym] = sell_qty
+
+            nav = _nav()
+            dd  = max(0.0, 1.0 - nav / max(initial_nav, 1e-9))
+            frame = {
+                "prices": {s: p["px"] for s, p in positions.items()},
+                "pnl":    {"realized": total_realized, "unrealized": nav - initial_nav - total_realized},
+                "sold":   dict(round_sold),
+                "dd_nav": dd,
+            }
+            frames.append(frame)
+            if cb_cap is not None and dd >= cb_cap:
+                break
+            if all(v == 0 for v in round_sold.values()):
+                break
+            cur_sale_frac *= 0.85  # decay each round to allow convergence
+
+        # Persist final state for chained resets
+        self._state = {"cash": cash, "positions": positions, "params": params}
+        return frames
 
     # ---- quick health metrics ----
     def summary(self) -> Dict[str, float]:

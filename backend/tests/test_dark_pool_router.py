@@ -59,7 +59,7 @@ except ImportError:
             if order.side == "buy":
                 venues = sorted(venues, key=lambda v: v.price + v.fee)
             else:
-                venues = sorted(venues, key=lambda v: v.price - v.fee)
+                venues = sorted(venues, key=lambda v: v.price - v.fee, reverse=True)
 
             plans = []
             remaining = order.qty

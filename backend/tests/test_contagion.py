@@ -106,6 +106,7 @@ def tiny_net():
     _add_exposure(g, "A", "B", amount=120.0, rr=0.5)
     _add_exposure(g, "B", "C", amount=100.0, rr=0.4)
     _add_exposure(g, "C", "A", amount=90.0,  rr=0.3)
+    _add_exposure(g, "A", "C", amount=90.0,  rr=0.3)  # A also lends to C
     return g
 
 

@@ -96,7 +96,60 @@ class FeatureStore:
     def __init__(self, redis_url: str = REDIS_URL, parquet_dir: str = PARQUET_DIR):
         self.redis_url = redis_url
         self.parquet_dir = parquet_dir
-        self.r: Optional[AsyncRedis] = None # type: ignore
+        self.r: Optional[AsyncRedis] = None  # type: ignore
+        # In-memory store for synchronous simple API (used when Redis is unavailable)
+        self._local: Dict[str, List[Dict[str, Any]]] = {}  # entity -> sorted list of {ts, features, ...}
+        self._views: Dict[str, Dict[str, Any]] = {}  # view name -> {keys, schema, ttl_s}
+
+    # ---- Synchronous simple API (no Redis required; for testing) ---------------
+
+    def register_view(self, name: str, keys: List[str], ttl_s: int = 3600,
+                      schema: Optional[Dict[str, Any]] = None, **kw: Any) -> None:
+        self._views[name] = {"keys": list(keys), "schema": schema or {}, "ttl_s": int(ttl_s)}
+
+    def put(self, *, entity: str, features: Dict[str, Any],
+            as_of: Union[int, float], ttl_s: Optional[float] = None, **kw: Any) -> None:
+        ts = int(as_of)
+        # Validate schema if a matching view is registered
+        for view in self._views.values():
+            schema = view.get("schema") or {}
+            for feat, val in features.items():
+                if feat in schema:
+                    expected = schema[feat]
+                    if expected is float and not isinstance(val, (int, float)):
+                        raise TypeError(f"Feature '{feat}' expected float, got {type(val).__name__}")
+        # Sanitize NaN / Inf
+        clean: Dict[str, Any] = {}
+        for k, v in features.items():
+            if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                continue  # omit non-finite values
+            clean[k] = v
+        entry: Dict[str, Any] = {"ts": ts, "features": clean}
+        if ttl_s is not None:
+            entry["expires_ts"] = ts + int(ttl_s * 1000)
+        bucket = self._local.setdefault(entity, [])
+        # Upsert: replace existing entry at same ts
+        for i, r in enumerate(bucket):
+            if r["ts"] == ts:
+                bucket[i] = entry
+                return
+        bucket.append(entry)
+        bucket.sort(key=lambda r: r["ts"])
+
+    def get(self, *, entity: str, keys: List[str],
+            as_of: Union[int, float], **kw: Any) -> Dict[str, Any]:
+        ts = int(as_of)
+        bucket = self._local.get(entity, [])
+        merged: Dict[str, Any] = {}
+        for entry in bucket:
+            if entry["ts"] > ts:
+                break
+            expires = entry.get("expires_ts")
+            if expires is not None and ts > expires:
+                # TTL expired as of the query time
+                continue
+            merged.update(entry["features"])
+        return {k: merged[k] for k in keys if k in merged}
 
     # ---- connections --------------------------------------------------------
     async def connect(self):
@@ -164,7 +217,7 @@ class FeatureStore:
         return f"{name}@v{version}"
 
     # ---- online writes ------------------------------------------------------
-    async def put(
+    async def put_async(
         self,
         *,
         name: str,
@@ -177,7 +230,7 @@ class FeatureStore:
         meta: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Upsert latest value online; append offline parquet row (best-effort).
+        Upsert latest value online (async/Redis path); append offline parquet row.
         """
         ts = int(ts_ms or now_ms())
         spec = await self.describe(name)
@@ -203,7 +256,7 @@ class FeatureStore:
         return {"ok": True, "ts_ms": ts}
 
     # ---- online reads -------------------------------------------------------
-    async def get(
+    async def get_async(
         self,
         *,
         name: str,
@@ -211,7 +264,7 @@ class FeatureStore:
         version: Optional[int] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        Return {"ts_ms":..., "value":..., "meta":...} or None
+        Return {"ts_ms":..., "value":..., "meta":...} or None (async/Redis path).
         """
         field = self._field_name(name, version or (await self._resolve_version(name)))
         key = self._key_entity(entity_key)

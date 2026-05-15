@@ -106,8 +106,8 @@ def optimal_schedule(params: ACParams) -> ACSchedule:
     x = np.empty(N + 1, dtype=float)
 
     if lam <= 0 or kb == 0.0:
-        # Risk-neutral ⇒ linear trajectory
-        x[:] = X0 * (1.0 - np.arange(N + 1) / N)
+        # Risk-neutral ⇒ linear trajectory (linspace for exact fp representation)
+        x = np.linspace(X0, 0.0, N + 1, dtype=float)
     else:
         denom = math.sinh(kb * N)
         # numerical guard

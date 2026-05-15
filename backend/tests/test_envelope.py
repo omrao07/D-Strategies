@@ -98,6 +98,9 @@ class Envelope:
 
     def _payload_for_wire(self):
         if self.enc == "gzip":
+            # If already in compressed wire form (e.g., after from_json), return as-is
+            if isinstance(self.payload, dict) and "b64" in self.payload:
+                return self.payload
             # compress JSON-serialized payload (deterministic) and b64url
             raw = canonical_json(self.payload).encode("utf-8")
             comp = gzip.compress(raw, mtime=0)  # deterministic gzip header (mtime=0)
@@ -313,7 +316,7 @@ class TestEnvelope(unittest.TestCase):
             Envelope.from_json(j).verify_and_decode(self.keyring, self.clock, replay_cache=rc)
 
         # After expiry window, same jti can be used again (cache evicted)
-        self.clock.sleep(env.ttl + 6.1)
+        self.clock.sleep(env.ttl + 5.0)
         Envelope.from_json(j).verify_and_decode(self.keyring, self.clock, replay_cache=rc)
 
     def test_content_type_validation(self):
@@ -330,7 +333,7 @@ class TestEnvelope(unittest.TestCase):
         a = self._make({"a": 1, "b": 2})
         sig_a = a.sig
         # Rebuild with swapped keys (JSON obj is unordered; we simulate by different construction)
-        e = Envelope(msg_type="order.created", payload={"b": 2, "a": 1}, ts=a.ts, ttl=a.ttl, headers=a.headers, enc=None)
+        e = Envelope(msg_type="order.created", payload={"b": 2, "a": 1}, ts=a.ts, ttl=a.ttl, headers=a.headers, enc=None, jti=a.jti)
         e.sign(self.keyring, a.kid or "k1")
         self.assertEqual(sig_a, e.sig)
 

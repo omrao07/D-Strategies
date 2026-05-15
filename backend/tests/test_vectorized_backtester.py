@@ -18,7 +18,7 @@ def trending_prices():
     rng = np.random.default_rng(99)
     n = 300
     t = 3
-    returns = np.tile(np.array([[0.002, -0.001, 0.001]]), (n // t + 1, 1))[:n]
+    returns = np.tile(np.array([[0.002, -0.001, 0.001]]), (n, 1))
     prices = 100 * np.cumprod(1 + returns + rng.normal(0, 0.005, (n, t)), axis=0)
     return pd.DataFrame(prices, columns=["A", "B", "C"])
 
