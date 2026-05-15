@@ -52,13 +52,15 @@ def risk_parity_weights(
         sigma = _portfolio_vol(w, cov_arr)
         if sigma < 1e-12:
             break
-        # Update: scale each weight by budget/current_contribution ratio
         target_rc = budget * sigma
-        new_w = w * (target_rc / (rc + 1e-12))
+        # Multiplicative update; clamp to positive orthant to handle negative MRC
+        new_w = w * (target_rc / np.where(np.abs(rc) > 1e-14, rc, 1e-14))
+        new_w = np.maximum(new_w, 1e-12)  # project back to positive orthant
         new_w = new_w / new_w.sum()
         if np.max(np.abs(new_w - w)) < tol:
             w = new_w
             break
         w = new_w
 
+    w = np.maximum(w, 0.0)
     return pd.Series(w / w.sum(), index=assets)

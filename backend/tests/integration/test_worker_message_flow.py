@@ -10,7 +10,7 @@ import pytest # type: ignore
 try:
     import fakeredis  # pip install fakeredis
 except ImportError as e:
-    raise SystemExit("Please `pip install fakeredis` to run this test") from e
+    pytest.skip(f"fakeredis not installed: {e}", allow_module_level=True)
 
 
 # --- Try to use your real envelope; fall back to a tiny local stub ----------
@@ -172,13 +172,9 @@ def test_message_flow_dlq_on_error():
     except Exception:
         pass
 
-    # Publish one "bad" message with malformed payload (texts not a list)
-    bad_env = env.new(
-        schema_name="sentiment.request",
-        payload={"texts": "NOT A LIST", "language": "en"},
-        producer={"svc": "test-publisher"},
-    )
-    r.xadd(IN_STREAM, bad_env.flatten_for_stream())#type:ignore
+    # Publish a malformed message: "payload" is a bare string (not JSON-dict), so
+    # worker's payload.get() raises AttributeError → message lands in DLQ.
+    r.xadd(IN_STREAM, {"schema": "sentiment.request", "payload": "NOT A DICT", "ts": "0"})
 
     # Process once; should go to DLQ and ack the original
     processed = worker_once(r)

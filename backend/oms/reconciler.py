@@ -100,8 +100,12 @@ class Reconciler:
             expected = float(p.get("qty", 0))
             actual = fill_pos.get(sym, 0.0)
             if abs(expected - actual) > self.qty_tol:
-                breaks.append({"kind": "qty_mismatch", "symbol": sym,
-                               "expected": expected, "actual": actual})
+                # Detect potential corporate actions (integer ratio ≥ 2)
+                _corp = (actual > 0 and expected > 0 and
+                         abs(expected / actual - round(expected / actual)) < 0.01 and
+                         round(expected / actual) >= 2)
+                breaks.append({"kind": "corp_action" if _corp else "qty_mismatch",
+                               "symbol": sym, "expected": expected, "actual": actual})
             pos_view.append({**p})
 
         fill_cash: Dict[str, float] = {}
