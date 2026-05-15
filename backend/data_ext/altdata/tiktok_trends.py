@@ -69,7 +69,7 @@ OUT_STREAM = os.getenv("TIKTOK_TRENDS_STREAM", "alt.tiktok_trends")
 
 # optional Sentiment
 try:
-    from backend.ai.nlp.sentiment_ai import SentimentAI  # type: ignore
+    from backend.ai.sentiment_ai import SentimentAI  # type: ignore
     _has_sa = True
 except Exception:
     _has_sa = False

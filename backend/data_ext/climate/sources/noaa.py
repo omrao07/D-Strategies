@@ -115,19 +115,122 @@ def _fake_alerts(region: str) -> int:
 # (Placeholder) real fetchers
 # ---------------------------
 
+_NOAA_CDO_BASE = "https://www.ncdc.noaa.gov/cdo-web/api/v2"
+
+# NOAA CDO dataset IDs for common variables
+_CDO_DATASET_MAP: Dict[str, str] = {
+    "precip_24h_mm": "GHCND",    # Daily summaries — PRCP
+    "temp_mean_c":   "GHCND",    # Daily summaries — TAVG
+    "wind_gust_ms":  "GHCND",    # Daily summaries — AWND
+}
+
+# NOAA CDO data type IDs
+_CDO_DTYPE_MAP: Dict[str, str] = {
+    "precip_24h_mm": "PRCP",
+    "temp_mean_c":   "TAVG",
+    "wind_gust_ms":  "AWND",
+}
+
+# Conversion factors from CDO tenths to standard units
+_CDO_UNIT_SCALE: Dict[str, float] = {
+    "PRCP": 0.1,   # tenths of mm -> mm
+    "TAVG": 0.1,   # tenths of degC -> degC
+    "AWND": 0.1,   # tenths of m/s -> m/s
+}
+
+
+def _bbox_to_extent(bbox: List[float]) -> Dict[str, float]:
+    """Convert [lon_min, lat_min, lon_max, lat_max] to NOAA extent params."""
+    return {"maxlon": bbox[2], "minlat": bbox[1], "maxlat": bbox[3], "minlon": bbox[0]}
+
+
 def _fetch_noaa_cdo_real(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
-    Placeholder for NOAA CDO (Climate Data Online) calls with api_token.
-    Implement when you have an API token:
-      - requests.get(..., headers={'token': token})
-      - Aggregate station data over bbox/time window
-    Returning [] delegates to demo generators.
+    Fetch climate data from NOAA CDO REST API.
+    Requires NOAA_API_TOKEN env var or cfg.api_token (free registration at
+    https://www.ncdc.noaa.gov/cdo-web/token).
+    Returns [] on error or missing token, allowing fallback to synthetic data.
     """
-    token = (cfg.get("api_token") or "").strip()
+    try:
+        import requests as _requests  # type: ignore
+    except ImportError:
+        return []
+
+    token = (cfg.get("api_token") or os.getenv("NOAA_API_TOKEN", "")).strip()
     if not token:
         return []
-    # TODO: implement real calls; return [] for now.
-    return []
+
+    regions: List[Dict[str, Any]] = list(cfg.get("regions") or [])
+    variables: List[str] = [str(v).lower() for v in (cfg.get("variables") or [])]
+    lookback_h: int = int(cfg.get("lookback_hours", 24))
+
+    import datetime as _dt
+    end_date = _dt.date.today()
+    start_date = end_date - _dt.timedelta(days=max(1, lookback_h // 24))
+
+    headers = {"token": token}
+    out: List[Dict[str, Any]] = []
+
+    for region in regions:
+        name = str(region.get("name", "UNKNOWN"))
+        bbox = region.get("bbox")
+        if not bbox or len(bbox) < 4:
+            continue
+
+        extent = _bbox_to_extent(bbox)
+
+        for var in variables:
+            dtype = _CDO_DTYPE_MAP.get(var)
+            dataset = _CDO_DATASET_MAP.get(var)
+            if not dtype or not dataset:
+                continue  # drought_spi and storm_alerts have no CDO equivalent; use synthetic
+
+            params: Dict[str, Any] = {
+                "datasetid": dataset,
+                "datatypeid": dtype,
+                "startdate": start_date.isoformat(),
+                "enddate": end_date.isoformat(),
+                "limit": 25,
+                "units": "metric",
+                **extent,
+            }
+            try:
+                resp = _requests.get(
+                    f"{_NOAA_CDO_BASE}/data",
+                    headers=headers,
+                    params=params,
+                    timeout=8,
+                )
+                if resp.status_code != 200:
+                    continue
+                data = resp.json()
+                results = data.get("results") or []
+                if not results:
+                    continue
+                # Average across stations for the region
+                values = [float(r["value"]) * _CDO_UNIT_SCALE.get(dtype, 1.0) for r in results if "value" in r]
+                if not values:
+                    continue
+                avg_val = sum(values) / len(values)
+                ts_str = results[-1].get("date", _iso_now_minus(lookback_h))
+                out.append({
+                    "metric": var,
+                    "value": round(avg_val, 2),
+                    "timestamp": ts_str,
+                    "region": name,
+                    "meta": {
+                        "provider": "noaa",
+                        "bbox": bbox,
+                        "lookback_hours": lookback_h,
+                        "dataset": dataset,
+                        "units": "mm" if var == "precip_24h_mm" else ("degC" if var == "temp_mean_c" else "m/s"),
+                        "n_stations": len(values),
+                    },
+                })
+            except Exception:
+                continue
+
+    return out
 
 
 # ---------------------------

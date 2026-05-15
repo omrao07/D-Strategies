@@ -25,7 +25,7 @@ sb = pytest.importorskip("backend.engine.strategy_base", reason="strategy_base n
 
 # Optional pnl_xray; if not present, we use a tiny inline book
 try:
-    from backend.analytics.pnl_xray import PnLXray  # type: ignore
+    from backend.intelligence.neurosym.pnl_xray import PnLXray  # type: ignore
 except Exception:
     class PnLXray:  # minimal stub
         def __init__(self, base_ccy="USD"):

@@ -23,7 +23,7 @@ except Exception:
     def decision_to_json(x): return "{}"
 
 try:
-    from backend.risk.contagian_graph import ContagionGraph, Bank, ShockParams # type: ignore
+    from backend.intelligence.neurosym.contagion_graph import ContagionGraph, Bank, ShockParams # type: ignore
 except Exception:
     ContagionGraph = object; Bank = object
     class ShockParams: ...

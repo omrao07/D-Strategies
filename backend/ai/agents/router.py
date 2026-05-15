@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Literal, Any, Tuple, Callable
 
 try:
     # Prefer your concrete interface if present
-    from backend.brokers.broker_interface import BrokerInterface, Order, Fill # type: ignore
+    from backend.api.broker_interface import BrokerInterface, Order, Fill # type: ignore
 except Exception:
     # Minimal shims so this file stays importable
     from dataclasses import dataclass

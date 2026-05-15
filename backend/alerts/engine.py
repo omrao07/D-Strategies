@@ -430,10 +430,38 @@ class AlertsEngine:
                     requests.post(url, headers=headers, data=json.dumps(payload), timeout=3)
             except Exception:
                 pass
-        # email (stub – integrate your mailer)
+        # email delivery via SMTP
         if self._email_cfg:
-            # TODO: wire to your SMTP or provider
-            pass
+            try:
+                import smtplib
+                from email.mime.text import MIMEText
+                from email.mime.multipart import MIMEMultipart
+
+                host = self._email_cfg.get("host", "smtp.gmail.com")
+                port = int(self._email_cfg.get("port", 587))
+                username = self._email_cfg.get("username", "")
+                password = self._email_cfg.get("password", "")
+                from_addr = self._email_cfg.get("from", username)
+                to_addrs = self._email_cfg.get("to", [])
+                if isinstance(to_addrs, str):
+                    to_addrs = [to_addrs]
+
+                if to_addrs and username and password:
+                    subject = f"[Alert/{alert.severity.upper()}] {alert.rule}"
+                    body = f"{alert.message}\n\n{json.dumps(payload, indent=2)}"
+                    msg = MIMEMultipart()
+                    msg["From"] = from_addr
+                    msg["To"] = ", ".join(to_addrs)
+                    msg["Subject"] = subject
+                    msg.attach(MIMEText(body, "plain"))
+
+                    with smtplib.SMTP(host, port, timeout=5) as srv:
+                        srv.ehlo()
+                        srv.starttls()
+                        srv.login(username, password)
+                        srv.sendmail(from_addr, to_addrs, msg.as_string())
+            except Exception as _email_err:
+                pass  # alert delivery must never crash the engine
 
     # ---------- signals ----------
     def _install_signals(self):

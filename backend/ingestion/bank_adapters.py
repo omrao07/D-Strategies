@@ -280,26 +280,102 @@ class SandboxUPI(BankAdapter):
 # =========================================================
 # REAL-WORLD STUBS (fill with actual SDK/API later)
 # =========================================================
+# --- Optional Plaid SDK ---
+try:
+    import plaid  # type: ignore # pip install plaid-python
+    from plaid.api import plaid_api as _plaid_api  # type: ignore
+    from plaid.model.accounts_balance_get_request import AccountsBalanceGetRequest as _PlaidBalReq  # type: ignore
+    from plaid.model.transactions_get_request import TransactionsGetRequest as _PlaidTxnReq  # type: ignore
+    from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions as _PlaidTxnOpts  # type: ignore
+    import datetime as _plaid_dt
+    _HAVE_PLAID = True
+except Exception:
+    _HAVE_PLAID = False
+
+
 class PlaidBalanceOnly(BankAdapter):
     """
-    Example read-only adapter using a data aggregator (balances/transactions only).
-    You would plug real calls here (omitted to avoid a hard dependency).
+    Read-only adapter using Plaid API (balances + transactions).
+    Set env vars: PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ACCESS_TOKEN, PLAID_ENV (sandbox|development|production)
+    Falls back to empty lists if credentials not set.
     """
     name = "plaid"
     sandbox = True
 
+    def __init__(self):
+        self._client_id = os.getenv("PLAID_CLIENT_ID", "")
+        self._secret = os.getenv("PLAID_SECRET", "")
+        self._access_token = os.getenv("PLAID_ACCESS_TOKEN", "")
+        self._env = os.getenv("PLAID_ENV", "sandbox")
+        self.sandbox = self._env != "production"
+        self._client = None
+        if _HAVE_PLAID and self._client_id and self._secret:
+            env_map = {
+                "sandbox": plaid.Environment.Sandbox,
+                "development": plaid.Environment.Development,
+                "production": plaid.Environment.Production,
+            }
+            cfg = plaid.Configuration(
+                host=env_map.get(self._env, plaid.Environment.Sandbox),
+                api_key={"clientId": self._client_id, "secret": self._secret},
+            )
+            self._client = _plaid_api.PlaidApi(plaid.ApiClient(cfg))
+
     def get_balances(self) -> List[Balance]:
-        # TODO: call Plaid /balances/get
-        return []
+        if not self._client or not self._access_token:
+            return []
+        try:
+            resp = self._client.accounts_balance_get(_PlaidBalReq(access_token=self._access_token))
+            out = []
+            for acct in resp.accounts:
+                balances = acct.balances
+                out.append(Balance(
+                    currency=balances.iso_currency_code or "USD",
+                    available=float(balances.available or 0.0),
+                    current=float(balances.current or 0.0),
+                    account_id=acct.account_id,
+                ))
+            return out
+        except Exception:
+            return []
+
     def get_statements(self, account_id: str, since_ms: int, until_ms: int) -> List[StatementLine]:
-        # TODO: call /transactions/get
-        return []
+        if not self._client or not self._access_token:
+            return []
+        try:
+            start = _plaid_dt.date.fromtimestamp(since_ms / 1000)
+            end = _plaid_dt.date.fromtimestamp(until_ms / 1000)
+            opts = _PlaidTxnOpts(account_ids=[account_id]) if account_id else _PlaidTxnOpts()
+            resp = self._client.transactions_get(
+                _PlaidTxnReq(access_token=self._access_token, start_date=start, end_date=end, options=opts)
+            )
+            out = []
+            for txn in resp.transactions:
+                ts = int(_plaid_dt.datetime.combine(txn.date, _plaid_dt.time()).timestamp() * 1000)
+                amount = float(txn.amount or 0.0)
+                out.append(StatementLine(
+                    ts_ms=ts,
+                    amount=abs(amount),
+                    currency=txn.iso_currency_code or "USD",
+                    type="debit" if amount > 0 else "credit",
+                    description=txn.name or "",
+                    counterparty=txn.merchant_name,
+                    ref=txn.transaction_id,
+                    raw={"category": txn.category},
+                ))
+            return out
+        except Exception:
+            return []
+
     def create_transfer(self, req: TransferRequest) -> TransferStatus:
-        raise NotImplementedError("Plaid is read-only here")
+        raise NotImplementedError("Plaid is read-only; use a payment rail adapter for transfers")
+
     def get_transfer(self, transfer_id: str) -> TransferStatus:
-        raise NotImplementedError
+        raise NotImplementedError("Plaid does not support transfer status queries in read-only mode")
+
     def quote_fx(self, pair: str, side: str, notional: float) -> Tuple[float, float]:
         return (math.nan, math.nan)
+
     def verify_webhook(self, body: bytes, headers: Dict[str, str]) -> bool:
         return True
 

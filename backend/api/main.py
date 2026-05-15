@@ -97,6 +97,38 @@ try:
 except Exception as _rr_err:
     logger.warning("risk_router unavailable: %s", _rr_err)
 
+# Wire analytics router (TCA, attribution, regime, optimizer)
+try:
+    from backend.api.analytics_router import router as analytics_router
+    app.include_router(analytics_router)
+    logger.info("Analytics router mounted at /analytics")
+except Exception as _an_err:
+    logger.warning("analytics_router unavailable: %s", _an_err)
+
+# Wire strategy-lab router (parallel sweep, A/B tests, allocator)
+try:
+    from backend.api.strategy_lab_router import router as lab_router
+    app.include_router(lab_router)
+    logger.info("Strategy-lab router mounted at /lab")
+except Exception as _lab_err:
+    logger.warning("strategy_lab_router unavailable: %s", _lab_err)
+
+# Mount Vector-AI REST sub-app at /vector
+# Directory is named "vector-ai" (hyphen) — use importlib.util to load it
+try:
+    import importlib.util as _ilu
+    _va_rest_path = ROOT / "vector-ai" / "api" / "rest.py"
+    if _va_rest_path.exists():
+        _va_spec = _ilu.spec_from_file_location("vector_ai_rest", str(_va_rest_path))
+        _va_mod = _ilu.module_from_spec(_va_spec)  # type: ignore[arg-type]
+        _va_spec.loader.exec_module(_va_mod)  # type: ignore[union-attr]
+        app.mount("/vector", _va_mod.app)
+        logger.info("Vector-AI REST app mounted at /vector")
+    else:
+        logger.warning("Vector-AI rest.py not found at %s", _va_rest_path)
+except Exception as _va_err:
+    logger.warning("Vector-AI REST unavailable: %s", _va_err)
+
 # ------------------------------------------------------------------------------
 # Schemas
 # ------------------------------------------------------------------------------

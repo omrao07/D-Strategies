@@ -10,7 +10,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 # ----------------------- Soft deps / hooks -----------------------------------
 try:
     # optional: your cost model (returns fees given trade dict)
-    from backend.execution.cost_model import estimate_fees  # type: ignore
+    from backend.execution.cost_model_v2 import estimate_fees  # type: ignore
 except Exception:
     def estimate_fees(trade: Dict[str, Any]) -> float:
         # fallback: 1 bps + 0.5 fixed per trade

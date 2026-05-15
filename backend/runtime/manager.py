@@ -29,8 +29,17 @@ from backend.bus.streams import (
 
 # ---- core components ----
 from backend.engine.strategy_base import Strategy, ExampleBuyTheDip
-from backend.engine.risk_manager import RiskManager # type: ignore
-from backend.execution.broker_base import BrokerBase, PaperBroker, Order, Side, OrderType, TIF # type: ignore
+try:
+    from backend.engine.risk_manager import RiskManager  # type: ignore
+except ImportError:
+    # risk_manager.py uses standalone functions; wrap in a thin class
+    from backend.engine import risk_manager as _rm
+    class RiskManager:  # type: ignore
+        def validate(self, order: dict):
+            ok, reason = _rm.check_order(order)
+            adj = order  # passthrough without adjustment
+            return ok, reason, adj
+from backend.runtime.broker_base import BrokerBase, PaperBroker, Order, Side, OrderType, TIF  # type: ignore
 
 # Optional strategies (import if present)
 try:

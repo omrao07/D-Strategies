@@ -29,7 +29,7 @@ except Exception:
 
 # ----------------------- Link to your PnL X-Ray ------------------------------
 try:
-    from backend.analytics.pnl_xray import PnLXray  # type: ignore
+    from backend.intelligence.neurosym.pnl_xray import PnLXray  # type: ignore
 except Exception as e:
     # Soft fallback if pnl_xray isn't present yet
     class PnLXray:  # type: ignore

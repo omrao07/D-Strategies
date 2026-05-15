@@ -23,7 +23,7 @@ Streams (env):
 """
 
 import os, json, time, math
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Dict, Optional, Tuple, List
 
 # -------- deps (graceful) ----------------------------------------------------
@@ -93,11 +93,11 @@ class Hysteresis:
 
 @dataclass
 class RegimeConfig:
-    thresholds: Thresholds = Thresholds()
-    hysteresis: Hysteresis = Hysteresis()
+    thresholds: Thresholds = field(default_factory=Thresholds)
+    hysteresis: Hysteresis = field(default_factory=Hysteresis)
     # derive features from prices if feed not present
     derive_from_prices: bool = False
-    bar_ms: int = int(os.getenv("REGIME_BAR_MS", "60000"))  # 1m bars
+    bar_ms: int = field(default_factory=lambda: int(os.getenv("REGIME_BAR_MS", "60000")))
     # trend calc window & vol window (in bars)
     tr_win: int = 60
     rv_win: int = 60
@@ -108,7 +108,7 @@ class RegimeState:
     ts_ms: int = 0
     regime: str = "RECOVERY"
     dwell: int = 0
-    last_features: Dict[str, float] = None # type: ignore
+    last_features: Dict[str, float] = field(default_factory=dict)
 
 # -------- regime mapper core -------------------------------------------------
 class RegimeMapper:

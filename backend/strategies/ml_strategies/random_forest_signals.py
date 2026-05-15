@@ -14,6 +14,7 @@ Inputs (CSV)
 --factors  factors.csv (optional)
     Columns: date, ticker, eps_surprise, iv_pct, analyst_revisions
 
+    
 Outputs
 -------
 outdir/rf_signals.csv       date, ticker, rf_prob_up, rf_signal, feature_importance

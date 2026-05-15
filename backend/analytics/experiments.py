@@ -241,7 +241,7 @@ class ExperimentRunner:
         Looks for backend.backtests.backtester.Backtester().run(params) -> dict
         If missing, returns a stub metric.
         """
-        mod = self._import_opt("backend.backtests.backtester")
+        mod = self._import_opt("backend.backtester.backtester")
         if mod and hasattr(mod, "Backtester"):
             bt = getattr(mod, "Backtester")()
             res = bt.run(params)  # expected to return dict of metrics

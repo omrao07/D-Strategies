@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # Optional: hook your cost model (kept optional to avoid hard deps)
 try:
-    from backend.execution.cost_model import CostModel # type: ignore
+    from backend.execution.cost_model_v2 import CostModel # type: ignore
 except Exception:
     CostModel = None  # type: ignore
 

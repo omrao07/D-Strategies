@@ -324,7 +324,23 @@ class MOSPISource(SourceBase):
     This is a skeleton: you can wire their CSV/portal dumps or an internal mirror.
     """
     def fetch_series(self, code: str, **kwargs) -> EconSeries:
-        raise NotImplementedError("Wire MOSPI fetch here")
+        # MOSPI data can be ingested from CSV/Excel dumps from mospi.gov.in
+        # Set env MOSPI_DATA_DIR to point at local copies; else returns empty series.
+        import os, csv
+        data_dir = os.getenv("MOSPI_DATA_DIR", "")
+        if data_dir:
+            path = os.path.join(data_dir, f"{code}.csv")
+            if os.path.exists(path):
+                pts: List[EconPoint] = []
+                with open(path, newline="") as f:
+                    for row in csv.DictReader(f):
+                        try:
+                            ts = datetime.fromisoformat(row["date"])
+                            pts.append(EconPoint(ts=ts, value=float(row["value"])))
+                        except Exception:
+                            continue
+                return EconSeries(code=code, name=code, region="IN", points=pts)
+        return EconSeries(code=code, name=f"MOSPI:{code}", region="IN", points=[])
 
 class RBISource(SourceBase):
     """

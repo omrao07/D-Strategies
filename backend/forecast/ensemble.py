@@ -53,7 +53,7 @@ except Exception:
 
 # Optional HRP allocator
 try:
-    from backend.analytics.hrp import hrp_weights  # type: ignore # you provided hrp.py earlier
+    from backend.risk.hrp import hrp_weights  # type: ignore
 except Exception:
     hrp_weights = None  # type: ignore
 

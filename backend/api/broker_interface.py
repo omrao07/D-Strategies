@@ -8,6 +8,23 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any, Protocol
 
 
+# --- Optional Kite Connect (Zerodha) ---
+try:
+    from kiteconnect import KiteConnect as _KiteConnect  # pip install kiteconnect
+    _HAVE_KITE = True
+except ImportError:
+    _KiteConnect = None  # type: ignore
+    _HAVE_KITE = False
+
+# --- Optional ib_insync (IBKR) ---
+try:
+    from ib_insync import IB as _IB, Stock as _Stock, MarketOrder as _MarketOrder, LimitOrder as _LimitOrder  # pip install ib_insync
+    _HAVE_IB = True
+except ImportError:
+    _IB = None  # type: ignore
+    _HAVE_IB = False
+
+
 # =======================
 # Data Models
 # =======================
@@ -210,61 +227,103 @@ class PaperBroker:
 
 class IBKRBroker:
     """
-    Thin adapter over IB API / ib_insync (recommended).
-    Fill in TODOs with real calls once you add dependency.
+    Adapter over ib_insync (pip install ib_insync).
+    Connects to IB Gateway or TWS on host:port.
     """
     name = "ibkr"
 
     def __init__(self, host: str = "127.0.0.1", port: int = 7497, client_id: int = 1, currency: str = "USD"):
+        if not _HAVE_IB:
+            raise RuntimeError("pip install ib_insync to use IBKRBroker")
         self.host = host
         self.port = port
         self.client_id = client_id
         self.currency = currency
         self._connected = False
-        # self.ib = IB()  # from ib_insync
+        self.ib = _IB()
 
     def connect(self) -> None:
-        # self.ib.connect(self.host, self.port, clientId=self.client_id)
+        self.ib.connect(self.host, self.port, clientId=self.client_id)
         self._connected = True
 
     def disconnect(self) -> None:
-        # self.ib.disconnect()
+        if self._connected:
+            self.ib.disconnect()
         self._connected = False
 
     def get_account(self) -> Account:
-        # acct_values = self.ib.accountSummary()
-        # equity = float(...)
-        # cash = float(...)
-        # bp = float(...)
-        # return Account(equity=equity, cash=cash, buying_power=bp, currency=self.currency)
-        return Account(equity=0.0, cash=0.0, buying_power=0.0, currency=self.currency)  # TODO
+        vals = {v.tag: v.value for v in self.ib.accountValues() if v.currency == self.currency or v.currency == ""}
+        equity = float(vals.get("NetLiquidation", 0.0))
+        cash = float(vals.get("TotalCashValue", 0.0))
+        bp = float(vals.get("BuyingPower", cash * 2))
+        return Account(equity=equity, cash=cash, buying_power=bp, currency=self.currency)
 
     def get_positions(self) -> Dict[str, Position]:
-        # pos = {}
-        # for p in self.ib.positions():
-        #     sym = p.contract.symbol
-        #     pos[sym] = Position(symbol=sym, qty=p.position, avg_price=p.avgCost)
-        # return pos
-        return {}
+        out: Dict[str, Position] = {}
+        for p in self.ib.positions():
+            sym = p.contract.symbol
+            out[sym] = Position(symbol=sym, qty=float(p.position), avg_price=float(p.avgCost))
+        return out
 
     def get_open_orders(self) -> Dict[str, Order]:
-        # return {str(o.order.orderId): ...}
-        return {}
+        out: Dict[str, Order] = {}
+        for trade in self.ib.openTrades():
+            o = trade.order
+            c = trade.contract
+            key = str(o.orderId)
+            out[key] = Order(
+                id=key,
+                symbol=c.symbol,
+                side="buy" if o.action == "BUY" else "sell",
+                qty=float(o.totalQuantity),
+                price=float(getattr(o, "lmtPrice", 0.0) or 0.0),
+                type="limit" if hasattr(o, "lmtPrice") and o.lmtPrice else "market",
+            )
+        return out
 
     def place_order(self, order: Order) -> Fill:
-        # TODO: translate Order -> IB Order, Contract; submit; await fill
-        # For now, raise so we don't silently "fake" fills
-        raise NotImplementedError("Wire IBKR API/ib_insync here")
+        contract = _Stock(order.symbol, "SMART", self.currency)
+        action = "BUY" if order.side.lower().startswith("b") else "SELL"
+        if order.type == "limit":
+            ib_order = _LimitOrder(action, order.qty, order.price)
+        else:
+            ib_order = _MarketOrder(action, order.qty)
+        trade = self.ib.placeOrder(contract, ib_order)
+        self.ib.sleep(0.5)  # brief yield for fill
+        fill_price = order.price
+        if trade.fills:
+            fill_price = float(trade.fills[-1].execution.price)
+        signed_qty = order.qty if action == "BUY" else -order.qty
+        return Fill(
+            order_id=order.id,
+            symbol=order.symbol,
+            side=order.side,
+            qty=signed_qty,
+            price=fill_price,
+            fee=0.0,
+            ts=time.time(),
+        )
 
     def cancel_order(self, order_id: str) -> bool:
-        # self.ib.cancelOrder( ... )
+        for trade in self.ib.openTrades():
+            if str(trade.order.orderId) == order_id:
+                self.ib.cancelOrder(trade.order)
+                return True
         return False
 
     def replace_order(self, order_id: str, new_qty: Optional[float] = None, new_price: Optional[float] = None) -> bool:
-        # IB uses cancel/replace; implement accordingly
+        for trade in self.ib.openTrades():
+            if str(trade.order.orderId) == order_id:
+                o = trade.order
+                if new_qty is not None:
+                    o.totalQuantity = new_qty
+                if new_price is not None and hasattr(o, "lmtPrice"):
+                    o.lmtPrice = new_price
+                self.ib.placeOrder(trade.contract, o)
+                return True
         return False
 
-    def set_prices(self, prices: Dict[str, float]) -> None:  # not used for live broker
+    def set_prices(self, prices: Dict[str, float]) -> None:
         pass
 
 
@@ -274,51 +333,134 @@ class IBKRBroker:
 
 class ZerodhaBroker:
     """
-    Adapter over Kite Connect (zerodha). Replace TODOs with real SDK calls.
+    Adapter over Kite Connect SDK (pip install kiteconnect).
+    Uses environment credentials by default; override in constructor.
     """
     name = "zerodha"
 
     def __init__(self, api_key: str, access_token: str, user_id: Optional[str] = None, currency: str = "INR"):
+        if not _HAVE_KITE:
+            raise RuntimeError("pip install kiteconnect to use ZerodhaBroker")
         self.api_key = api_key
         self.access_token = access_token
         self.user_id = user_id
         self.currency = currency
         self._connected = False
-        # self.kite = KiteConnect(api_key=api_key); self.kite.set_access_token(access_token)
+        self.kite: Any = None
 
     def connect(self) -> None:
-        # test auth / profile
+        self.kite = _KiteConnect(api_key=self.api_key)
+        self.kite.set_access_token(self.access_token)
+        # Verify auth — raises KiteException on bad token
+        profile = self.kite.profile()
+        self.user_id = self.user_id or profile.get("user_id")
         self._connected = True
 
     def disconnect(self) -> None:
         self._connected = False
+        self.kite = None
 
     def get_account(self) -> Account:
-        # profile = self.kite.margins()
-        # equity = ...
-        # cash = ...
-        # bp = ...
-        return Account(equity=0.0, cash=0.0, buying_power=0.0, currency=self.currency)  # TODO
+        if not self.kite:
+            raise RuntimeError("Not connected")
+        margins = self.kite.margins("equity")
+        net = margins.get("net", {})
+        available = net.get("available", {})
+        equity = float(net.get("net", available.get("cash", 0.0)))
+        cash = float(available.get("live_balance", available.get("cash", 0.0)))
+        bp = float(available.get("intraday_payin", cash))
+        return Account(equity=equity, cash=cash, buying_power=bp, currency=self.currency)
 
     def get_positions(self) -> Dict[str, Position]:
-        # positions = {}
-        # for p in self.kite.positions()["net"]:
-        #     sym = p["tradingsymbol"]
-        #     positions[sym] = Position(symbol=sym, qty=float(p["quantity"]), avg_price=float(p["average_price"]))
-        return {}
+        if not self.kite:
+            raise RuntimeError("Not connected")
+        out: Dict[str, Position] = {}
+        for p in self.kite.positions().get("net", []):
+            sym = p["tradingsymbol"]
+            out[sym] = Position(
+                symbol=sym,
+                qty=float(p.get("quantity", 0)),
+                avg_price=float(p.get("average_price", 0.0)),
+            )
+        return out
 
     def get_open_orders(self) -> Dict[str, Order]:
-        return {}
+        if not self.kite:
+            raise RuntimeError("Not connected")
+        out: Dict[str, Order] = {}
+        for o in self.kite.orders():
+            if o.get("status") not in ("COMPLETE", "CANCELLED", "REJECTED"):
+                oid = str(o["order_id"])
+                out[oid] = Order(
+                    id=oid,
+                    symbol=o["tradingsymbol"],
+                    side="buy" if o["transaction_type"] == "BUY" else "sell",
+                    qty=float(o.get("quantity", 0)),
+                    price=float(o.get("price", 0.0)),
+                    type=o.get("order_type", "MARKET").lower(),
+                )
+        return out
 
     def place_order(self, order: Order) -> Fill:
-        # Map to kite.order_place(...)
-        raise NotImplementedError("Wire Zerodha Kite Connect SDK here")
+        if not self.kite:
+            raise RuntimeError("Not connected")
+        txn = self.kite.TRANSACTION_TYPE_BUY if order.side.lower().startswith("b") else self.kite.TRANSACTION_TYPE_SELL
+        order_type = self.kite.ORDER_TYPE_LIMIT if order.type == "limit" else self.kite.ORDER_TYPE_MARKET
+        params: Dict[str, Any] = dict(
+            variety=self.kite.VARIETY_REGULAR,
+            exchange=self.kite.EXCHANGE_NSE,
+            tradingsymbol=order.symbol,
+            transaction_type=txn,
+            quantity=int(order.qty),
+            product=self.kite.PRODUCT_MIS,
+            order_type=order_type,
+        )
+        if order.type == "limit":
+            params["price"] = order.price
+        order_id = self.kite.place_order(**params)
+        # Fetch fill details
+        fill_price = order.price
+        try:
+            history = self.kite.order_history(order_id)
+            completed = [h for h in history if h.get("status") == "COMPLETE"]
+            if completed:
+                fill_price = float(completed[-1].get("average_price", order.price))
+        except Exception:
+            pass
+        signed_qty = order.qty if txn == self.kite.TRANSACTION_TYPE_BUY else -order.qty
+        fee = abs(signed_qty * fill_price) * 0.0003  # ~0.03% NSE transaction charge approx
+        return Fill(
+            order_id=str(order_id),
+            symbol=order.symbol,
+            side=order.side,
+            qty=signed_qty,
+            price=fill_price,
+            fee=fee,
+            ts=time.time(),
+        )
 
     def cancel_order(self, order_id: str) -> bool:
-        return False
+        if not self.kite:
+            raise RuntimeError("Not connected")
+        try:
+            self.kite.cancel_order(variety=self.kite.VARIETY_REGULAR, order_id=order_id)
+            return True
+        except Exception:
+            return False
 
     def replace_order(self, order_id: str, new_qty: Optional[float] = None, new_price: Optional[float] = None) -> bool:
-        return False
+        if not self.kite:
+            raise RuntimeError("Not connected")
+        try:
+            params: Dict[str, Any] = dict(variety=self.kite.VARIETY_REGULAR, order_id=order_id)
+            if new_qty is not None:
+                params["quantity"] = int(new_qty)
+            if new_price is not None:
+                params["price"] = new_price
+            self.kite.modify_order(**params)
+            return True
+        except Exception:
+            return False
 
     def set_prices(self, prices: Dict[str, float]) -> None:
         pass

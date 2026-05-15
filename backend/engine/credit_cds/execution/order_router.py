@@ -114,15 +114,134 @@ class MockBrokerAdapter(BaseBrokerAdapter):
         child.avg_price_bps = float(child.meta["px_hint_bps"]) + self.slip_bps if "px_hint_bps" in child.meta else self.slip_bps # type: ignore
         return child
 
+def _build_fix_35d(child: "ChildOrder", sender_comp: str = "ALGO", target_comp: str = "BROKER") -> bytes:
+    """
+    Build a FIX 4.2 NewOrderSingle (MsgType=D) for a CDS child order.
+
+    CDS-specific mappings:
+      SecurityType (167) = "CS" (Credit Default Swap)
+      Side (54):  BUY_PROTECTION -> 1 (Buy), SELL_PROTECTION -> 2 (Sell)
+      OrdType (40) = 1 (Market) for spread orders; 2 (Limit) if px_hint_bps present
+      Price (44)   = spread in bps represented as decimal (px_hint_bps / 100)
+      Currency (15) = venue currency
+      OrderQty (38) = notional in currency units
+    """
+    import datetime as _dt
+    SEP = b"\x01"  # FIX field separator (SOH)
+    now = _dt.datetime.utcnow()
+    utc_ts = now.strftime("%Y%m%d-%H:%M:%S.%f")[:-3]
+    side_val = "1" if "BUY" in str(child.side).upper() else "2"
+    px_bps = child.meta.get("px_hint_bps")
+    ord_type = "2" if px_bps is not None else "1"  # 2=Limit, 1=Market
+
+    fields = {
+        "35": "D",
+        "49": sender_comp,
+        "56": target_comp,
+        "52": utc_ts,
+        "11": child.child_id,
+        "1": child.child_id,         # Account
+        "55": child.ticker,
+        "167": "CS",                  # SecurityType = Credit Default Swap
+        "54": side_val,
+        "60": utc_ts,
+        "38": f"{child.child_notional_usd:.2f}",
+        "40": ord_type,
+        "15": child.currency,
+        "207": "XNAS",               # SecurityExchange (placeholder)
+    }
+    if px_bps is not None:
+        fields["44"] = f"{float(px_bps) / 100:.6f}"  # spread bps -> decimal
+
+    body = SEP.join(f"{k}={v}".encode() for k, v in fields.items()) + SEP
+    checksum = sum(body) % 256
+    header = f"8=FIX.4.2{chr(1)}9={len(body)}{chr(1)}".encode()
+    trailer = f"10={checksum:03d}{chr(1)}".encode()
+    return header + body + trailer
+
+
 class FixAdapter(BaseBrokerAdapter):
-    """Sketch for a FIX adapter; wire to your FIX engine here."""
+    """
+    FIX 4.2 adapter for CDS order routing.
+    Builds NewOrderSingle (35=D) messages and sends them over a TCP socket
+    to a FIX acceptor (QuickFIX/N, FixJ, or any FIX engine).
+    Parses ExecutionReport (35=8) for fills/acks/rejects.
+
+    Config via VenueConfig.name must encode host:port as "FIX:host:port"
+    (e.g., "FIX:localhost:9877"). Falls back to simulation on connect failure.
+    """
+
+    def __init__(self, venue_cfg: VenueConfig):
+        super().__init__(venue_cfg)
+        self._sender = "ALGO"
+        self._target = "BROKER"
+        self._sock = None
+        self._connected = False
+        self._try_connect()
+
+    def _try_connect(self):
+        import socket as _socket
+        name = self.cfg.name or ""
+        if name.upper().startswith("FIX:"):
+            parts = name.split(":", 2)
+            if len(parts) == 3:
+                host, port = parts[1], int(parts[2])
+                try:
+                    s = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+                    s.settimeout(2.0)
+                    s.connect((host, port))
+                    self._sock = s
+                    self._connected = True
+                except Exception:
+                    self._sock = None
+                    self._connected = False
+
+    def _send_recv(self, msg: bytes, timeout: float = 2.0) -> dict:
+        """Send FIX message over socket, read back ExecutionReport fields."""
+        if not self._connected or self._sock is None:
+            return {}
+        try:
+            self._sock.settimeout(timeout)
+            self._sock.sendall(msg)
+            resp = self._sock.recv(4096)
+            # Parse flat FIX response into {tag: value} dict
+            return {
+                k: v
+                for field in resp.split(b"\x01")
+                for k, _, v in [field.partition(b"=")]
+                if k and v
+            }
+        except Exception:
+            return {}
+
     def send_child(self, child: ChildOrder) -> ChildOrder:
         self._rate_limit()
-        # TODO: translate to FIX (35=D), manage sessions, acks, fills, rejects.
-        # For now behave like full fill with no slip.
-        child.status = "FILLED"
-        child.filled_usd = child.child_notional_usd
-        child.avg_price_bps = float(child.meta["px_hint_bps"]) if "px_hint_bps" in child.meta else None # type: ignore
+        msg = _build_fix_35d(child, sender_comp=self._sender, target_comp=self._target)
+
+        if self._connected:
+            resp = self._send_recv(msg)
+            ord_status = resp.get(b"39", b"").decode()  # OrdStatus
+            exec_type = resp.get(b"150", b"").decode()  # ExecType
+
+            if ord_status in ("2", "1"):  # 2=Filled, 1=PartiallyFilled
+                cum_qty = float(resp.get(b"14", b"0") or 0)
+                avg_px_dec = float(resp.get(b"6", b"0") or 0)  # AvgPx (decimal, bps/100)
+                child.status = "FILLED" if ord_status == "2" else "PARTIAL"
+                child.filled_usd = cum_qty if cum_qty > 0 else child.child_notional_usd
+                child.avg_price_bps = avg_px_dec * 100.0 if avg_px_dec else child.meta.get("px_hint_bps")
+            elif ord_status == "8":  # Rejected
+                child.status = "REJECTED"
+                child.reason = resp.get(b"58", b"FIX rejected").decode()
+            else:
+                # Acked / pending — treat as partial for now
+                child.status = "ACK"
+                child.filled_usd = 0.0
+        else:
+            # Simulation fallback when no FIX session available
+            child.status = "FILLED"
+            child.filled_usd = child.child_notional_usd
+            child.avg_price_bps = float(child.meta["px_hint_bps"]) if "px_hint_bps" in child.meta else None  # type: ignore
+
         return child
 
 # =============================================================================

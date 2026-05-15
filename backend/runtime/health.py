@@ -10,7 +10,11 @@ from typing import Dict, Optional, Any
 
 import redis
 
-from backend.execution.broker_base import BrokerBase, PaperBroker # type: ignore
+try:
+    from backend.runtime.broker_base import BrokerBase, PaperBroker  # type: ignore
+except Exception:
+    BrokerBase = object  # type: ignore
+    PaperBroker = None  # type: ignore
 
 log = logging.getLogger("health")
 if not log.handlers:
@@ -104,7 +108,7 @@ try:
         log.info(f"Starting health server on {host}:{port}")
         uvicorn.run(app, host=host, port=port)
 
-except ImportError:
-    # FastAPI not installed — only programmatic use
-    def serve(*args, **kwargs):
+except Exception:
+    # FastAPI not installed or incompatible — only programmatic use
+    def serve(*args, **kwargs):  # type: ignore
         log.error("FastAPI/uvicorn not available; pip install fastapi uvicorn to enable HTTP health endpoint.")

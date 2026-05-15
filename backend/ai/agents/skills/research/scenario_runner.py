@@ -6,11 +6,32 @@ import pathlib
 from dataclasses import dataclass, asdict
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from backend.backtest.backtester import ( # type: ignore
-    Backtester, DataFeed, Candle, TradeTick, Quote,
-    CommissionModel, SlippageModel, LatencyModel, ExecConfig
-)
-from backend.common.schemas import PortfolioSnapshot, LedgerEvent # type: ignore
+try:
+    from backend.backtester.backtester import ( # type: ignore
+        Backtester, DataFeed, Candle, TradeTick, Quote,
+        CommissionModel, SlippageModel, LatencyModel, ExecConfig
+    )
+except Exception:
+    Backtester = DataFeed = Candle = TradeTick = Quote = None  # type: ignore
+    CommissionModel = SlippageModel = LatencyModel = ExecConfig = None  # type: ignore
+
+try:
+    from backend.common.schemas import PortfolioSnapshot, LedgerEvent  # type: ignore
+except Exception:
+    from dataclasses import dataclass, field
+    from typing import List
+
+    @dataclass
+    class PortfolioSnapshot:  # type: ignore
+        nav: float = 0.0
+        cash: float = 0.0
+        ts_ms: int = 0
+
+    @dataclass
+    class LedgerEvent:  # type: ignore
+        ts_ms: int = 0
+        event_type: str = ""
+        detail: dict = field(default_factory=dict)
 
 
 # ---------------- Scenario Definitions ----------------

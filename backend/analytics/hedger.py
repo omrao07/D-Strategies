@@ -51,9 +51,15 @@ except Exception:
     _consume_stream = None
 
 # ---------- Hedge recipes ----------
-from backend.strategies.hedge_recipes import ( # type: ignore
-    HedgeKitchen, ChainSnapshot, OptionQuote, dummy_accessor
-)
+try:
+    from backend.analytics.hedge_recipes import ( # type: ignore
+        HedgeKitchen, ChainSnapshot, OptionQuote, dummy_accessor
+    )
+except Exception:
+    HedgeKitchen = None  # type: ignore
+    ChainSnapshot = None  # type: ignore
+    OptionQuote = None  # type: ignore
+    def dummy_accessor(*a, **k): return None  # type: ignore
 
 # ---------- Env / Streams ----------
 REDIS_URL          = os.getenv("REDIS_URL", "redis://localhost:6379/0")
