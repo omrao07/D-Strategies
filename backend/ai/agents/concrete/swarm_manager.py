@@ -100,6 +100,14 @@ except Exception:
         name = "portfolio_agent"
         def act(self, req): return {"summary": "portfolio(stub)", "weight_sets": []}
 
+# Commodity AI
+try:
+    from .commodity_ai_agent import CommodityAIAgent  # type: ignore
+except Exception:
+    class CommodityAIAgent(BaseAgent): # type: ignore
+        name = "commodity_ai_agent"
+        def act(self, req): return {"macro_regime": "neutral", "top_ideas": [], "n_signals_generated": 0}
+
 # ============================================================
 # Swarm data models
 # ============================================================
@@ -165,6 +173,7 @@ class SwarmManager(BaseAgent): # type: ignore
             "greeks":       _safe(GreeksAgent,       GreeksAgent),
             "monte_carlo":  _safe(MonteCarloAgent,   MonteCarloAgent),
             "portfolio":    _safe(PortfolioAgent,    PortfolioAgent),
+            "commodity":    _safe(CommodityAIAgent,  CommodityAIAgent),
         }
 
         # simple mappers: how to feed outputs forward (task_id -> transform(result)->dict to merge in child payload)
@@ -178,6 +187,7 @@ class SwarmManager(BaseAgent): # type: ignore
             "greeks":       self._map_from_greeks,
             "monte_carlo":  self._map_from_monte_carlo,
             "portfolio":    self._map_from_portfolio,
+            "commodity":    self._map_from_commodity,
         }
 
     # ----------------- Public API -----------------
@@ -332,6 +342,31 @@ class SwarmManager(BaseAgent): # type: ignore
                 "mc_max_drawdown": getattr(port, "max_drawdown_stats", {}).get("worst") if hasattr(port, "max_drawdown_stats") else None,
                 "mc_summary": getattr(res, "summary", ""),
             }
+        except Exception:
+            return {}
+
+    def _map_from_commodity(self, res: Any) -> Dict[str, Any]:
+        """Surface macro regime and top commodity ideas for downstream tasks."""
+        try:
+            macro = None
+            top_ideas = []
+            if hasattr(res, "macro_regime"):
+                macro = res.macro_regime
+                top_ideas = res.top_ideas or []
+            elif isinstance(res, dict):
+                macro = res.get("macro_regime")
+                top_ideas = res.get("top_ideas", [])
+            out: Dict[str, Any] = {}
+            if macro:
+                out["commodity_macro_regime"] = macro
+            if top_ideas:
+                first = top_ideas[0]
+                out["top_commodity_idea"] = {
+                    "commodity": getattr(first, "commodity", None) or (first.get("commodity") if isinstance(first, dict) else None),
+                    "direction": getattr(first, "direction", None) or (first.get("direction") if isinstance(first, dict) else None),
+                    "score":     getattr(first, "score", 0.0) or (first.get("score", 0.0) if isinstance(first, dict) else 0.0),
+                }
+            return out
         except Exception:
             return {}
 
@@ -500,6 +535,72 @@ def playbook_portfolio_rebalance(holdings: List[Dict], capital: float,
                                   "qty": exec_qty, "px": 0.0, "strategy": "rebalance"}},
         })
     return {"name": "portfolio-rebalance", "tasks": tasks}
+
+
+def playbook_commodity_brief(
+    commodities: Optional[List[str]] = None,
+    price_data: Optional[Dict[str, Any]] = None,
+    satellite_data: Optional[Dict[str, Any]] = None,
+    ais_data: Optional[Dict[str, Any]] = None,
+    capital: float = 5_000_000.0,
+) -> Dict[str, Any]:
+    """
+    Commodity analysis DAG:
+      1. Commodity AI agent (signal hub + all strategies)
+      2. Monte Carlo simulation (macro risk overlay)
+      3. Explainer (ties commodity regime to portfolio context)
+
+    Produces ranked commodity trade ideas with macro regime classification,
+    satellite/AIS alternative data signals, and a Monte Carlo risk overlay.
+    """
+    commodity_list = commodities or ["lng", "soybeans", "carbon_eua", "nickel", "copper"]
+    mc_assets = [{"symbol": c, "s0": 100.0, "mu": 0.05, "sigma": 0.25,
+                  "weight": 1.0/len(commodity_list)} for c in commodity_list]
+    return {
+        "name": "commodity-brief",
+        "tasks": [
+            {
+                "task_id": "commodity",
+                "agent": "commodity",
+                "payload": {
+                    "commodities": commodity_list,
+                    "price_data": price_data or {},
+                    "satellite_data": satellite_data or {},
+                    "ais_data": ais_data or {},
+                    "capital": capital,
+                    "min_confidence": 0.55,
+                },
+            },
+            {
+                "task_id": "mc_overlay",
+                "agent": "monte_carlo",
+                "payload": {
+                    "assets": mc_assets,
+                    "model": "gbm",
+                    "n_paths": 5_000,
+                    "n_steps": 63,
+                    "antithetic": True,
+                    "var_levels": [0.95, 0.99],
+                    "stress": {"vol_mult": 1.5},
+                },
+            },
+            {
+                "task_id": "explain",
+                "agent": "explainer",
+                "depends_on": ["commodity", "mc_overlay"],
+                "payload": {
+                    "trade": {
+                        "symbol": commodity_list[0],
+                        "side": "buy",
+                        "qty": 0,
+                        "px": 0.0,
+                        "strategy": "commodity-macro-brief",
+                    }
+                },
+            },
+        ],
+    }
+
 
 # ============================================================
 # Smoke test
