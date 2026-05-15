@@ -76,6 +76,30 @@ except Exception:
         name = "explainer_agent"
         def act(self, req): return {"explanation": {"headline": "explainer(stub)"}}
 
+# Greeks
+try:
+    from .greeks_agent import GreeksAgent  # type: ignore
+except Exception:
+    class GreeksAgent(BaseAgent): # type: ignore
+        name = "greeks_agent"
+        def act(self, req): return {"summary": "greeks(stub)", "legs": [], "portfolio": {}}
+
+# Monte Carlo
+try:
+    from .monte_carlo_agent import MonteCarloAgent  # type: ignore
+except Exception:
+    class MonteCarloAgent(BaseAgent): # type: ignore
+        name = "monte_carlo_agent"
+        def act(self, req): return {"summary": "mc(stub)", "asset_results": [], "portfolio": None}
+
+# Portfolio
+try:
+    from .portfolio_agent import PortfolioAgent  # type: ignore
+except Exception:
+    class PortfolioAgent(BaseAgent): # type: ignore
+        name = "portfolio_agent"
+        def act(self, req): return {"summary": "portfolio(stub)", "weight_sets": []}
+
 # ============================================================
 # Swarm data models
 # ============================================================
@@ -132,22 +156,28 @@ class SwarmManager(BaseAgent): # type: ignore
         super().__init__()
         # Instantiate agents (upgrade to real if available)
         self.agents: Dict[str, BaseAgent] = {
-            "analyst": _safe(AnalystAgent, AnalystAgent),
-            "insight": _safe(InsightAgent, InsightAgent),
-            "query": _safe(QueryAgent, QueryAgent),
-            "execution": _safe(ExecutionAgent, ExecutionAgent),
-            "rl_execution": _safe(RLExecutionAgent, RLExecutionAgent),
-            "explainer": _safe(ExplainerAgent, ExplainerAgent),
+            "analyst":      _safe(AnalystAgent,      AnalystAgent),
+            "insight":      _safe(InsightAgent,      InsightAgent),
+            "query":        _safe(QueryAgent,        QueryAgent),
+            "execution":    _safe(ExecutionAgent,    ExecutionAgent),
+            "rl_execution": _safe(RLExecutionAgent,  RLExecutionAgent),
+            "explainer":    _safe(ExplainerAgent,    ExplainerAgent),
+            "greeks":       _safe(GreeksAgent,       GreeksAgent),
+            "monte_carlo":  _safe(MonteCarloAgent,   MonteCarloAgent),
+            "portfolio":    _safe(PortfolioAgent,    PortfolioAgent),
         }
 
         # simple mappers: how to feed outputs forward (task_id -> transform(result)->dict to merge in child payload)
         self.mappers: Dict[str, Callable[[Any], Dict[str, Any]]] = {
-            "analyst": self._map_from_analyst,
-            "insight": self._map_from_insight,
-            "query": self._map_from_query,
-            "execution": self._map_from_execution,
+            "analyst":      self._map_from_analyst,
+            "insight":      self._map_from_insight,
+            "query":        self._map_from_query,
+            "execution":    self._map_from_execution,
             "rl_execution": self._map_from_execution,
-            "explainer": self._map_from_explainer,
+            "explainer":    self._map_from_explainer,
+            "greeks":       self._map_from_greeks,
+            "monte_carlo":  self._map_from_monte_carlo,
+            "portfolio":    self._map_from_portfolio,
         }
 
     # ----------------- Public API -----------------
@@ -274,6 +304,56 @@ class SwarmManager(BaseAgent): # type: ignore
         # terminal step usually; no downstream fields required
         return {}
 
+    def _map_from_greeks(self, res: Any) -> Dict[str, Any]:
+        """Surface net portfolio delta + hedge notional for execution tasks."""
+        try:
+            port = res.portfolio if hasattr(res, "portfolio") else (res.get("portfolio") if isinstance(res, dict) else None)
+            if port is None:
+                return {}
+            net_delta = getattr(port, "net_delta", None) or (port.get("net_delta") if isinstance(port, dict) else None)
+            hedge_notional = getattr(port, "hedge_notional", None) or (port.get("hedge_notional") if isinstance(port, dict) else None)
+            out: Dict[str, Any] = {}
+            if net_delta is not None:
+                out["net_delta"] = net_delta
+            if hedge_notional is not None:
+                out["hedge_notional"] = hedge_notional
+            return out
+        except Exception:
+            return {}
+
+    def _map_from_monte_carlo(self, res: Any) -> Dict[str, Any]:
+        """Pass VaR/ES and Sharpe estimate downstream."""
+        try:
+            port = res.portfolio if hasattr(res, "portfolio") else (res.get("portfolio") if isinstance(res, dict) else None)
+            if port is None:
+                return {}
+            return {
+                "mc_sharpe": getattr(port, "sharpe_estimate", None),
+                "mc_max_drawdown": getattr(port, "max_drawdown_stats", {}).get("worst") if hasattr(port, "max_drawdown_stats") else None,
+                "mc_summary": getattr(res, "summary", ""),
+            }
+        except Exception:
+            return {}
+
+    def _map_from_portfolio(self, res: Any) -> Dict[str, Any]:
+        """Forward first weight set and rebalance signals."""
+        try:
+            wsets = res.weight_sets if hasattr(res, "weight_sets") else (res.get("weight_sets", []) if isinstance(res, dict) else [])
+            rebal = res.rebalance_signals if hasattr(res, "rebalance_signals") else (res.get("rebalance_signals", []) if isinstance(res, dict) else [])
+            out: Dict[str, Any] = {}
+            if wsets:
+                first = wsets[0]
+                out["target_weights"] = getattr(first, "weights", {}) or (first.get("weights", {}) if isinstance(first, dict) else {})
+            if rebal:
+                out["rebalance_actions"] = [
+                    {"symbol": getattr(r, "symbol", "?"), "action": getattr(r, "action", "hold"),
+                     "delta_value": getattr(r, "delta_value", 0)}
+                    for r in rebal if getattr(r, "action", "hold") != "hold"
+                ]
+            return out
+        except Exception:
+            return {}
+
     # ----------------- Reporting -----------------
 
     def _summarize(self, pb: Playbook, results: Dict[str, TaskResult]) -> str:
@@ -321,6 +401,105 @@ def playbook_rl_execute(symbol: str, side: str, qty: float, dry_run: bool = True
              "payload": {"trade": {"symbol": symbol, "side": side, "qty": qty, "px": 0.0, "strategy": "RL"}}}
         ]
     }
+
+
+def playbook_full_morning_brief(symbols: List[str], capital: float = 10_000_000,
+                                 mc_paths: int = 10_000) -> Dict[str, Any]:
+    """
+    Full morning analysis DAG:
+      1. Analyst (signals + VaR overview)
+      2. Monte Carlo simulation (parallel, no dep)
+      2. Portfolio construction (parallel, no dep)
+      3. Insight anomaly scan (waits for analyst)
+      4. Explainer summary (waits for all)
+    """
+    holdings = [{"symbol": s, "exp_vol": 0.20, "exp_return": 0.10, "current_value": 0}
+                for s in symbols]
+    assets   = [{"symbol": s, "s0": 100.0, "mu": 0.10, "sigma": 0.20,
+                 "weight": 1.0/max(len(symbols),1)} for s in symbols]
+    return {
+        "name": "morning-brief",
+        "tasks": [
+            {"task_id": "analyst", "agent": "analyst",
+             "payload": {"symbols": symbols, "interval": "1d", "lookback": 120,
+                         "tasks": ["overview","signals","risk"]}},
+            {"task_id": "mc_sim", "agent": "monte_carlo",
+             "payload": {"assets": assets, "model": "gbm",
+                         "n_paths": mc_paths, "n_steps": 252, "antithetic": True,
+                         "var_levels": [0.95, 0.99]}},
+            {"task_id": "portfolio", "agent": "portfolio",
+             "payload": {"holdings": holdings, "total_capital": capital,
+                         "methods": ["risk_parity","inv_vol"],
+                         "kelly_win_rate": 0.54, "kelly_odds": 1.8}},
+            {"task_id": "insight", "agent": "insight", "depends_on": ["analyst"],
+             "payload": {"symbols": symbols, "mode": "anomaly"}},
+            {"task_id": "explain", "agent": "explainer",
+             "depends_on": ["analyst","mc_sim","portfolio","insight"],
+             "payload": {"trade": {"symbol": symbols[0] if symbols else "?",
+                                   "side": "buy", "qty": 0, "px": 0.0,
+                                   "strategy": "morning-brief"}}},
+        ]
+    }
+
+
+def playbook_options_risk(option_specs: List[Dict], symbols: List[str],
+                          compute_surface: bool = True) -> Dict[str, Any]:
+    """
+    Options risk DAG:
+      1. Greeks (pricing + portfolio greeks + IV surface)
+      2. Monte Carlo (vol stress simulation)
+      3. Explainer (using greek results)
+    """
+    assets = [{"symbol": s, "s0": 100.0, "mu": 0.0, "sigma": 0.20} for s in symbols]
+    return {
+        "name": "options-risk",
+        "tasks": [
+            {"task_id": "greeks", "agent": "greeks",
+             "payload": {"options": option_specs, "compute_surface": compute_surface}},
+            {"task_id": "mc_stress", "agent": "monte_carlo",
+             "payload": {"assets": assets, "model": "heston", "n_paths": 5000, "n_steps": 30,
+                         "stress": {"vol_mult": 2.0, "drift_shock": -0.15}}},
+            {"task_id": "explain", "agent": "explainer", "depends_on": ["greeks","mc_stress"],
+             "payload": {"trade": {"symbol": symbols[0] if symbols else "?",
+                                   "side": "hedge", "qty": 0, "px": 0.0,
+                                   "strategy": "options-delta-hedge"}}},
+        ]
+    }
+
+
+def playbook_portfolio_rebalance(holdings: List[Dict], capital: float,
+                                  exec_symbol: Optional[str] = None,
+                                  exec_qty: float = 0, dry_run: bool = True) -> Dict[str, Any]:
+    """
+    Portfolio rebalance DAG:
+      1. Portfolio construction (ERC weights + rebalance signals)
+      2. Analyst (current signal check)
+      3. Execution (if exec_symbol set)
+      4. Explainer
+    """
+    symbols = [h["symbol"] for h in holdings]
+    tasks = [
+        {"task_id": "portfolio", "agent": "portfolio",
+         "payload": {"holdings": holdings, "total_capital": capital,
+                     "methods": ["risk_parity","hrp","inv_vol"],
+                     "rebalance_threshold": 0.05}},
+        {"task_id": "analyst", "agent": "analyst",
+         "payload": {"symbols": symbols, "lookback": 60, "tasks": ["signals","risk"]}},
+    ]
+    if exec_symbol and exec_qty > 0:
+        tasks.append({
+            "task_id": "exec", "agent": "rl_execution",
+            "depends_on": ["portfolio","analyst"],
+            "payload": {"target": {"symbol": exec_symbol, "side": "buy", "qty": exec_qty},
+                        "schedule": {"horizon_min": 5, "max_participation": 0.10},
+                        "dry_run": dry_run},
+        })
+        tasks.append({
+            "task_id": "explain", "agent": "explainer", "depends_on": ["exec"],
+            "payload": {"trade": {"symbol": exec_symbol, "side": "buy",
+                                  "qty": exec_qty, "px": 0.0, "strategy": "rebalance"}},
+        })
+    return {"name": "portfolio-rebalance", "tasks": tasks}
 
 # ============================================================
 # Smoke test
