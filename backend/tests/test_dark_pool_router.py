@@ -45,39 +45,7 @@ class ExecutionPlan:
     price: float
 
 
-# ─────────────────────────────────────────────────────────────
-# Dummy router (only used if real one is missing)
-# Remove this block once real router exists
-# ─────────────────────────────────────────────────────────────
-
-try:
-    from engine.execution.dark_pool_router import DarkPoolRouter
-except ImportError:
-    class DarkPoolRouter:
-        def route(self, order, venues):
-            # Simple best-price router
-            if order.side == "buy":
-                venues = sorted(venues, key=lambda v: v.price + v.fee)
-            else:
-                venues = sorted(venues, key=lambda v: v.price - v.fee, reverse=True)
-
-            plans = []
-            remaining = order.qty
-
-            for v in venues:
-                if remaining <= 0:
-                    break
-                take = min(remaining, v.liquidity)
-                plans.append(
-                    ExecutionPlan(
-                        venue=v.name,
-                        qty=take,
-                        price=v.price
-                    )
-                )
-                remaining -= take
-
-            return plans
+from backend.engine.execution.dark_pool_router import DarkPoolRouter
 
 
 # ─────────────────────────────────────────────────────────────

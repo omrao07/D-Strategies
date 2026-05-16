@@ -438,5 +438,150 @@ def _cli():
     else:
         print(json.dumps(asdict(res), indent=2))
 
+
+# ---------------------------------------------------------------------------
+# Test-compatible ScenarioGenerator — numpy path-simulation interface
+# ---------------------------------------------------------------------------
+
+class ScenarioGenerator:
+    """
+    Monte-Carlo path generator with a simple sample() interface.
+
+    Returns {"paths": ndarray[n_scenarios, horizon, N], "assets": [...],
+             "dates": [...], "meta": {"freq": ...}}.
+    """
+
+    def sample(
+        self,
+        n_scenarios: int,
+        horizon_days: int,
+        assets: list,
+        mu: Optional[Any] = None,
+        Sigma: Optional[Any] = None,
+        seed: Optional[int] = None,
+        freq: str = "D",
+        method: str = "gaussian",
+        shocks: Optional[List[Dict]] = None,
+        jumps: Optional[Dict] = None,
+        regimes: Optional[Dict] = None,
+        mix: Optional[Dict] = None,
+        **kw,
+    ) -> Dict[str, Any]:
+        if n_scenarios <= 0:
+            raise ValueError(f"n_scenarios must be > 0, got {n_scenarios}")
+        if horizon_days <= 0:
+            raise ValueError(f"horizon_days must be > 0, got {horizon_days}")
+
+        N = len(list(assets))
+        assets_list = list(assets)
+
+        mu_arr = np.zeros(N) if mu is None else np.asarray(mu, dtype=float)
+        Sigma_arr = np.eye(N) if Sigma is None else np.asarray(Sigma, dtype=float)
+
+        if len(mu_arr) != N:
+            raise ValueError(f"mu length {len(mu_arr)} != len(assets) {N}")
+        if Sigma_arr.shape != (N, N):
+            raise ValueError(f"Sigma shape {Sigma_arr.shape} != ({N},{N})")
+
+        # Validate PSD
+        eigvals = np.linalg.eigvalsh(Sigma_arr)
+        if eigvals.min() < -1e-8:
+            raise ValueError("Sigma is not positive semi-definite")
+
+        rng = np.random.default_rng(seed)
+
+        # Cholesky factor (stabilize tiny eigenvalues)
+        L = np.linalg.cholesky(Sigma_arr + 1e-10 * np.eye(N))
+
+        if method == "gaussian":
+            Z = rng.standard_normal(size=(n_scenarios, horizon_days, N))
+            paths = Z @ L.T + mu_arr[np.newaxis, np.newaxis, :]
+        elif method == "t":
+            df = int(kw.get("df", 6))
+            Z = rng.standard_normal(size=(n_scenarios, horizon_days, N))
+            chi2 = rng.chisquare(df, size=(n_scenarios, horizon_days, 1))
+            t_factor = np.sqrt(df / chi2)
+            paths = (Z * t_factor) @ L.T + mu_arr[np.newaxis, np.newaxis, :]
+        else:
+            # Unsupported method: fall back to Gaussian
+            Z = rng.standard_normal(size=(n_scenarios, horizon_days, N))
+            paths = Z @ L.T + mu_arr[np.newaxis, np.newaxis, :]
+
+        # Apply shocks
+        if shocks:
+            for shock in shocks:
+                asset_name = shock.get("asset")
+                t = int(shock.get("t", 0))
+                value = float(shock.get("value", 0.0))
+                if asset_name in assets_list and 0 <= t < horizon_days:
+                    i = assets_list.index(asset_name)
+                    paths[:, t, i] += value
+
+        # Apply jump diffusion
+        if jumps is not None:
+            lam = float(jumps.get("lam", 0.1))
+            j_mu = float(jumps.get("mu", 0.0))
+            j_sig = float(jumps.get("sigma", 0.02))
+            # Expected jumps per step; Poisson draw
+            n_jumps = rng.poisson(lam, size=(n_scenarios, horizon_days, N))
+            jump_sizes = rng.normal(j_mu, j_sig, size=(n_scenarios, horizon_days, N))
+            paths += n_jumps * jump_sizes
+
+        # Regime switching
+        if regimes is not None:
+            P_mat = np.asarray(regimes.get("P", [[1.0]]))
+            mus_reg = regimes.get("mus", [mu_arr])
+            Sigs_reg = regimes.get("Sigmas", [Sigma_arr])
+            n_reg = len(mus_reg)
+            state = 0
+            for t in range(horizon_days):
+                L_r = np.linalg.cholesky(np.asarray(Sigs_reg[state]) + 1e-10 * np.eye(N))
+                Z_r = rng.standard_normal(size=(n_scenarios, N))
+                mu_r = np.asarray(mus_reg[state])
+                paths[:, t, :] = Z_r @ L_r.T + mu_r[np.newaxis, :]
+                # Markov transition (deterministic for simplicity: use prob of staying)
+                if n_reg > 1 and t < horizon_days - 1:
+                    next_prob = P_mat[state]
+                    state = int(rng.choice(n_reg, p=next_prob))
+
+        dates = list(range(horizon_days))
+        return {
+            "paths": paths,
+            "assets": assets_list,
+            "dates": dates,
+            "meta": {"freq": freq, "method": method},
+        }
+
+    def percentiles(
+        self,
+        paths: Any,
+        qs: tuple = (1, 5, 50, 95, 99),
+    ) -> Dict[str, Any]:
+        X = np.asarray(paths)
+        N = X.shape[-1] if X.ndim == 3 else 1
+        out: Dict[str, Any] = {}
+        for i in range(N):
+            series = X[:, :, i].reshape(-1) if X.ndim == 3 else X.reshape(-1)
+            out[str(i)] = np.percentile(series, list(qs))
+        return out
+
+    def export_json(self, obj: Dict) -> Dict:
+        result = {}
+        for k, v in obj.items():
+            if isinstance(v, np.ndarray):
+                result[k] = v.tolist()
+            else:
+                result[k] = v
+        return result
+
+    def import_json(self, blob: Dict) -> Dict:
+        result = {}
+        for k, v in blob.items():
+            if isinstance(v, list):
+                result[k] = np.asarray(v)
+            else:
+                result[k] = v
+        return result
+
 if __name__ == "__main__":
     _cli()

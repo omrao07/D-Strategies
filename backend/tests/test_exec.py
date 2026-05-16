@@ -83,7 +83,9 @@ def run_exec(
         cwd=str(cwd) if cwd is not None else None,
         env=(os.environ | env) if env else None,
         text=text,
-        bufsize=1 if text else 0,  # line-buffered text
+        encoding="utf-8" if text else None,
+        errors="replace" if text else None,
+        bufsize=1 if text else 0,
     )
 
     stdout_parts: List[str] = []

@@ -424,5 +424,108 @@ if __name__ == "__main__":
     elif args.worker:
         cfg = RegimeConfig(derive_from_prices=args.derive_from_prices)
         asyncio.run(RegimeWorker(cfg).run())
+
+
+# ---------------------------------------------------------------------------
+# Test-compatible RegimeMap — fit(X) / predict(X) interface
+# ---------------------------------------------------------------------------
+
+class RegimeMap:
+    """
+    2-regime market classifier with a scikit-learn-compatible fit/predict API.
+
+    Uses K-means (k=2) on standardized features to separate low-volatility
+    (bull) and high-volatility (bear) regimes.
+    """
+
+    def __init__(self, n_regimes: int = 2, max_iter: int = 200, **kw):
+        self.n_regimes = int(n_regimes)
+        self.max_iter = int(max_iter)
+        self._centroids: Optional[np.ndarray] = None
+        self._scale: Optional[np.ndarray] = None
+        self._shift: Optional[np.ndarray] = None
+
+    # ------------------------------------------------------------------
+    def fit(self, X, y=None, **kw) -> "RegimeMap":
+        X = np.asarray(np.nan_to_num(X, nan=0.0), dtype=float)
+        n, nf = X.shape if X.ndim == 2 else (len(X), 1)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+
+        # Standardize features
+        self._shift = X.mean(axis=0)
+        self._scale = X.std(axis=0)
+        self._scale[self._scale < 1e-12] = 1.0
+        Xs = (X - self._shift) / self._scale
+
+        # K-means with k=n_regimes (2 by default)
+        k = min(self.n_regimes, n)
+        # Spread initial centroids across the data range
+        idx = np.linspace(0, n - 1, k, dtype=int)
+        centroids = Xs[idx].copy()
+
+        for _ in range(self.max_iter):
+            dists = np.stack([np.linalg.norm(Xs - c, axis=1) for c in centroids], axis=1)
+            labels = np.argmin(dists, axis=1)
+            new_centroids = np.array([
+                Xs[labels == i].mean(axis=0) if (labels == i).any() else centroids[i]
+                for i in range(k)
+            ])
+            if np.allclose(new_centroids, centroids, atol=1e-10):
+                break
+            centroids = new_centroids
+
+        self._centroids = centroids
+        return self
+
+    # ------------------------------------------------------------------
+    def predict(self, X, **kw) -> np.ndarray:
+        if self._centroids is None:
+            raise RuntimeError("RegimeMap not fitted")
+        X = np.asarray(np.nan_to_num(X, nan=0.0), dtype=float)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        Xs = (X - self._shift) / self._scale
+        dists = np.stack([np.linalg.norm(Xs - c, axis=1) for c in self._centroids], axis=1)
+        return np.argmin(dists, axis=1)
+
+    # ------------------------------------------------------------------
+    def predict_proba(self, X, **kw) -> np.ndarray:
+        if self._centroids is None:
+            raise RuntimeError("RegimeMap not fitted")
+        X = np.asarray(np.nan_to_num(X, nan=0.0), dtype=float)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        Xs = (X - self._shift) / self._scale
+        dists = np.stack([np.linalg.norm(Xs - c, axis=1) for c in self._centroids], axis=1)
+        # Softmax over negative distances
+        neg_d = -dists
+        neg_d -= neg_d.max(axis=1, keepdims=True)
+        exp_d = np.exp(neg_d)
+        return exp_d / exp_d.sum(axis=1, keepdims=True)
+
+    # ------------------------------------------------------------------
+    def transition_matrix(self) -> np.ndarray:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------
+    def regimes(self) -> list:
+        k = len(self._centroids) if self._centroids is not None else self.n_regimes
+        return [{"id": i, "name": f"regime_{i}"} for i in range(k)]
+
+    # ------------------------------------------------------------------
+    def export_json(self) -> Dict:
+        if self._centroids is None:
+            return {}
+        return {
+            "centroids": self._centroids.tolist(),
+            "shift": self._shift.tolist(),
+            "scale": self._scale.tolist(),
+        }
+
+    def import_json(self, blob: Dict) -> None:
+        self._centroids = np.asarray(blob["centroids"])
+        self._shift = np.asarray(blob["shift"])
+        self._scale = np.asarray(blob["scale"])
     else:
         _demo()
