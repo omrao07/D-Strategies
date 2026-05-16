@@ -1,102 +1,12 @@
-# tests/test_drift_detection.py
-#
-# Pytest tests for data / feature drift detection
-#
-# Expected interface:
-#
-# class DriftDetector:
-#     def fit(reference: np.ndarray)
-#     def detect(current: np.ndarray) -> DriftResult
-#
-# class DriftResult:
-#     drifted: bool
-#     statistic: float
-#     threshold: float
-#     p_value: float | None
-#
-# Supported methods:
-# - KS test (univariate)
-# - PSI (population stability index)
-#
+# backend/tests/test_drift_detection.py
+"""
+Tests for backend.engine.monitoring.drift
+"""
 
 import numpy as np
 import pytest
-from dataclasses import dataclass
 
-
-# ─────────────────────────────────────────────────────────────
-# Fallback reference implementation (REMOVE once real exists)
-# ─────────────────────────────────────────────────────────────
-
-try:
-    from engine.monitoring.drift import DriftDetector
-except ImportError:
-    class DriftDetector:
-        def __init__(self, method="ks", alpha=0.05):
-            self.method = method
-            self.alpha = alpha
-            self.ref = None
-
-        def fit(self, reference: np.ndarray):
-            self.ref = np.asarray(reference)
-
-        def detect(self, current: np.ndarray):
-            cur = np.asarray(current)
-            if len(cur) == 0:
-                raise ValueError("current array must not be empty")
-
-            if self.method == "ks":
-                from scipy.stats import ks_2samp
-                stat, p = ks_2samp(self.ref, cur)
-                return DriftResult(
-                    drifted=bool(p < self.alpha),
-                    statistic=float(stat),
-                    threshold=self.alpha,
-                    p_value=float(p)
-                )
-
-            if self.method == "psi":
-                psi = population_stability_index(self.ref, cur)
-                return DriftResult(
-                    drifted=bool(psi > 0.25),
-                    statistic=float(psi),
-                    threshold=0.25,
-                    p_value=None
-                )
-
-            raise ValueError("Unknown drift method")
-
-
-# ─────────────────────────────────────────────────────────────
-# Types
-# ─────────────────────────────────────────────────────────────
-
-@dataclass
-class DriftResult:
-    drifted: bool
-    statistic: float
-    threshold: float
-    p_value: float | None
-
-
-# ─────────────────────────────────────────────────────────────
-# Helpers
-# ─────────────────────────────────────────────────────────────
-
-def population_stability_index(expected, actual, bins=10):
-    eps = 1e-6
-    breakpoints = np.percentile(expected, np.linspace(0, 100, bins + 1))
-    exp_counts, _ = np.histogram(expected, breakpoints)
-    act_counts, _ = np.histogram(actual, breakpoints)
-
-    exp_dist = exp_counts / max(exp_counts.sum(), eps)
-    act_dist = act_counts / max(act_counts.sum(), eps)
-
-    psi = np.sum(
-        (exp_dist - act_dist) *
-        np.log((exp_dist + eps) / (act_dist + eps))
-    )
-    return psi
+from backend.engine.monitoring.drift import DriftDetector, DriftResult
 
 
 # ─────────────────────────────────────────────────────────────
@@ -122,79 +32,107 @@ def drifted_current():
 
 
 # ─────────────────────────────────────────────────────────────
-# Tests: KS Test
+# KS test
 # ─────────────────────────────────────────────────────────────
 
 def test_ks_no_drift(stable_reference, stable_current):
-    detector = DriftDetector(method="ks", alpha=0.05)
-    detector.fit(stable_reference)
+    det = DriftDetector(method="ks", alpha=0.05)
+    det.fit(stable_reference)
+    result = det.detect(stable_current)
 
-    result = detector.detect(stable_current)
-
+    assert isinstance(result, DriftResult)
     assert result.drifted is False
     assert result.p_value is not None
     assert result.p_value >= 0.05
 
 
 def test_ks_detects_drift(stable_reference, drifted_current):
-    detector = DriftDetector(method="ks", alpha=0.05)
-    detector.fit(stable_reference)
-
-    result = detector.detect(drifted_current)
+    det = DriftDetector(method="ks", alpha=0.05)
+    det.fit(stable_reference)
+    result = det.detect(drifted_current)
 
     assert result.drifted is True
     assert result.p_value < 0.05
     assert result.statistic > 0
 
 
+def test_ks_identical_arrays_no_drift(stable_reference):
+    det = DriftDetector(method="ks")
+    det.fit(stable_reference)
+    result = det.detect(stable_reference.copy())
+
+    assert result.drifted is False
+    assert result.statistic == 0.0 or result.p_value == 1.0
+
+
 # ─────────────────────────────────────────────────────────────
-# Tests: PSI
+# PSI
 # ─────────────────────────────────────────────────────────────
 
 def test_psi_no_drift(stable_reference, stable_current):
-    detector = DriftDetector(method="psi")
-    detector.fit(stable_reference)
-
-    result = detector.detect(stable_current)
+    det = DriftDetector(method="psi")
+    det.fit(stable_reference)
+    result = det.detect(stable_current)
 
     assert result.drifted is False
     assert result.statistic < result.threshold
+    assert result.p_value is None
 
 
 def test_psi_detects_drift(stable_reference, drifted_current):
-    detector = DriftDetector(method="psi")
-    detector.fit(stable_reference)
-
-    result = detector.detect(drifted_current)
+    det = DriftDetector(method="psi")
+    det.fit(stable_reference)
+    result = det.detect(drifted_current)
 
     assert result.drifted is True
     assert result.statistic > result.threshold
 
 
 # ─────────────────────────────────────────────────────────────
-# Edge cases
+# Edge cases / error handling
 # ─────────────────────────────────────────────────────────────
 
 def test_empty_current_raises(stable_reference):
-    detector = DriftDetector(method="ks")
-    detector.fit(stable_reference)
+    det = DriftDetector(method="ks")
+    det.fit(stable_reference)
 
-    with pytest.raises(Exception):
-        detector.detect(np.array([]))
+    with pytest.raises(ValueError, match="empty"):
+        det.detect(np.array([]))
 
 
 def test_detect_without_fit_raises():
-    detector = DriftDetector(method="ks")
+    det = DriftDetector(method="ks")
 
-    with pytest.raises(Exception):
-        detector.detect(np.random.randn(100))
+    with pytest.raises(RuntimeError, match="fit"):
+        det.detect(np.random.randn(100))
 
 
-def test_identical_arrays_no_drift(stable_reference):
-    detector = DriftDetector(method="ks")
-    detector.fit(stable_reference)
+def test_empty_reference_raises():
+    det = DriftDetector(method="ks")
 
-    result = detector.detect(stable_reference.copy())
+    with pytest.raises(ValueError, match="empty"):
+        det.fit(np.array([]))
 
-    assert result.drifted is False
-    assert result.statistic == 0 or result.p_value == 1.0
+
+def test_unknown_method_raises():
+    with pytest.raises(ValueError, match="Unknown drift method"):
+        DriftDetector(method="chi2")
+
+
+def test_fit_returns_self(stable_reference):
+    det = DriftDetector()
+    ret = det.fit(stable_reference)
+    assert ret is det
+
+
+def test_result_fields_present(stable_reference, stable_current):
+    det = DriftDetector(method="ks")
+    det.fit(stable_reference)
+    result = det.detect(stable_current)
+
+    assert hasattr(result, "drifted")
+    assert hasattr(result, "statistic")
+    assert hasattr(result, "threshold")
+    assert hasattr(result, "p_value")
+    assert isinstance(result.drifted, bool)
+    assert result.statistic >= 0
