@@ -173,23 +173,6 @@ class VolSurface:
         return self.iv(T, K)
 
     # ------------------------------------------------------------------
-    def price(
-        self,
-        kind: str,
-        T: float,
-        K: float,
-        S0: Optional[float] = None,
-        r: Optional[float] = None,
-        q: Optional[float] = None,
-    ) -> float:
-        """Price a call or put using the fitted implied vol and Black-Scholes."""
-        sigma = self.iv(T, K)
-        S = S0 if S0 is not None else self._S0
-        rf = r if r is not None else self._r
-        qf = q if q is not None else self._q
-        return _bs_price(kind.lower(), float(S), float(K), float(T), float(rf), float(qf), sigma)
-
-    # ------------------------------------------------------------------
     def grid(
         self,
         expiries: List[float],
@@ -201,26 +184,6 @@ class VolSurface:
             for j, K in enumerate(strikes):
                 result[i, j] = self.iv(T, K)
         return result
-
-    # ------------------------------------------------------------------
-    def no_arb_checks(self) -> Dict[str, bool]:
-        """
-        Heuristic calendar and butterfly no-arbitrage checks.
-
-        calendar_ok : total variance T*sigma^2 non-decreasing in T at-the-money.
-        butterfly_ok: second difference of IV w.r.t. K is non-negative (approx).
-        """
-        if not self._fitted:
-            return {}
-        K_atm = float(self._K_grid[np.argmin(np.abs(self._K_grid - self._S0))])
-        tvars = [float(T * self.iv(T, K_atm) ** 2) for T in self._T_grid]
-        cal_ok = all(tvars[i] <= tvars[i + 1] + 1e-8 for i in range(len(tvars) - 1))
-
-        T_mid = float(self._T_grid[len(self._T_grid) // 2])
-        ivs = [self.iv(T_mid, float(K)) for K in self._K_grid]
-        d2 = [ivs[i] - 2 * ivs[i + 1] + ivs[i + 2] for i in range(len(ivs) - 2)]
-        bf_ok = all(v >= -1e-4 for v in d2)
-        return {"calendar_ok": cal_ok, "butterfly_ok": bf_ok}
 
     # ------------------------------------------------------------------
     def params(self) -> Dict[str, Any]:

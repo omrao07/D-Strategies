@@ -495,17 +495,17 @@ class ScenarioGenerator:
 
         if method == "gaussian":
             Z = rng.standard_normal(size=(n_scenarios, horizon_days, N))
-            paths = Z @ L.T + mu_arr[np.newaxis, np.newaxis, :]
+            paths = Z @ L.T
         elif method == "t":
             df = int(kw.get("df", 6))
             Z = rng.standard_normal(size=(n_scenarios, horizon_days, N))
             chi2 = rng.chisquare(df, size=(n_scenarios, horizon_days, 1))
             t_factor = np.sqrt(df / chi2)
-            paths = (Z * t_factor) @ L.T + mu_arr[np.newaxis, np.newaxis, :]
+            paths = (Z * t_factor) @ L.T
         else:
             # Unsupported method: fall back to Gaussian
             Z = rng.standard_normal(size=(n_scenarios, horizon_days, N))
-            paths = Z @ L.T + mu_arr[np.newaxis, np.newaxis, :]
+            paths = Z @ L.T
 
         # Apply shocks
         if shocks:

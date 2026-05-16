@@ -476,6 +476,7 @@ class RegimeMap:
             centroids = new_centroids
 
         self._centroids = centroids
+        self._train_labels = labels  # store for transition_matrix
         return self
 
     # ------------------------------------------------------------------
@@ -506,7 +507,20 @@ class RegimeMap:
 
     # ------------------------------------------------------------------
     def transition_matrix(self) -> np.ndarray:
-        raise NotImplementedError
+        """Row-stochastic transition matrix from training labels."""
+        if self._centroids is None:
+            raise RuntimeError("RegimeMap not fitted")
+        labels = getattr(self, "_train_labels", None)
+        if labels is None or len(labels) < 2:
+            k = len(self._centroids)
+            return np.eye(k)
+        k = len(self._centroids)
+        T = np.zeros((k, k))
+        for a, b in zip(labels[:-1], labels[1:]):
+            T[a, b] += 1
+        row_sums = T.sum(axis=1, keepdims=True)
+        row_sums[row_sums == 0] = 1.0
+        return T / row_sums
 
     # ------------------------------------------------------------------
     def regimes(self) -> list:
@@ -527,5 +541,3 @@ class RegimeMap:
         self._centroids = np.asarray(blob["centroids"])
         self._shift = np.asarray(blob["shift"])
         self._scale = np.asarray(blob["scale"])
-    else:
-        _demo()
