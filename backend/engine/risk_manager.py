@@ -58,7 +58,26 @@ RISK_MAX_DAILY_LOSS_PER_STRAT = float(os.getenv("RISK_MAX_DAILY_LOSS_PER_STRAT",
 INCOMING_STREAM = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
 OUT_STREAM = STREAM_ORDERS
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
+class _LazyRedis:
+    """Defers Redis connection until first use so import doesn't fail if Redis is unavailable."""
+    def __init__(self):
+        self._client = None
+
+    def _get(self):
+        if self._client is None:
+            self._client = redis.Redis(
+                host=REDIS_HOST,
+                port=REDIS_PORT,
+                password=os.getenv("REDIS_PASSWORD") or None,
+                decode_responses=True,
+            )
+        return self._client
+
+    def __getattr__(self, name: str):
+        return getattr(self._get(), name)
+
+
+r = _LazyRedis()
 
 # ---------------- Helpers ----------------
 def _now_ms() -> int:

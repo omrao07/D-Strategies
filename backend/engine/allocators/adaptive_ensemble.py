@@ -51,7 +51,8 @@ HKEY_DRAWDOWN = os.getenv("STRAT_DD_KEY",       "strategy:drawdown") # field=nam
 HKEY_WEIGHTS  = os.getenv("ALLOCATOR_WEIGHTS_KEY", "strategy:weight")     # hset <name> {"w": x}
 STREAM_WEIGHTS = os.getenv("ALLOCATOR_STREAM",     "allocator.weights")   # xadd events for history/UI
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
+from backend.bus.redis_factory import LazyRedis as _LazyRedis
+r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 
 @dataclass

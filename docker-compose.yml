@@ -34,7 +34,12 @@ services:
   redis:
     image: redis:7-alpine
     container_name: dstrategies_redis
-    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    command: >
+      redis-server
+        --appendonly yes
+        --maxmemory 512mb
+        --maxmemory-policy allkeys-lru
+        --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:

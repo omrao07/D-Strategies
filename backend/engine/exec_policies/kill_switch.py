@@ -19,7 +19,8 @@ REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 KILL_KEY   = os.getenv("KILL_SWITCH_KEY", "policy:kill_switch")
 ALERTS_KEY = os.getenv("ALERTS_STREAM", "alerts")
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
+from backend.bus.redis_factory import LazyRedis as _LazyRedis
+r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 
 class KillSwitch:

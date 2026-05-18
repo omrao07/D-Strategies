@@ -38,7 +38,26 @@ MAX_GROSS_USD         = float(os.getenv("RISK_MAX_GROSS_USD", "100000"))
 SLIPPAGE_BPS          = float(os.getenv("EXEC_SLIPPAGE_BPS", "0"))   # e.g., "1.5" for 1.5bps
 FEES_BPS              = float(os.getenv("EXEC_FEES_BPS", "0"))       # simple all-in fee model
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
+class _LazyRedis:
+    """Defers Redis connection until first use so import doesn't fail if Redis is unavailable."""
+    def __init__(self):
+        self._client = None
+
+    def _get(self):
+        if self._client is None:
+            self._client = redis.Redis(
+                host=REDIS_HOST,
+                port=REDIS_PORT,
+                password=os.getenv("REDIS_PASSWORD") or None,
+                decode_responses=True,
+            )
+        return self._client
+
+    def __getattr__(self, name: str):
+        return getattr(self._get(), name)
+
+
+r = _LazyRedis()
 
 # ---------- Helpers ----------
 def _now_ms() -> int:

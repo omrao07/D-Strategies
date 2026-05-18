@@ -49,7 +49,8 @@ KILL_SWITCH_KEY= os.getenv("KILL_SWITCH_KEY", "policy:kill_switch")
 INCLUDE = {s for s in os.getenv("REGIME_INCLUDE", "").split(",") if s.strip()}
 EXCLUDE = {s for s in os.getenv("REGIME_EXCLUDE", "").split(",") if s.strip()}
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
+from backend.bus.redis_factory import LazyRedis as _LazyRedis
+r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 
 # ---------- Policy model -----------------------------------------------------

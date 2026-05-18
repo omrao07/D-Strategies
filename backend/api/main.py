@@ -2,6 +2,7 @@ import os
 import time
 import uuid
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -46,7 +47,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger("api")
 
-app = FastAPI(title="Damodar Orchestrator API", version=APP_VERSION)
+_REQUIRED_ENV = ["ENGINE_API_KEY"]
+_RECOMMENDED_ENV = ["REDIS_HOST", "DB_HOST", "REDIS_PASSWORD"]
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    missing_required = [v for v in _REQUIRED_ENV if not os.getenv(v)]
+    if missing_required:
+        raise RuntimeError(f"Missing required env vars at startup: {missing_required}")
+    missing_recommended = [v for v in _RECOMMENDED_ENV if not os.getenv(v)]
+    if missing_recommended:
+        logger.warning("Missing recommended env vars (defaults used): %s", missing_recommended)
+    logger.info("API startup OK — version=%s", APP_VERSION)
+    yield
+    logger.info("API shutdown complete")
+
+
+app = FastAPI(title="Damodar Orchestrator API", version=APP_VERSION, lifespan=lifespan)
 
 _ENGINE_API_KEY = os.getenv("ENGINE_API_KEY", "")
 _key_header = APIKeyHeader(name="X-Engine-Key", auto_error=False)
@@ -112,6 +130,46 @@ try:
     logger.info("Strategy-lab router mounted at /lab")
 except Exception as _lab_err:
     logger.warning("strategy_lab_router unavailable: %s", _lab_err)
+
+# Wire orders router
+try:
+    from backend.api.orders import router as orders_router
+    app.include_router(orders_router)
+    logger.info("Orders router mounted")
+except Exception as _or_err:
+    logger.warning("orders router unavailable: %s", _or_err)
+
+# Wire WebSocket candles router
+try:
+    from backend.api.ws_candles import router as ws_candles_router
+    app.include_router(ws_candles_router)
+    logger.info("WS candles router mounted")
+except Exception as _wc_err:
+    logger.warning("ws_candles router unavailable: %s", _wc_err)
+
+# Wire alerts router
+try:
+    from backend.api.alerts import router as alerts_router
+    app.include_router(alerts_router)
+    logger.info("Alerts router mounted")
+except Exception as _al_err:
+    logger.warning("alerts router unavailable: %s", _al_err)
+
+# Wire WebSocket orderbook router
+try:
+    from backend.api.ws_orderbook import router as ws_orderbook_router
+    app.include_router(ws_orderbook_router)
+    logger.info("WS orderbook router mounted")
+except Exception as _wo_err:
+    logger.warning("ws_orderbook router unavailable: %s", _wo_err)
+
+# Wire WebSocket Greeks router
+try:
+    from backend.api.ws_greeks import router as ws_greeks_router
+    app.include_router(ws_greeks_router)
+    logger.info("WS greeks router mounted")
+except Exception as _wg_err:
+    logger.warning("ws_greeks router unavailable: %s", _wg_err)
 
 # Mount Vector-AI REST sub-app at /vector
 # Directory is named "vector-ai" (hyphen) — use importlib.util to load it

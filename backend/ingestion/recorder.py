@@ -46,8 +46,9 @@ CLICKHOUSE_PORT = int(os.getenv("CLICKHOUSE_PORT", "9000"))
 CLICKHOUSE_DB   = os.getenv("CLICKHOUSE_DB", "market_data")
 CLICKHOUSE_TABLE_PREFIX = os.getenv("REC_CH_TABLE_PREFIX", "rec")
 
-# ---- Redis client ----
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True)
+# ---- Redis client (lazy — connects on first use) ----
+from backend.bus.redis_factory import LazyRedis as _LazyRedis
+r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 
 # ---------- Helpers ----------

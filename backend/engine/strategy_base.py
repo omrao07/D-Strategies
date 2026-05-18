@@ -28,7 +28,21 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 INCOMING_ORDERS = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
 
-r = _redis_mod.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True) if _HAVE_REDIS else None
+_redis_client = None
+
+
+def _get_redis():
+    global _redis_client
+    if _redis_client is None and _HAVE_REDIS:
+        _redis_client = _redis_mod.Redis(
+            host=REDIS_HOST,
+            port=REDIS_PORT,
+            password=os.getenv("REDIS_PASSWORD") or None,
+            decode_responses=True,
+        )
+    return _redis_client
+
+
 
 
 @dataclass
@@ -180,8 +194,9 @@ class Strategy(abc.ABC):
                     tick = json.loads(tick)
                 self.on_tick(tick)
             except Exception as e:
-                if r is not None:
-                    r.lpush(f"strategy:errors:{self.ctx.name}", json.dumps({"ts": int(time.time()*1000), "err": str(e)}))
+                _r = _get_redis()
+                if _r is not None:
+                    _r.lpush(f"strategy:errors:{self.ctx.name}", json.dumps({"ts": int(time.time()*1000), "err": str(e)}))
 
 
 # ---------------- Convenience: a toy example ----------------
