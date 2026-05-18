@@ -25,11 +25,11 @@ except Exception:
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 _R = None
-if redis:
-    try:
-        _R = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=__import__("os").getenv("REDIS_PASSWORD") or None, decode_responses=True)
-    except Exception:
-        _R = None
+try:
+    from backend.bus.redis_factory import LazyRedis as _LazyRedis
+    _R = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
+except Exception:
+    _R = None
 
 # -----------------------------------------------------------------------------
 
