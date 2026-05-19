@@ -10,11 +10,14 @@ Execution Engine (paper mode):
 
 from __future__ import annotations
 import json
+import logging
 import os
 import time
 from typing import Dict, Tuple, Optional, Any
 
 import redis
+
+log = logging.getLogger(__name__)
 
 from backend.bus.streams import (
     consume_stream,
@@ -368,6 +371,7 @@ def run():
                 order = json.loads(order)
             _process_order(order)
         except Exception as e:
+            log.exception("Execution engine: unhandled error processing order %s", order)
             publish_pubsub(CHAN_ORDERS, {"event": "error", "error": str(e), "order": order})
 
 if __name__ == "__main__":

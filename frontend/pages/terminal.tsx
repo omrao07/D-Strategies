@@ -1,5 +1,6 @@
 // frontend/components/Terminal.tsx
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../lib/api";
 import {
   ResponsiveContainer,
   LineChart,
@@ -48,16 +49,16 @@ export default function Terminal() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [candleRes, bookRes, tradeRes, alertRes] = await Promise.all([
-          fetch("/api/terminal/candles"),
-          fetch("/api/terminal/book"),
-          fetch("/api/terminal/trades"),
-          fetch("/api/terminal/alerts"),
+        const [candlesData, bookData, tradesData, alertsData] = await Promise.all([
+          apiFetch<Candle[]>("/api/terminal/candles"),
+          apiFetch<OrderBookLevel[]>("/api/terminal/book"),
+          apiFetch<TradeLogRow[]>("/api/terminal/trades"),
+          apiFetch<Alert[]>("/api/terminal/alerts"),
         ]);
-        setCandles(await candleRes.json());
-        setBook(await bookRes.json());
-        setTrades(await tradeRes.json());
-        setAlerts(await alertRes.json());
+        setCandles(candlesData);
+        setBook(bookData);
+        setTrades(tradesData);
+        setAlerts(alertsData);
       } catch (err) {
         console.error("Terminal fetch error:", err);
       }

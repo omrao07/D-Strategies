@@ -1,5 +1,6 @@
 // frontend/components/Risk.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "../../lib/api";
 import {
   ResponsiveContainer,
   LineChart,
@@ -50,10 +51,10 @@ export default function Risk() {
       try {
         setLoading(true);
         const [k, m, s, h] = await Promise.all([
-          fetch("/api/risk/kpis").then((r) => r.json()),
-          fetch("/api/risk/monte_carlo").then((r) => r.json()),
-          fetch("/api/risk/scenarios").then((r) => r.json()),
-          fetch("/api/risk/timeseries").then((r) => r.json()),
+          apiFetch("/api/risk/kpis"),
+          apiFetch("/api/risk/monte_carlo"),
+          apiFetch("/api/risk/scenarios"),
+          apiFetch("/api/risk/timeseries"),
         ]);
         setKpis(k);
         setMc(m);

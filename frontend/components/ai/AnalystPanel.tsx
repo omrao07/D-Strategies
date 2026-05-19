@@ -1,5 +1,6 @@
 // frontend/components/AnalystPanel.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "../../lib/api";
 import {
   ResponsiveContainer,
   LineChart,
@@ -66,11 +67,11 @@ export default function AnalystPanel() {
     (async () => {
       try {
         const [sc, nw, nt, tk, st] = await Promise.all([
-          fetch("/api/analyst/screener").then(r => r.json()),
-          fetch("/api/analyst/news").then(r => r.json()),
-          fetch("/api/analyst/notes").then(r => r.json()),
-          fetch("/api/analyst/tasks").then(r => r.json()),
-          fetch("/api/analyst/sentiment").then(r => r.json()),
+          apiFetch<ScreenerRow[]>("/api/analyst/screener"),
+          apiFetch<NewsItem[]>("/api/analyst/news"),
+          apiFetch<Note[]>("/api/analyst/notes"),
+          apiFetch<Task[]>("/api/analyst/tasks"),
+          apiFetch<SentPt[]>("/api/analyst/sentiment"),
         ]);
         setScreener(sc);
         setNews(nw);
@@ -96,8 +97,7 @@ export default function AnalystPanel() {
 
   const runQuery = async () => {
     try {
-      const res = await fetch(`/api/analyst/query?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
+      const data = await apiFetch<{ tickers?: string[]; sentiment?: SentPt[] }>(`/api/analyst/query?q=${encodeURIComponent(query)}`);
       // For demo: if query returns a list of tickers, refilter screener/news
       if (Array.isArray(data?.tickers) && data.tickers.length) {
         const set = new Set<string>(data.tickers.map((t: string) => t.toUpperCase()));
@@ -114,12 +114,10 @@ export default function AnalystPanel() {
   const createNote = async () => {
     if (!newNoteTitle.trim() || !newNoteBody.trim()) return;
     try {
-      const res = await fetch("/api/analyst/notes", {
+      const note = await apiFetch<Note>("/api/analyst/notes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newNoteTitle, content: newNoteBody }),
       });
-      const note = await res.json();
       setNotes((x) => [note, ...x]);
       setNewNoteTitle(""); setNewNoteBody("");
     } catch (e) {
@@ -130,12 +128,10 @@ export default function AnalystPanel() {
   const addTask = async () => {
     if (!newTask.trim()) return;
     try {
-      const res = await fetch("/api/analyst/tasks", {
+      const task = await apiFetch<Task>("/api/analyst/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: newTask }),
       });
-      const task = await res.json();
       setTasks((x) => [task, ...x]);
       setNewTask("");
     } catch (e) {
@@ -145,7 +141,7 @@ export default function AnalystPanel() {
 
   const toggleTask = async (id: string) => {
     try {
-      await fetch(`/api/analyst/tasks/${id}/toggle`, { method: "POST" });
+      await apiFetch(`/api/analyst/tasks/${id}/toggle`, { method: "POST" });
       setTasks((x) => x.map(t => t.id === id ? { ...t, done: !t.done } : t));
     } catch (e) {
       console.error("Toggle task error:", e);

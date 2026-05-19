@@ -1,5 +1,6 @@
 // frontend/src/components/CommoditiesTicker.tsx
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../../lib/api";
 
 type Commodity = {
   symbol: string;
@@ -16,9 +17,7 @@ const CommoditiesTicker: React.FC = () => {
       try {
         const data: Commodity[] = await Promise.all(
           symbols.map(async (sym) => {
-            const res = await fetch(`/api/commodities/${sym}`);
-            if (!res.ok) throw new Error(`Failed for ${sym}`);
-            return res.json();
+            return apiFetch<Commodity>(`/api/commodities/${sym}`);
           })
         );
         setCommodities(data);

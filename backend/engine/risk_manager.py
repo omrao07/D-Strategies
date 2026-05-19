@@ -20,11 +20,14 @@ Checks:
 from __future__ import annotations
 
 import json
+import logging
 import os
 import time
 from typing import Dict, Tuple
 
 import redis
+
+log = logging.getLogger(__name__)
 
 from backend.bus.streams import (
     consume_stream,
@@ -253,6 +256,7 @@ def run_gateway(in_stream: str = INCOMING_STREAM, out_stream: str = OUT_STREAM) 
             publish_pubsub(CHAN_ORDERS, {"event": "accepted", **order})
 
         except Exception as e:
+            log.exception("Risk gateway: unhandled error processing order %s", order)
             publish_pubsub(CHAN_ORDERS, {"event": "error", "component": "risk_gateway", "error": str(e)})
 
 if __name__ == "__main__":

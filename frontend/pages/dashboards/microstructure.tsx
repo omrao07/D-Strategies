@@ -1,5 +1,6 @@
 // frontend/components/Microstructure.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { wsUrl as buildWsUrl } from "../../lib/api";
 import {
   ResponsiveContainer,
   BarChart,
@@ -52,7 +53,7 @@ export default function Microstructure({
   // --- WebSocket wiring (optional) ---
   useEffect(() => {
     if (!wsUrl) return;
-    const ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(buildWsUrl(wsUrl));
     wsRef.current = ws;
 
     ws.onopen = () => {

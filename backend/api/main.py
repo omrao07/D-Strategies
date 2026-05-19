@@ -378,6 +378,174 @@ def run_vec_backtest(req: VecBacktestRequest, _auth: None = Depends(_require_key
         raise HTTPException(500, str(exc))
 
 # ------------------------------------------------------------------------------
+# 501 Stub routes — frontend-facing endpoints not yet fully implemented
+# Each returns 501 so the frontend shows a clear "not implemented" error
+# rather than a confusing 404. Replace these with real handlers as built.
+# ------------------------------------------------------------------------------
+
+def _not_implemented(name: str):
+    raise HTTPException(501, f"Not implemented: {name}")
+
+# Alt-data
+@app.get("/api/altdata/card_spend")
+def stub_altdata_card_spend():
+    _not_implemented("card spend data")
+
+@app.get("/api/altdata/satellite_lights")
+def stub_altdata_satellite_lights():
+    _not_implemented("satellite lights data")
+
+@app.get("/api/altdata/shipping_traffic")
+def stub_altdata_shipping_traffic():
+    _not_implemented("shipping traffic data")
+
+@app.get("/api/altdata/geo_spatial")
+def stub_altdata_geo_spatial():
+    _not_implemented("geo spatial data")
+
+# Analyst
+@app.get("/api/analyst/screener")
+def stub_analyst_screener():
+    _not_implemented("analyst screener")
+
+@app.get("/api/analyst/news")
+def stub_analyst_news():
+    _not_implemented("analyst news")
+
+@app.get("/api/analyst/notes")
+def stub_analyst_notes_get():
+    _not_implemented("analyst notes GET")
+
+@app.post("/api/analyst/notes")
+def stub_analyst_notes_post(payload: Dict[str, Any]):
+    _not_implemented("analyst notes POST")
+
+@app.get("/api/analyst/tasks")
+def stub_analyst_tasks_get():
+    _not_implemented("analyst tasks GET")
+
+@app.post("/api/analyst/tasks")
+def stub_analyst_tasks_post(payload: Dict[str, Any]):
+    _not_implemented("analyst tasks POST")
+
+@app.post("/api/analyst/tasks/{task_id}/toggle")
+def stub_analyst_tasks_toggle(task_id: str):
+    _not_implemented(f"analyst task toggle {task_id}")
+
+@app.get("/api/analyst/sentiment")
+def stub_analyst_sentiment():
+    _not_implemented("analyst sentiment")
+
+@app.get("/api/analyst/query")
+def stub_analyst_query(q: str = ""):
+    _not_implemented("analyst query")
+
+# FNO
+@app.get("/api/fno/futures")
+def stub_fno_futures():
+    _not_implemented("FNO futures data")
+
+@app.get("/api/fno/options")
+def stub_fno_options():
+    _not_implemented("FNO options data")
+
+# Research
+@app.get("/api/research/notes")
+def stub_research_notes():
+    _not_implemented("research notes")
+
+@app.get("/api/research/chart")
+def stub_research_chart():
+    _not_implemented("research chart data")
+
+@app.get("/api/research/query")
+def stub_research_query(q: str = ""):
+    _not_implemented("research query")
+
+# Risk (UI-facing thin wrappers not in risk_router)
+@app.get("/api/risk/kpis")
+def stub_risk_kpis():
+    _not_implemented("risk KPIs summary")
+
+@app.get("/api/risk/monte_carlo")
+def stub_risk_monte_carlo():
+    _not_implemented("risk Monte Carlo summary")
+
+@app.get("/api/risk/scenarios")
+def stub_risk_scenarios():
+    _not_implemented("risk stress scenarios")
+
+@app.get("/api/risk/timeseries")
+def stub_risk_timeseries():
+    _not_implemented("risk timeseries data")
+
+# Strategies
+@app.get("/api/strategies")
+def stub_strategies():
+    _not_implemented("strategy list")
+
+@app.patch("/api/strategy/{name}")
+def stub_strategy_patch(name: str, payload: Dict[str, Any]):
+    _not_implemented(f"strategy update {name}")
+
+@app.post("/api/strategies/start")
+def stub_strategies_start(payload: Dict[str, Any]):
+    _not_implemented("strategies start")
+
+@app.post("/api/strategies/stop")
+def stub_strategies_stop(payload: Dict[str, Any]):
+    _not_implemented("strategies stop")
+
+@app.post("/api/strategies/presets/save")
+def stub_presets_save(payload: Dict[str, Any]):
+    _not_implemented("strategy preset save")
+
+@app.post("/api/strategies/presets/apply")
+def stub_presets_apply(payload: Dict[str, Any]):
+    _not_implemented("strategy preset apply")
+
+# Terminal
+@app.get("/api/terminal/candles")
+def stub_terminal_candles():
+    _not_implemented("terminal candles")
+
+@app.get("/api/terminal/book")
+def stub_terminal_book():
+    _not_implemented("terminal order book")
+
+@app.get("/api/terminal/trades")
+def stub_terminal_trades():
+    _not_implemented("terminal trades")
+
+@app.get("/api/terminal/alerts")
+def stub_terminal_alerts():
+    _not_implemented("terminal alerts")
+
+# Voice / AI
+@app.post("/api/voice/command")
+def stub_voice_command(payload: Dict[str, Any]):
+    _not_implemented("voice command")
+
+# Commodities
+@app.get("/api/commodities/{sym}")
+def stub_commodities(sym: str):
+    _not_implemented(f"commodities data for {sym}")
+
+# Trades
+@app.get("/api/trades/{trade_id}")
+def stub_trade(trade_id: str):
+    _not_implemented(f"trade {trade_id}")
+
+@app.get("/api/trades/{trade_id}/explain")
+def stub_trade_explain(trade_id: str):
+    _not_implemented(f"trade explanation {trade_id}")
+
+# GEE
+@app.get("/api/gee/url")
+def stub_gee_url(q: str = ""):
+    _not_implemented("Google Earth Engine URL")
+
+# ------------------------------------------------------------------------------
 # Entrypoint (Render / Docker safe)
 # ------------------------------------------------------------------------------
 

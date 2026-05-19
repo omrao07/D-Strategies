@@ -20,8 +20,9 @@
 // You can adapt endpoints; just tweak the calls below.
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { apiFetch, wsUrl as buildWsUrl } from "../lib/api";
 
-const WS_URL = "wss://localhost:8081/ws/strategies"; // change to your gateway
+const WS_URL = buildWsUrl("/ws/strategies");
 
 function classNames(...xs) {
   return xs.filter(Boolean).join(" ");
@@ -50,9 +51,7 @@ export default function StrategyControl() {
       try {
         setLoading(true);
         setErr("");
-        const res = await fetch("/api/strategies", { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
+        const json = await apiFetch("/api/strategies", { cache: "no-store" });
         if (mounted) setRows(Array.isArray(json?.data) ? json.data : []);
       } catch (e) {
         if (mounted) setErr(e?.message ?? "Failed to load strategies");
@@ -130,12 +129,10 @@ export default function StrategyControl() {
   async function persist(name, body) {
     setSaving(true);
     try {
-      const res = await fetch(`/api/strategy/${encodeURIComponent(name)}`, {
+      await apiFetch(`/api/strategy/${encodeURIComponent(name)}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(`Save failed (${res.status})`);
     } catch (e) {
       console.error(e);
       setErr(e?.message ?? "Failed to save");
@@ -149,7 +146,7 @@ export default function StrategyControl() {
     try {
       const endpoint = start ? "/api/strategies/start" : "/api/strategies/stop";
       const body = all ? {} : { names: selectedNames() };
-      await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      await apiFetch(endpoint, { method: "POST", body: JSON.stringify(body) });
     } catch (e) {
       setErr(e?.message ?? "Failed to execute");
     }
@@ -186,9 +183,8 @@ export default function StrategyControl() {
     const name = prompt("Preset name?");
     if (!name) return;
     try {
-      await fetch("/api/strategies/presets/save", {
+      await apiFetch("/api/strategies/presets/save", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, items: rows }),
       });
     } catch (e) {
@@ -199,13 +195,10 @@ export default function StrategyControl() {
     const name = prompt("Apply preset name?");
     if (!name) return;
     try {
-      const res = await fetch("/api/strategies/presets/apply", {
+      const json = await apiFetch("/api/strategies/presets/apply", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
       if (Array.isArray(json?.data)) setRows(json.data);
     } catch (e) {
       setErr(e?.message ?? "Failed to apply preset");

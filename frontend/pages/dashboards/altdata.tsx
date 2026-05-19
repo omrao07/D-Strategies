@@ -1,5 +1,6 @@
 // frontend/components/AltData.tsx
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../../lib/api";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, AreaChart, Area } from "recharts";
 
 interface AltDataPoint {
@@ -16,16 +17,16 @@ export default function AltData() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [cardRes, lightsRes, shipRes, geoRes] = await Promise.all([
-          fetch("/api/altdata/card_spend"),
-          fetch("/api/altdata/satellite_lights"),
-          fetch("/api/altdata/shipping_traffic"),
-          fetch("/api/altdata/geo_spatial"),
+        const [cardSpendData, satLightsData, shippingData, geoData] = await Promise.all([
+          apiFetch<AltDataPoint[]>("/api/altdata/card_spend"),
+          apiFetch<AltDataPoint[]>("/api/altdata/satellite_lights"),
+          apiFetch<AltDataPoint[]>("/api/altdata/shipping_traffic"),
+          apiFetch<AltDataPoint[]>("/api/altdata/geo_spatial"),
         ]);
-        setCardSpend(await cardRes.json());
-        setSatLights(await lightsRes.json());
-        setShipping(await shipRes.json());
-        setGeo(await geoRes.json());
+        setCardSpend(cardSpendData);
+        setSatLights(satLightsData);
+        setShipping(shippingData);
+        setGeo(geoData);
       } catch (err) {
         console.error("AltData fetch error:", err);
       }

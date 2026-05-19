@@ -1,5 +1,6 @@
 // frontend/components/Fno.tsx
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../../lib/api";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, AreaChart, Area } from "recharts";
 
 interface OptionData {
@@ -21,12 +22,12 @@ export default function Fno() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [futRes, optRes] = await Promise.all([
-          fetch("/api/fno/futures"),
-          fetch("/api/fno/options"),
+        const [futuresData, optionsData] = await Promise.all([
+          apiFetch<FutureData[]>("/api/fno/futures"),
+          apiFetch<OptionData[]>("/api/fno/options"),
         ]);
-        setFutures(await futRes.json());
-        setOptions(await optRes.json());
+        setFutures(futuresData);
+        setOptions(optionsData);
       } catch (err) {
         console.error("FNO fetch error:", err);
       }

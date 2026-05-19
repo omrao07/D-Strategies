@@ -1,5 +1,6 @@
 // frontend/components/ExplainTrade.tsx
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../../lib/api";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 interface Trade {
@@ -29,8 +30,8 @@ export default function ExplainTrade({ tradeId }: { tradeId: string }) {
       try {
         setLoading(true);
         const [t, e] = await Promise.all([
-          fetch(`/api/trades/${tradeId}`).then(r => r.json()),
-          fetch(`/api/trades/${tradeId}/explain`).then(r => r.json()),
+          apiFetch<Trade>(`/api/trades/${tradeId}`),
+          apiFetch<Explanation>(`/api/trades/${tradeId}/explain`),
         ]);
         setTrade(t);
         setExplanation(e);

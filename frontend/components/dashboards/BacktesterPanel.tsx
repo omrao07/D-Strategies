@@ -3,6 +3,7 @@
 
 "use client";
 import React, { useState, useCallback } from "react";
+import { apiFetch } from "../../lib/api";
 
 interface BacktestConfig {
   universe: string;
@@ -128,13 +129,10 @@ export function BacktesterPanel() {
     setError(null);
     setResult(null);
     try {
-      const res = await fetch("/api/backtest/run", {
+      const data = await apiFetch<{ summary?: unknown }>("/api/backtest/run", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
       });
-      if (!res.ok) throw new Error(`API error ${res.status}`);
-      const data = await res.json();
       setResult(data.summary ?? data);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e));

@@ -1,5 +1,6 @@
 // frontend/components/CandleChart.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { wsUrl as buildWsUrl } from "../../lib/api";
 import {
   createChart,
   ColorType,
@@ -144,7 +145,7 @@ export default function CandleChart({
   // Optional WS updates
   useEffect(() => {
     if (!wsUrl || !candleRef.current) return;
-    const ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(buildWsUrl(wsUrl));
     wsRef.current = ws;
     ws.onopen = () => ws.send(JSON.stringify({ type: "subscribe", channel: "candles", symbol }));
     ws.onmessage = (ev) => {

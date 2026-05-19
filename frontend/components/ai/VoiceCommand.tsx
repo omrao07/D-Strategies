@@ -1,5 +1,6 @@
 // frontend/components/VoiceCommand.tsx
 import React, { useEffect, useRef, useState } from "react";
+import { apiFetch } from "../../lib/api";
 
 declare global {
   interface Window {
@@ -58,12 +59,10 @@ export default function VoiceCommand() {
     setLog((prev) => [`> ${cmd}`, ...prev]);
 
     try {
-      const res = await fetch("/api/voice/command", {
+      const data = await apiFetch<{ reply?: string }>("/api/voice/command", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ command: cmd }),
       });
-      const data = await res.json();
       if (data?.reply) {
         setLog((prev) => [`AI: ${data.reply}`, ...prev]);
       }

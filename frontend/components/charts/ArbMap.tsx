@@ -1,5 +1,6 @@
 // frontend/components/ArbMap.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { wsUrl as buildWsUrl } from "../../lib/api";
 import {
   ResponsiveContainer,
   LineChart,
@@ -65,7 +66,7 @@ export default function ArbMap({
   // ---------- Optional WS live updates ----------
   useEffect(() => {
     if (!wsUrl) return;
-    const ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(buildWsUrl(wsUrl));
     wsRef.current = ws;
     ws.onopen = () => ws.send(JSON.stringify({ type: "subscribe", channel: "arbmap", symbol }));
     ws.onmessage = (ev) => {

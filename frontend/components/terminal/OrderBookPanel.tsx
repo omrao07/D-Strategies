@@ -1,5 +1,6 @@
 // frontend/components/OrderbookPanel.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { wsUrl as buildWsUrl } from "../../lib/api";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -58,7 +59,7 @@ export default function OrderbookPanel({
 
     if (wsUrl) {
       try {
-        const ws = new WebSocket(wsUrl);
+        const ws = new WebSocket(buildWsUrl(wsUrl));
         wsRef.current = ws;
         ws.onopen = () => setErr(null);
         ws.onerror = () => setErr("WebSocket error");

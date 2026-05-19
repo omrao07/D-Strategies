@@ -1,5 +1,6 @@
 // frontend/components/Research.tsx
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../../lib/api";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from "recharts";
 
 interface Note {
@@ -22,12 +23,12 @@ export default function Research() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [notesRes, chartRes] = await Promise.all([
-          fetch("/api/research/notes"),
-          fetch("/api/research/chart"),
+        const [notesData, chartData] = await Promise.all([
+          apiFetch<Note[]>("/api/research/notes"),
+          apiFetch<ChartData[]>("/api/research/chart"),
         ]);
-        setNotes(await notesRes.json());
-        setChartData(await chartRes.json());
+        setNotes(notesData);
+        setChartData(chartData);
       } catch (err) {
         console.error("Research fetch error:", err);
       }
@@ -37,8 +38,7 @@ export default function Research() {
 
   const runQuery = async () => {
     try {
-      const res = await fetch(`/api/research/query?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
+      const data = await apiFetch<ChartData[]>(`/api/research/query?q=${encodeURIComponent(query)}`);
       setChartData(data);
     } catch (err) {
       console.error("Query error:", err);

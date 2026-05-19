@@ -3,6 +3,7 @@
 // SSE/WebSocket support, and an automatic demo fallback (no placeholders).
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { wsUrl as buildWsUrl } from "../lib/api";
 
 type Position = { symbol: string; qty: number; price: number; sector?: string };
 type Snapshot = {
@@ -154,7 +155,7 @@ export default function JarvisPanel({ sseUrl, wsUrl, maxAlerts = 200, thresholds
 
     if (wsUrl) {
       try {
-        const ws = new WebSocket(wsUrl);
+        const ws = new WebSocket(buildWsUrl(wsUrl));
         wsRef.current = ws;
         ws.onopen = () => active && setStatus("live");
         ws.onmessage = (ev) => {

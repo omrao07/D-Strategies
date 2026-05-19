@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "../../lib/api";
 
 type Toggles = {
   ndvi: boolean;
@@ -71,8 +72,7 @@ export default function GeeDashboard({
     setErr(null);
 
     const timer = setTimeout(() => {
-      fetch(`/api/gee/url?${query}`)
-        .then((r) => r.json())
+      apiFetch<{ ok?: boolean; url?: string; error?: string }>(`/api/gee/url?${query}`)
         .then((d) => {
           if (!alive) return;
           if (d?.ok && d?.url) setGeeUrl(d.url);
