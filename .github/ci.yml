@@ -73,6 +73,22 @@ jobs:
           name: coverage-xml
           path: coverage.xml
 
+  hft-gateway-build:
+    name: HFT Gateway (CMake C++17)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build deps
+        run: sudo apt-get install -y cmake g++ ninja-build
+
+      - name: Configure CMake
+        run: cmake -S backend/hft-gateway -B build/hft-gateway -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build HFT Gateway
+        run: cmake --build build/hft-gateway --parallel
+
   docker-build:
     name: Docker Build
     runs-on: ubuntu-latest

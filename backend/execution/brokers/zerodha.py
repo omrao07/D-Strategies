@@ -10,6 +10,7 @@ Requirements:
 
 from __future__ import annotations
 
+import os
 import time
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
@@ -211,8 +212,8 @@ class ZerodhaBroker:
 
 if __name__ == "__main__":
     broker = ZerodhaBroker(
-        api_key="YOUR_API_KEY",
-        access_token="YOUR_ACCESS_TOKEN",
+        api_key=os.getenv("ZERODHA_API_KEY", ""),
+        access_token=os.getenv("ZERODHA_ACCESS_TOKEN", ""),
     )
 
     print("Account:", broker.account())

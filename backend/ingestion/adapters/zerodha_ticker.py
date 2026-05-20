@@ -15,6 +15,7 @@ https://kite.trade/docs/connect/v3/websocket/
 import asyncio
 import json
 import logging
+import os
 from typing import Callable, Dict, List, Optional
 
 import websockets
@@ -178,8 +179,8 @@ if __name__ == "__main__":
         print(evt)
 
     ticker = ZerodhaTicker(
-        api_key="YOUR_API_KEY",
-        access_token="YOUR_ACCESS_TOKEN",
+        api_key=os.getenv("ZERODHA_API_KEY", ""),
+        access_token=os.getenv("ZERODHA_ACCESS_TOKEN", ""),
         instrument_tokens=[256265, 260105],  # NIFTY, BANKNIFTY
         mode=MODE_LTP,
         on_event=handle,

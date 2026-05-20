@@ -15,6 +15,7 @@ https://polygon.io/docs/websockets
 import asyncio
 import json
 import logging
+import os
 from typing import Callable, Dict, List, Optional
 
 import websockets
@@ -184,7 +185,7 @@ if __name__ == "__main__":
         print(evt)
 
     ws = PolygonWebSocket(
-        api_key="YOUR_POLYGON_API_KEY",
+        api_key=os.getenv("POLYGON_API_KEY", ""),
         symbols=["AAPL", "MSFT"],
         trades=True,
         quotes=True,

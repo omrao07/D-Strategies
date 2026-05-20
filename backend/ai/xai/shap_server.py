@@ -28,8 +28,17 @@ import os
 import json
 import joblib # type: ignore
 from typing import Any, Dict, List
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Security, Header
+from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
+
+_API_KEY_NAME = "X-Engine-Key"
+_api_key_header = APIKeyHeader(name=_API_KEY_NAME, auto_error=False)
+
+def _require_key(x_engine_key: str | None = Security(_api_key_header)) -> None:
+    secret = os.getenv("ENGINE_API_KEY")
+    if secret and x_engine_key != secret:
+        raise HTTPException(status_code=403, detail="Forbidden")
 
 # optional: SHAP
 try:
@@ -76,15 +85,15 @@ class ExplainRequest(BaseModel):
 app = FastAPI(title="SHAP Server", version="0.1.0")
 
 @app.get("/health")
-def health():
+def health(_: None = Security(_require_key)):
     return {"ok": True, "models": list(MODEL_REGISTRY.keys()), "shap": _has_shap}
 
 @app.get("/models")
-def list_models():
+def list_models(_: None = Security(_require_key)):
     return {"models": list(MODEL_REGISTRY.keys())}
 
 @app.post("/explain")
-def explain(req: ExplainRequest):
+def explain(req: ExplainRequest, _: None = Security(_require_key)):
     if req.model not in MODEL_REGISTRY:
         raise HTTPException(status_code=404, detail=f"Model {req.model} not found")
     if not _has_shap:

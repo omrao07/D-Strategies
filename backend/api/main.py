@@ -526,6 +526,63 @@ def stub_terminal_alerts():
 def stub_voice_command(payload: Dict[str, Any]):
     _not_implemented("voice command")
 
+# Jarvis — Natural Language Strategy Querying
+class JarvisRequest(BaseModel):
+    question: str
+
+@app.post("/api/jarvis")
+def jarvis_query(req: JarvisRequest, _auth: None = Depends(_require_key)):
+    try:
+        from backend.ai.jarvis import answer
+        return answer(req.question)
+    except Exception as e:
+        logger.exception("Jarvis: error answering question")
+        raise HTTPException(500, f"Jarvis error: {e}")
+
+# Tournament leaderboard
+@app.get("/api/tournament/leaderboard")
+def tournament_leaderboard(_auth: None = Depends(_require_key)):
+    try:
+        from backend.engine.strategy_tournament import get_leaderboard
+        return {"leaderboard": get_leaderboard()}
+    except Exception as e:
+        raise HTTPException(500, f"Tournament error: {e}")
+
+# Merkle ledger verification
+@app.get("/api/ledger/verify")
+def ledger_verify(last_n: int = 1000, _auth: None = Depends(_require_key)):
+    try:
+        from backend.security.merkle_ledger import verify_chain
+        ok, msg = verify_chain(last_n=last_n)
+        return {"ok": ok, "message": msg, "entries_checked": last_n}
+    except Exception as e:
+        raise HTTPException(500, f"Ledger error: {e}")
+
+# Regime
+@app.get("/api/regime")
+def get_regime(_auth: None = Depends(_require_key)):
+    try:
+        from backend.engine.regime_risk import regime_multiplier
+        import redis as _redis, os as _os
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        raw = r.get("regime:current")
+        mult = regime_multiplier(r)
+        return {"regime_raw": raw, "multiplier": mult}
+    except Exception as e:
+        raise HTTPException(500, f"Regime error: {e}")
+
+@app.post("/api/regime")
+def set_regime_endpoint(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    regime = str(payload.get("regime", "")).lower()
+    if regime not in ("bull", "neutral", "bear", "crisis"):
+        raise HTTPException(400, "regime must be one of: bull, neutral, bear, crisis")
+    try:
+        from backend.engine.regime_risk import set_regime
+        set_regime(regime, confidence=float(payload.get("confidence", 1.0)))
+        return {"ok": True, "regime": regime}
+    except Exception as e:
+        raise HTTPException(500, f"Regime set error: {e}")
+
 # Commodities
 @app.get("/api/commodities/{sym}")
 def stub_commodities(sym: str):

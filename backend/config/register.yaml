@@ -1,0 +1,3 @@
+# register.yaml — feed registration for the D-Strategies platform
+# Add feed entries under `feeds:` as the platform grows.
+feeds: []

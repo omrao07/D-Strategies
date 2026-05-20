@@ -57,7 +57,7 @@ class VaultError(RuntimeError):
 
 @dataclass
 class VaultConfig:
-    addr: str = field(default_factory=lambda: os.getenv("VAULT_ADDR", "http://127.0.0.1:8200"))
+    addr: str = field(default_factory=lambda: os.getenv("VAULT_ADDR", "https://127.0.0.1:8200"))
     token: Optional[str] = field(default_factory=lambda: os.getenv("VAULT_TOKEN"))
     namespace: Optional[str] = field(default_factory=lambda: os.getenv("VAULT_NAMESPACE"))
     role_id: Optional[str] = field(default_factory=lambda: os.getenv("VAULT_ROLE_ID"))

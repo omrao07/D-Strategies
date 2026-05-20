@@ -44,12 +44,16 @@ FEEDS_DIR = CONFIG_DIR / "feeds"
 REGISTER_FILE = CONFIG_DIR / "register.yaml"
 
 # --- Load Register YAML ---
+import logging as _logging
+_log = _logging.getLogger(__name__)
+
 def load_register_config():
     """Load the register.yaml file for all feeds."""
     if not REGISTER_FILE.exists():
-        raise FileNotFoundError(f"Register file not found: {REGISTER_FILE}")
+        _log.warning("register.yaml not found at %s — running with empty feed config", REGISTER_FILE)
+        return {}
     with open(REGISTER_FILE, "r") as f:
-        return yaml.safe_load(f)
+        return yaml.safe_load(f) or {}
 
 REGISTER_CONFIG = load_register_config()
 

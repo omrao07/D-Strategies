@@ -10,6 +10,7 @@ Requirements:
 
 from __future__ import annotations
 
+import os
 import time
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
@@ -220,8 +221,8 @@ class AlpacaBroker:
 
 if __name__ == "__main__":
     broker = AlpacaBroker(
-        api_key="YOUR_KEY",
-        api_secret="YOUR_SECRET",
+        api_key=os.getenv("ALPACA_KEY_ID", ""),
+        api_secret=os.getenv("ALPACA_SECRET_KEY", ""),
         paper=True,
     )
 

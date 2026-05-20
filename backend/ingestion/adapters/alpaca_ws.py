@@ -18,6 +18,7 @@ No Alpaca SDK dependency.
 import asyncio
 import json
 import logging
+import os
 import time
 from typing import Callable, Dict, List, Optional
 
@@ -179,8 +180,8 @@ if __name__ == "__main__":
         print("TRADE:", event)
 
     ws = AlpacaWebSocket(
-        api_key="YOUR_KEY",
-        api_secret="YOUR_SECRET",
+        api_key=os.getenv("ALPACA_KEY_ID", ""),
+        api_secret=os.getenv("ALPACA_SECRET_KEY", ""),
         symbols=["AAPL", "MSFT"],
         on_data=handle_market,
         on_trade=handle_trade,

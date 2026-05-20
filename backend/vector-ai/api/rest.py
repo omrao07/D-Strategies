@@ -35,9 +35,18 @@ from typing import List, Optional, Any, Dict
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, Field
+
+_API_KEY_NAME = "X-Engine-Key"
+_api_key_header = APIKeyHeader(name=_API_KEY_NAME, auto_error=False)
+
+def _require_key(x_engine_key: str | None = Security(_api_key_header)) -> None:
+    secret = os.getenv("ENGINE_API_KEY")
+    if secret and x_engine_key != secret:
+        raise HTTPException(status_code=403, detail="Forbidden")
 
 # Optional deps
 try:
@@ -190,11 +199,11 @@ def _minmax(arr: np.ndarray) -> np.ndarray:
 # ============================== Endpoints ============================
 
 @app.get("/health")
-def health():
+def health(_: None = Security(_require_key)):
     return {"status": "ok", "faiss": bool(state.index is not None), "meta_loaded": bool(state.meta_df is not None)}
 
 @app.post("/search", response_model=SearchResponse)
-def search(req: SearchRequest):
+def search(req: SearchRequest, _: None = Security(_require_key)):
     if state.index is None:
         raise HTTPException(500, "FAISS index not loaded")
 
@@ -269,7 +278,7 @@ def search(req: SearchRequest):
 
 
 @app.get("/doc/{doc_id}", response_model=DocResponse)
-def get_doc(doc_id: str):
+def get_doc(doc_id: str, _: None = Security(_require_key)):
     if state.meta_df is None:
         raise HTTPException(404, "Metadata store not available")
     df = state.meta_df
@@ -293,7 +302,7 @@ def get_doc(doc_id: str):
 
 
 @app.get("/kg/neighbors", response_model=List[Neighbor])
-def kg_neighbors(node_id: str = Query(...), depth: int = Query(1, ge=1, le=6)):
+def kg_neighbors(node_id: str = Query(...), depth: int = Query(1, ge=1, le=6), _: None = Security(_require_key)):
     if state.kg_driver is None:
         raise HTTPException(400, "Knowledge graph not configured")
     q = f"""
@@ -310,7 +319,7 @@ def kg_neighbors(node_id: str = Query(...), depth: int = Query(1, ge=1, le=6)):
 
 
 @app.get("/kg/correlations", response_model=List[Correlation])
-def kg_correlations(node_id: str = Query(...)):
+def kg_correlations(node_id: str = Query(...), _: None = Security(_require_key)):
     if state.kg_driver is None:
         raise HTTPException(400, "Knowledge graph not configured")
     q = """

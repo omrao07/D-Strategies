@@ -13,6 +13,7 @@ Design goals:
 
 from __future__ import annotations
 
+import os
 import time
 import json
 import requests
@@ -221,7 +222,7 @@ class MacroBridge:
 
 if __name__ == "__main__":
     fred = FREDSource(
-        api_key="YOUR_FRED_API_KEY",
+        api_key=os.getenv("FRED_API_KEY", ""),
         region="US",
         series={
             "CPI_YoY": "CPIAUCSL",

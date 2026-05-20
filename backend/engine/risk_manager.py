@@ -44,6 +44,20 @@ try:
 except Exception:
     HAS_POLICY = False
 
+# Optional: regime-conditional risk multiplier
+try:
+    from backend.engine.regime_risk import regime_multiplier as _regime_multiplier
+    HAS_REGIME_RISK = True
+except Exception:
+    HAS_REGIME_RISK = False
+
+# Optional: Merkle compliance ledger
+try:
+    from backend.security.merkle_ledger import append_event as _ledger_append
+    HAS_LEDGER = True
+except Exception:
+    HAS_LEDGER = False
+
 # ---------------- Config (override via .env) ----------------
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
@@ -206,14 +220,17 @@ def check_order(order: Dict) -> Tuple[bool, str | None]:
     if notional_abs > 0 and (_gross_usd() + notional_abs) > RISK_MAX_GROSS_USD:
         return False, "global_cap"
 
-    # per-strategy cap (allocator target preferred)
+    # regime-conditional multiplier (scales caps down in bear/crisis regimes)
+    _mult = _regime_multiplier(r) if HAS_REGIME_RISK else 1.0
+
+    # per-strategy cap (allocator target preferred, then scaled by regime)
     cap_alloc = _allocator_cap(strat)
-    cap_strat = cap_alloc if cap_alloc > 0 else RISK_MAX_POS_PER_STRAT_USD
+    cap_strat = (cap_alloc if cap_alloc > 0 else RISK_MAX_POS_PER_STRAT_USD) * _mult
     if notional_abs > 0 and (_used_by_strategy(strat) + notional_abs) > cap_strat:
         return False, "strategy_cap"
 
-    # per-symbol cap
-    if notional_abs > 0 and (_used_by_symbol(symbol) + notional_abs) > RISK_MAX_PER_SYMBOL_USD:
+    # per-symbol cap (scaled by regime)
+    if notional_abs > 0 and (_used_by_symbol(symbol) + notional_abs) > RISK_MAX_PER_SYMBOL_USD * _mult:
         return False, "symbol_cap"
 
     # soft daily loss stops (block if thresholds configured as negatives and breached)
@@ -240,6 +257,8 @@ def run_gateway(in_stream: str = INCOMING_STREAM, out_stream: str = OUT_STREAM) 
             ok, reason = check_order(order)
             if not ok:
                 publish_pubsub(CHAN_ORDERS, {"event": "reject", "reason": reason, **order})
+                if HAS_LEDGER:
+                    _ledger_append("order_reject", {"reason": reason, "strategy": order.get("strategy"), "symbol": order.get("symbol")})
                 continue
 
             # Provisional usage + rate touch (helps cap before OMS updates gross)
@@ -254,6 +273,8 @@ def run_gateway(in_stream: str = INCOMING_STREAM, out_stream: str = OUT_STREAM) 
             _touch_rate(str(order.get("strategy")))
             publish_stream(out_stream, order)
             publish_pubsub(CHAN_ORDERS, {"event": "accepted", **order})
+            if HAS_LEDGER:
+                _ledger_append("order_accept", {"strategy": order.get("strategy"), "symbol": order.get("symbol"), "side": order.get("side"), "qty": order.get("qty")})
 
         except Exception as e:
             log.exception("Risk gateway: unhandled error processing order %s", order)
