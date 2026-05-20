@@ -289,3 +289,192 @@ def cointegration_score(x: ArrayLike, y: ArrayLike, period: int = 60) -> pd.Seri
         alpha = yi.mean() - beta * xi.mean()
         spread.iat[i] = ys.iat[i] - (beta * xs.iat[i] + alpha)
     return zscore(spread, period)
+
+
+# ---- HMA / KAMA / T3 -------------------------------------------------------
+
+def hma(series: ArrayLike, period: int) -> pd.Series:
+    """Hull Moving Average: sqrt(period) WMA of (2*WMA(n/2) - WMA(n))."""
+    s = _s(series)
+    half = max(1, period // 2)
+    sqrt_p = max(1, int(period ** 0.5))
+    return wma(2 * wma(s, half) - wma(s, period), sqrt_p)
+
+
+def kama(series: ArrayLike, period: int = 10,
+         fast: int = 2, slow: int = 30) -> pd.Series:
+    """Kaufman Adaptive Moving Average."""
+    s = _s(series).values.astype(float)
+    fast_sc = 2.0 / (fast + 1)
+    slow_sc = 2.0 / (slow + 1)
+    result = np.full(len(s), np.nan)
+    if len(s) <= period:
+        return pd.Series(result)
+    result[period - 1] = s[period - 1]
+    for i in range(period, len(s)):
+        direction = abs(s[i] - s[i - period])
+        volatility = sum(abs(s[j] - s[j - 1]) for j in range(i - period + 1, i + 1))
+        er = direction / volatility if volatility > 0 else 0.0
+        sc = (er * (fast_sc - slow_sc) + slow_sc) ** 2
+        result[i] = result[i - 1] + sc * (s[i] - result[i - 1])
+    return pd.Series(result)
+
+
+def t3(series: ArrayLike, period: int = 5, v: float = 0.7) -> pd.Series:
+    """Tillson T3 moving average."""
+    c1 = -(v ** 3)
+    c2 = 3 * v ** 2 + 3 * v ** 3
+    c3 = -6 * v ** 2 - 3 * v - 3 * v ** 3
+    c4 = 1 + 3 * v + v ** 3 + 3 * v ** 2
+    e1 = ema(series, period)
+    e2 = ema(e1, period)
+    e3 = ema(e2, period)
+    e4 = ema(e3, period)
+    e5 = ema(e4, period)
+    e6 = ema(e5, period)
+    return c1 * e6 + c2 * e5 + c3 * e4 + c4 * e3
+
+
+# ---- Stochastic RSI ---------------------------------------------------------
+
+def stoch_rsi(series: ArrayLike, rsi_period: int = 14,
+              stoch_period: int = 14, smooth_k: int = 3,
+              smooth_d: int = 3) -> Tuple[pd.Series, pd.Series]:
+    """Stochastic RSI: %K and %D."""
+    r = rsi(series, rsi_period)
+    r_min = r.rolling(stoch_period).min()
+    r_max = r.rolling(stoch_period).max()
+    denom = r_max - r_min
+    k = ((r - r_min) / denom.replace(0, np.nan)).fillna(0.5) * 100
+    k_smooth = k.rolling(smooth_k).mean()
+    d_smooth = k_smooth.rolling(smooth_d).mean()
+    return k_smooth, d_smooth
+
+
+# ---- GARCH(1,1) Volatility --------------------------------------------------
+
+def garch_vol(returns: ArrayLike, omega: float = 1e-6,
+              alpha: float = 0.1, beta: float = 0.85,
+              annualize: bool = True) -> pd.Series:
+    """
+    GARCH(1,1) conditional volatility estimate.
+    omega, alpha, beta: model parameters (alpha+beta < 1 for stationarity).
+    """
+    r = _s(returns).values.astype(float)
+    n = len(r)
+    sigma2 = np.full(n, np.var(r))
+    for t in range(1, n):
+        sigma2[t] = omega + alpha * r[t - 1] ** 2 + beta * sigma2[t - 1]
+    vol = np.sqrt(sigma2)
+    if annualize:
+        vol = vol * (252 ** 0.5)
+    return pd.Series(vol)
+
+
+# ---- Anchored VWAP ----------------------------------------------------------
+
+def avwap(close: ArrayLike, volume: ArrayLike, anchor_idx: int = 0) -> pd.Series:
+    """Anchored VWAP from a specified bar index."""
+    c, v = _s(close), _s(volume)
+    cum_pv = (c * v).cumsum()
+    cum_v = v.cumsum()
+    # Subtract values before anchor
+    if anchor_idx > 0:
+        pv_base = (c * v).iloc[:anchor_idx].sum()
+        v_base = v.iloc[:anchor_idx].sum()
+        result = (cum_pv - pv_base) / (cum_v - v_base).replace(0, np.nan)
+    else:
+        result = cum_pv / cum_v.replace(0, np.nan)
+    return result
+
+
+# ---- Aroon ------------------------------------------------------------------
+
+def aroon(high: ArrayLike, low: ArrayLike,
+          period: int = 25) -> Tuple[pd.Series, pd.Series]:
+    """Aroon Up and Down oscillators."""
+    h, l = _s(high), _s(low)
+    up = h.rolling(period + 1).apply(
+        lambda x: (period - (len(x) - 1 - np.argmax(x))) / period * 100, raw=True
+    )
+    down = l.rolling(period + 1).apply(
+        lambda x: (period - (len(x) - 1 - np.argmin(x))) / period * 100, raw=True
+    )
+    return up, down
+
+
+# ---- Ichimoku Cloud ---------------------------------------------------------
+
+def ichimoku(
+    high: ArrayLike, low: ArrayLike, close: ArrayLike,
+    tenkan: int = 9, kijun: int = 26, senkou_b: int = 52, displacement: int = 26,
+) -> dict:
+    """
+    Ichimoku Cloud components.
+    Returns dict: tenkan_sen, kijun_sen, senkou_a, senkou_b, chikou_span.
+    """
+    h, l, c = _s(high), _s(low), _s(close)
+
+    def mid_range(s_h, s_l, p):
+        return (s_h.rolling(p).max() + s_l.rolling(p).min()) / 2
+
+    tenkan_sen = mid_range(h, l, tenkan)
+    kijun_sen = mid_range(h, l, kijun)
+    senkou_a = ((tenkan_sen + kijun_sen) / 2).shift(displacement)
+    senkou_b_line = mid_range(h, l, senkou_b).shift(displacement)
+    chikou_span = c.shift(-displacement)
+    return {
+        "tenkan_sen": tenkan_sen,
+        "kijun_sen": kijun_sen,
+        "senkou_a": senkou_a,
+        "senkou_b": senkou_b_line,
+        "chikou_span": chikou_span,
+    }
+
+
+# ---- Fibonacci Retracement --------------------------------------------------
+
+def fibonacci_levels(high: float, low: float) -> dict:
+    """
+    Classic Fibonacci retracement and extension levels.
+    Returns levels keyed by ratio string.
+    """
+    diff = high - low
+    return {
+        "0.0": low,
+        "23.6": low + 0.236 * diff,
+        "38.2": low + 0.382 * diff,
+        "50.0": low + 0.500 * diff,
+        "61.8": low + 0.618 * diff,
+        "78.6": low + 0.786 * diff,
+        "100.0": high,
+        "127.2": high + 0.272 * diff,
+        "161.8": high + 0.618 * diff,
+    }
+
+
+# ---- Pivot Points -----------------------------------------------------------
+
+def pivot_points(
+    prev_high: float, prev_low: float, prev_close: float
+) -> dict:
+    """Classic floor trader pivot points with S1/S2/S3 and R1/R2/R3."""
+    pp = (prev_high + prev_low + prev_close) / 3
+    r1 = 2 * pp - prev_low
+    s1 = 2 * pp - prev_high
+    r2 = pp + (prev_high - prev_low)
+    s2 = pp - (prev_high - prev_low)
+    r3 = prev_high + 2 * (pp - prev_low)
+    s3 = prev_low - 2 * (prev_high - pp)
+    return {"pp": pp, "r1": r1, "r2": r2, "r3": r3, "s1": s1, "s2": s2, "s3": s3}
+
+
+def camarilla_pivots(prev_high: float, prev_low: float, prev_close: float) -> dict:
+    """Camarilla pivot point levels (tighter S/R near close)."""
+    diff = prev_high - prev_low
+    return {
+        "h4": prev_close + diff * 1.1 / 2,
+        "h3": prev_close + diff * 1.1 / 4,
+        "l3": prev_close - diff * 1.1 / 4,
+        "l4": prev_close - diff * 1.1 / 2,
+    }
