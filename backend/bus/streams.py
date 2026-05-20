@@ -31,6 +31,7 @@ except Exception:
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
+_REDIS_SSL = os.getenv("REDIS_SSL", "").lower() in ("1", "true", "yes")
 
 _r = None  # lazy: connected on first use
 
@@ -38,9 +39,18 @@ def _get_r():
     global _r
     if _r is None:
         try:
-            _r = redis.Redis(
-                host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
+            kwargs = dict(
+                host=REDIS_HOST,
+                port=REDIS_PORT,
+                password=REDIS_PASSWORD,
+                decode_responses=True,
             )
+            if _REDIS_SSL:
+                kwargs["ssl"] = True
+                ca = os.getenv("REDIS_SSL_CA_CERTS")
+                if ca:
+                    kwargs["ssl_ca_certs"] = ca
+            _r = redis.Redis(**kwargs)
         except Exception:
             pass
     return _r
