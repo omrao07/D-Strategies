@@ -1,4 +1,8 @@
 # backend/bus/streams.py
+# CANONICAL BUS IMPLEMENTATION — this is the active sync Redis Streams bus used by
+# the risk gateway, execution engine, shadow engine, and causal attribution loop.
+# backend/bus/python/bus.py is an alternative async Kafka/NATS/Redis façade retained
+# for future migration — it is NOT imported by the live engine path.
 import os
 import json
 from dataclasses import asdict, is_dataclass

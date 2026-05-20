@@ -1,4 +1,8 @@
 # bus/python/bus.py
+# FUTURE MIGRATION — async Kafka/NATS/Redis façade for eventual replacement of
+# the sync bus (backend/bus/streams.py). Not imported by the live engine path today.
+# When migrating: replace consume_stream/publish_stream calls in engine files with
+# this EventBus, then delete streams.py.
 from __future__ import annotations
 
 import asyncio
