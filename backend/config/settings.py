@@ -39,7 +39,8 @@ OANDA_API_KEY = os.getenv("OANDA_API_KEY", "")
 IBKR_API_KEY = os.getenv("IBKR_API_KEY", "")
 
 # --- Data & Config Paths ---
-CONFIG_DIR = BASE_DIR / "config"
+# BASE_DIR is already backend/config/ — don't add a second "config" segment
+CONFIG_DIR = BASE_DIR
 FEEDS_DIR = CONFIG_DIR / "feeds"
 REGISTER_FILE = CONFIG_DIR / "register.yaml"
 

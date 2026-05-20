@@ -6,6 +6,8 @@ from .technical import (
     vwap, obv, mfi,
     adx, supertrend,
     zscore, kalman_filter, hurst_exponent, cointegration_score,
+    hma, kama, t3, stoch_rsi, garch_vol, avwap,
+    aroon, ichimoku, fibonacci_levels, pivot_points, camarilla_pivots,
 )
 
 __all__ = [
@@ -15,4 +17,6 @@ __all__ = [
     "vwap", "obv", "mfi",
     "adx", "supertrend",
     "zscore", "kalman_filter", "hurst_exponent", "cointegration_score",
+    "hma", "kama", "t3", "stoch_rsi", "garch_vol", "avwap",
+    "aroon", "ichimoku", "fibonacci_levels", "pivot_points", "camarilla_pivots",
 ]
