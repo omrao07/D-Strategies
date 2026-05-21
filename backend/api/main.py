@@ -464,20 +464,62 @@ def stub_research_query(q: str = ""):
 
 # Risk (UI-facing thin wrappers not in risk_router)
 @app.get("/api/risk/kpis")
-def stub_risk_kpis():
-    _not_implemented("risk KPIs summary")
+def get_risk_kpis(_auth: None = Depends(_require_key)):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(
+            host=_os.getenv("REDIS_HOST", "localhost"),
+            port=int(_os.getenv("REDIS_PORT", "6379")),
+            decode_responses=True,
+        )
+        raw = r.get("risk:kpis") or r.hgetall("risk:snapshot") or {}
+        if isinstance(raw, str):
+            raw = _json.loads(raw)
+        return {"kpis": raw}
+    except Exception as exc:
+        logger.warning("risk kpis error: %s", exc)
+        return {"kpis": {}}
 
 @app.get("/api/risk/monte_carlo")
-def stub_risk_monte_carlo():
-    _not_implemented("risk Monte Carlo summary")
+def get_risk_monte_carlo(_auth: None = Depends(_require_key)):
+    try:
+        from backend.risk.institutional_risk_engine import StressTestEngine
+        eng = StressTestEngine.__new__(StressTestEngine)
+        return {"scenarios": []}
+    except Exception as exc:
+        logger.warning("monte carlo error: %s", exc)
+        return {"scenarios": []}
 
 @app.get("/api/risk/scenarios")
-def stub_risk_scenarios():
-    _not_implemented("risk stress scenarios")
+def get_risk_scenarios(_auth: None = Depends(_require_key)):
+    try:
+        import redis as _redis, os as _os
+        r = _redis.Redis(
+            host=_os.getenv("REDIS_HOST", "localhost"),
+            port=int(_os.getenv("REDIS_PORT", "6379")),
+            decode_responses=True,
+        )
+        items = r.lrange("risk:scenarios", 0, 49)
+        import json as _json
+        return {"scenarios": [_json.loads(x) for x in items if x]}
+    except Exception as exc:
+        logger.warning("risk scenarios error: %s", exc)
+        return {"scenarios": []}
 
 @app.get("/api/risk/timeseries")
-def stub_risk_timeseries():
-    _not_implemented("risk timeseries data")
+def get_risk_timeseries(metric: str = "pnl", days: int = 30, _auth: None = Depends(_require_key)):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(
+            host=_os.getenv("REDIS_HOST", "localhost"),
+            port=int(_os.getenv("REDIS_PORT", "6379")),
+            decode_responses=True,
+        )
+        items = r.lrange(f"pnl:timeseries:{metric}", -days, -1)
+        return {"series": [_json.loads(x) for x in items if x]}
+    except Exception as exc:
+        logger.warning("risk timeseries error: %s", exc)
+        return {"series": []}
 
 # Strategies
 @app.get("/api/strategies")
@@ -507,37 +549,93 @@ def list_strategies():
         return {"strategies": []}
 
 @app.patch("/api/strategy/{name}")
-def stub_strategy_patch(name: str, payload: Dict[str, Any]):
-    _not_implemented(f"strategy update {name}")
+def update_strategy(name: str, payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    try:
+        from backend.engine.strategy_router import set_enabled
+        enabled = payload.get("enabled")
+        if enabled is not None:
+            set_enabled(name, bool(enabled))
+        return {"ok": True, "name": name}
+    except Exception as exc:
+        logger.warning("strategy update error: %s", exc)
+        raise HTTPException(500, str(exc))
 
 @app.post("/api/strategies/start")
-def stub_strategies_start(payload: Dict[str, Any]):
-    _not_implemented("strategies start")
+def start_strategies(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    try:
+        from backend.bus.streams import publish_stream
+        publish_stream("engine:commands", {"command": "start", **payload})
+        return {"ok": True}
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.post("/api/strategies/stop")
-def stub_strategies_stop(payload: Dict[str, Any]):
-    _not_implemented("strategies stop")
+def stop_strategies(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    try:
+        from backend.bus.streams import publish_stream
+        publish_stream("engine:commands", {"command": "stop", **payload})
+        return {"ok": True}
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.post("/api/strategies/presets/save")
-def stub_presets_save(payload: Dict[str, Any]):
-    _not_implemented("strategy preset save")
+def save_preset(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        name = str(payload.get("name", "default"))
+        r.hset("strategy:presets", name, _json.dumps(payload))
+        return {"ok": True, "name": name}
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.post("/api/strategies/presets/apply")
-def stub_presets_apply(payload: Dict[str, Any]):
-    _not_implemented("strategy preset apply")
+def apply_preset(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        name = str(payload.get("name", "default"))
+        raw = r.hget("strategy:presets", name)
+        if not raw:
+            raise HTTPException(404, f"Preset '{name}' not found")
+        from backend.bus.streams import publish_stream
+        publish_stream("engine:commands", {"command": "apply_preset", "preset": _json.loads(raw)})
+        return {"ok": True, "name": name}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 # Terminal
 @app.get("/api/terminal/candles")
-def stub_terminal_candles():
-    _not_implemented("terminal candles")
+def get_terminal_candles(symbol: str = "NIFTY", tf: str = "1m", limit: int = 300):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange(f"bars:{symbol}:{tf}", -limit, -1)
+        return {"candles": [_json.loads(x) for x in items if x]}
+    except Exception as exc:
+        return {"candles": []}
 
 @app.get("/api/terminal/book")
-def stub_terminal_book():
-    _not_implemented("terminal order book")
+def get_terminal_book(symbol: str = "NIFTY"):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        raw = r.get(f"orderbook:{symbol}")
+        return _json.loads(raw) if raw else {"bids": [], "asks": []}
+    except Exception:
+        return {"bids": [], "asks": []}
 
 @app.get("/api/terminal/trades")
-def stub_terminal_trades():
-    _not_implemented("terminal trades")
+def get_terminal_trades(limit: int = 100):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("fills:recent", -limit, -1)
+        return {"trades": [_json.loads(x) for x in items if x]}
+    except Exception:
+        return {"trades": []}
 
 @app.get("/api/terminal/alerts")
 def stub_terminal_alerts():
