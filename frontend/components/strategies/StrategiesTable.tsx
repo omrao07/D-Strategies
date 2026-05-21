@@ -1,6 +1,6 @@
-"use client";
-
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
+import { useTradingStore } from "@/store/useTradingStore";
 
 export type Strategy = {
   id: string;
@@ -12,89 +12,117 @@ export type Strategy = {
   pnlYTD?: number;
 };
 
-type Props = {
-  strategies: Strategy[];
-  title?: string;
-};
+const COLS: { key: keyof Strategy; label: string }[] = [
+  { key: "name", label: "Name" },
+  { key: "family", label: "Family" },
+  { key: "region", label: "Region" },
+  { key: "type", label: "Type" },
+  { key: "risk", label: "Risk" },
+  { key: "pnlYTD", label: "PnL YTD" },
+];
 
-const StrategiesTable: React.FC<Props> = ({ strategies, title = "Strategies" }) => {
+export function StrategiesTable() {
+  const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [filter, setFilter] = useState("");
   const [sortKey, setSortKey] = useState<keyof Strategy>("name");
   const [sortAsc, setSortAsc] = useState(true);
+  const signals = useTradingStore((s) => s.signals);
+
+  useEffect(() => {
+    apiFetch<{ strategies: Strategy[] }>("/api/strategies")
+      .then((r) => setStrategies(r.strategies ?? []))
+      .catch(() => {});
+  }, []);
+
+  const enriched = useMemo(
+    () =>
+      strategies.map((s) => ({
+        ...s,
+        pnlYTD: signals[s.name]?.score != null ? signals[s.name].score * 100 : s.pnlYTD,
+      })),
+    [strategies, signals]
+  );
 
   const filtered = useMemo(() => {
     const q = filter.toLowerCase().trim();
-    if (!q) return strategies;
-    return strategies.filter(
+    if (!q) return enriched;
+    return enriched.filter(
       (s) =>
         s.name.toLowerCase().includes(q) ||
         s.family.toLowerCase().includes(q) ||
-        s.region.toLowerCase().includes(q) ||
-        s.type.toLowerCase().includes(q) ||
-        s.risk.toLowerCase().includes(q)
+        s.region.toLowerCase().includes(q)
     );
-  }, [strategies, filter]);
+  }, [enriched, filter]);
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
     arr.sort((a, b) => {
       const av = a[sortKey];
       const bv = b[sortKey];
-      if (typeof av === "number" && typeof bv === "number") {
+      if (typeof av === "number" && typeof bv === "number")
         return sortAsc ? av - bv : bv - av;
-      }
       return sortAsc
-        ? String(av).localeCompare(String(bv))
-        : String(bv).localeCompare(String(av));
+        ? String(av ?? "").localeCompare(String(bv ?? ""))
+        : String(bv ?? "").localeCompare(String(av ?? ""));
     });
     return arr;
   }, [filtered, sortKey, sortAsc]);
 
-  const columns: { key: keyof Strategy; label: string; num?: boolean }[] = [
-    { key: "name", label: "Name" },
-    { key: "family", label: "Family" },
-    { key: "region", label: "Region" },
-    { key: "type", label: "Type" },
-    { key: "risk", label: "Risk" },
-    { key: "pnlYTD", label: "PnL YTD", num: true },
-  ];
+  const th: React.CSSProperties = {
+    padding: "8px 10px",
+    textAlign: "left",
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    color: "#64748b",
+    cursor: "pointer",
+    userSelect: "none",
+    borderBottom: "1px solid #1e293b",
+  };
+  const td: React.CSSProperties = {
+    padding: "7px 10px",
+    fontSize: 12,
+    color: "#cbd5e1",
+    borderBottom: "1px solid #0f172a",
+  };
 
   return (
-    <div className="w-full rounded-2xl border border-neutral-200 bg-white shadow">
-      <div className="flex items-center justify-between border-b px-4 py-3">
-        <h2 className="text-lg font-semibold">{title}</h2>
+    <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid #1e293b" }}>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#e2e8f0" }}>
+          Strategies ({sorted.length})
+        </span>
         <input
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          placeholder="Search strategies…"
-          className="h-9 w-72 rounded-md border border-neutral-300 px-3 text-sm outline-none focus:border-neutral-500"
+          placeholder="Search…"
+          style={{
+            background: "#1e293b",
+            border: "1px solid #334155",
+            borderRadius: 6,
+            padding: "5px 10px",
+            fontSize: 12,
+            color: "#e2e8f0",
+            outline: "none",
+            width: 180,
+          }}
         />
       </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm">
+      <div style={{ overflowX: "auto", maxHeight: 400, overflowY: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr className="border-b bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600">
-              {columns.map((col) => (
+            <tr>
+              {COLS.map((col) => (
                 <th
                   key={col.key as string}
-                  className="cursor-pointer px-3 py-2"
+                  style={th}
                   onClick={() => {
                     if (sortKey === col.key) setSortAsc((s) => !s);
-                    else {
-                      setSortKey(col.key);
-                      setSortAsc(true);
-                    }
+                    else { setSortKey(col.key); setSortAsc(true); }
                   }}
                 >
-                  <span className="inline-flex items-center gap-1">
-                    {col.label}
-                    {sortKey === col.key && (
-                      <span className="text-[10px] text-neutral-500">
-                        {sortAsc ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </span>
+                  {col.label}{sortKey === col.key ? (sortAsc ? " ▲" : " ▼") : ""}
                 </th>
               ))}
             </tr>
@@ -102,29 +130,32 @@ const StrategiesTable: React.FC<Props> = ({ strategies, title = "Strategies" }) 
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-3 py-6 text-center text-neutral-500">
-                  No strategies found
+                <td colSpan={COLS.length} style={{ ...td, textAlign: "center", color: "#475569", padding: "24px" }}>
+                  {strategies.length === 0 ? "Loading…" : "No strategies found"}
                 </td>
               </tr>
             ) : (
-              sorted.map((s) => (
-                <tr key={s.id} className="border-b last:border-0 hover:bg-neutral-50/60">
-                  <td className="px-3 py-2">{s.name}</td>
-                  <td className="px-3 py-2">{s.family}</td>
-                  <td className="px-3 py-2">{s.region}</td>
-                  <td className="px-3 py-2">{s.type}</td>
-                  <td className="px-3 py-2">{s.risk}</td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {s.pnlYTD !== undefined ? s.pnlYTD.toFixed(2) + "%" : "–"}
-                  </td>
-                </tr>
-              ))
+              sorted.map((s) => {
+                const pnlColor = (s.pnlYTD ?? 0) > 0 ? "#10b981" : (s.pnlYTD ?? 0) < 0 ? "#ef4444" : "#94a3b8";
+                return (
+                  <tr key={s.id}>
+                    <td style={{ ...td, fontWeight: 600, color: "#e2e8f0" }}>{s.name.replace(/_/g, " ")}</td>
+                    <td style={td}>{s.family}</td>
+                    <td style={td}>{s.region}</td>
+                    <td style={td}>{s.type}</td>
+                    <td style={td}>{s.risk}</td>
+                    <td style={{ ...td, textAlign: "right", fontVariantNumeric: "tabular-nums", color: pnlColor }}>
+                      {s.pnlYTD != null ? `${s.pnlYTD >= 0 ? "+" : ""}${s.pnlYTD.toFixed(1)}%` : "–"}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
     </div>
   );
-};
+}
 
 export default StrategiesTable;

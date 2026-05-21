@@ -1,296 +1,220 @@
-"use client";
-
 import React, { useMemo } from "react";
-
-/* =========================
- * Types
- * ========================= */
-export type KPI = {
-  label: string;
-  value: string;
-  hint?: string;
-  warn?: boolean;
-};
-
-export type SeriesPoint = { date: string | Date; value: number };
-
-export type Allocation = {
-  bucket: string;     // e.g., "Equity", "Credit"
-  weight: number;     // 0..1
-};
-
-export type RiskSnapshot = {
-  gross?: number;     // × equity
-  net?: number;       // × equity
-  var95?: number;     // fraction (0.04 = 4%)
-  vol?: number;       // fraction annualized
-  beta?: number;
-  maxDD?: number;     // fraction
-};
-
-export type Position = {
-  id: string;
-  name: string;       // ticker or instrument
-  side: "Long" | "Short";
-  notional: number;   // in base currency
-  pnl?: number;       // realized+unrealized (same unit as notional)
-  weight?: number;    // 0..1 of portfolio
-  sector?: string;
-  region?: string;
-};
-
-export type PortfolioOverviewProps = {
-  title?: string;
-  asOf?: string;                      // ISO
-  kpis?: KPI[];
-  performance?: SeriesPoint[];        // cumulative PnL (fraction) or currency
-  asPercent?: boolean;                // format performance as % if true
-  allocations?: Allocation[];         // by asset class / sleeve
-  risk?: RiskSnapshot;
-  topPositions?: Position[];
-};
-
-/* =========================
- * Helpers
- * ========================= */
+import {
+  useTradingStore,
+  selectGrossExposure,
+  selectNetExposure,
+  selectTotalUnrealizedPnL,
+} from "@/store/useTradingStore";
 
 const fmtPct = (x?: number, d = 2) =>
   Number.isFinite(x as number) ? `${((x as number) * 100).toFixed(d)}%` : "–";
-const fmtNum = (x?: number, d = 2) =>
-  Number.isFinite(x as number) ? (x as number).toFixed(d) : "–";
-const toDateNum = (d: string | Date) => (d instanceof Date ? +d : +new Date(d));
-
-function niceExtent(vals: number[]) {
-  if (!vals.length) return [0, 1] as [number, number];
-  let lo = Math.min(...vals), hi = Math.max(...vals);
-  if (lo === hi) { lo -= 1; hi += 1; }
-  const pad = (hi - lo) * 0.05;
-  return [lo - pad, hi + pad] as [number, number];
-}
-
-/* =========================
- * Small visual components
- * ========================= */
-
-const Card: React.FC<React.PropsWithChildren<{ title?: string; right?: React.ReactNode }>> = ({ title, right, children }) => (
-  <div className="rounded-2xl border border-neutral-200 bg-white shadow">
-    {(title || right) && (
-      <div className="flex items-center justify-between border-b px-4 py-3">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {right}
-      </div>
-    )}
-    <div className="p-4">{children}</div>
-  </div>
-);
-
-const KPIGrid: React.FC<{ items: KPI[] }> = ({ items }) => (
-  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-    {items.map((k, i) => (
-      <div key={i} className={`rounded-xl border px-3 py-2 ${k.warn ? "border-red-300 bg-red-50" : "border-neutral-200"}`}>
-        <div className="text-[11px] uppercase tracking-wide text-neutral-500">{k.label}</div>
-        <div className={`mt-0.5 text-sm ${k.warn ? "text-red-700" : "text-neutral-900"}`}>{k.value}</div>
-        {k.hint && <div className="mt-0.5 text-[11px] text-neutral-500">{k.hint}</div>}
-      </div>
-    ))}
-  </div>
-);
-
-const SparkLine: React.FC<{ data: SeriesPoint[]; height?: number; stroke?: string; fill?: string; asPercent?: boolean }> = ({
-  data, height = 160, stroke = "#0ea5e9", fill = "rgba(14,165,233,0.12)", asPercent = false
-}) => {
-  const w = 720; // responsive container will clip; width comes from parent
-  const pts = useMemo(() => data.map(d => ({ t: toDateNum(d.date), v: d.value })).sort((a,b)=>a.t-b.t), [data]);
-  const xs = pts.map(p => p.t);
-  const ys = pts.map(p => p.v);
-  const xMin = Math.min(...xs, Date.now()), xMax = Math.max(...xs, Date.now());
-  const [yMin, yMax] = niceExtent(ys.length ? ys : [0]);
-
-  const x = (t: number) => ((t - xMin) / Math.max(1, xMax - xMin)) * (w - 48) + 40; // side margins
-  const y = (v: number) => (height - 30) - ((v - yMin) / Math.max(1e-9, yMax - yMin)) * (height - 50);
-
-  const d = pts.length
-    ? `M ${x(pts[0].t)} ${y(pts[0].v)}` + pts.slice(1).map(p => ` L ${x(p.t)} ${y(p.v)}`).join("")
-    : "";
-
-  return (
-    <svg width="100%" viewBox={`0 0 ${w} ${height}`} className="overflow-visible">
-      {/* axes */}
-      <line x1={40} x2={w-8} y1={height-30} y2={height-30} stroke="#e5e7eb"/>
-      <line x1={40} x2={40} y1={10} y2={height-30} stroke="#e5e7eb"/>
-      {/* zero baseline if percent */}
-      {asPercent && yMin < 0 && yMax > 0 && (
-        <line x1={40} x2={w-8} y1={y(0)} y2={y(0)} stroke="#d1d5db" />
-      )}
-      {/* area */}
-      {pts.length > 1 && (
-        <path d={`${d} L ${x(pts[pts.length-1].t)} ${height-30} L ${x(pts[0].t)} ${height-30} Z`} fill={fill} />
-      )}
-      {/* line */}
-      {pts.length > 1 && <path d={d} stroke={stroke} fill="none" strokeWidth={1.8} />}
-      {/* labels */}
-      <text x={40} y={12} className="fill-neutral-500 text-[11px]">{asPercent ? `${(yMax*100).toFixed(1)}%` : yMax.toFixed(2)}</text>
-      <text x={40} y={height-16} className="fill-neutral-500 text-[11px]">{asPercent ? `${(yMin*100).toFixed(1)}%` : yMin.toFixed(2)}</text>
-    </svg>
-  );
-};
-
-const StackedBar: React.FC<{ data: Allocation[] }> = ({ data }) => {
-  const total = Math.max(1e-9, data.reduce((a, d) => a + Math.max(0, d.weight), 0));
-  return (
-    <div className="flex h-6 w-full overflow-hidden rounded-md border border-neutral-200">
-      {data.map((d) => (
-        <div
-          key={d.bucket}
-          title={`${d.bucket}: ${(d.weight * 100).toFixed(1)}%`}
-          className="h-full"
-          style={{
-            width: `${(Math.max(0, d.weight) / total) * 100}%`,
-            background: hashColor(d.bucket),
-          }}
-        />
-      ))}
-    </div>
-  );
-};
+const fmtNum = (x?: number, d = 0) =>
+  Number.isFinite(x as number)
+    ? (x as number).toLocaleString(undefined, { maximumFractionDigits: d })
+    : "–";
 
 function hashColor(s: string) {
-  // deterministic pleasant color from string
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-  const hue = Math.abs(h) % 360;
-  return `hsl(${hue} 65% 60%)`;
+  return `hsl(${Math.abs(h) % 360} 65% 55%)`;
 }
 
-const PositionsTable: React.FC<{ rows: Position[] }> = ({ rows }) => (
-  <div className="overflow-auto">
-    <table className="min-w-full border-collapse text-sm">
-      <thead>
-        <tr className="border-b bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600">
-          <th className="px-3 py-2">Name</th>
-          <th className="px-3 py-2">Side</th>
-          <th className="px-3 py-2">Sector</th>
-          <th className="px-3 py-2">Region</th>
-          <th className="px-3 py-2 text-right">Weight</th>
-          <th className="px-3 py-2 text-right">Notional</th>
-          <th className="px-3 py-2 text-right">PnL</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.length === 0 ? (
-          <tr>
-            <td colSpan={7} className="px-3 py-6 text-center text-neutral-500">No positions</td>
-          </tr>
-        ) : (
-          rows.map((p) => (
-            <tr key={p.id} className="border-b last:border-0 hover:bg-neutral-50/60">
-              <td className="px-3 py-2">{p.name}</td>
-              <td className={`px-3 py-2 ${p.side === "Long" ? "text-green-700" : "text-red-700"}`}>{p.side}</td>
-              <td className="px-3 py-2">{p.sector ?? "—"}</td>
-              <td className="px-3 py-2">{p.region ?? "—"}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{p.weight != null ? fmtPct(p.weight) : "—"}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{p.notional != null ? fmtNum(p.notional, 0) : "—"}</td>
-              <td className={`px-3 py-2 text-right tabular-nums ${Number(p.pnl) < 0 ? "text-red-700" : "text-green-700"}`}>
-                {p.pnl != null ? fmtNum(p.pnl, 0) : "—"}
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
-  </div>
-);
-
-/* =========================
- * Main component
- * ========================= */
-
-const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
-  title = "Portfolio Overview",
-  asOf,
-  kpis = [],
-  performance = [],
-  asPercent = false,
-  allocations = [],
-  risk = {},
-  topPositions = [],
-}) => {
-  const right = (
-    <div className="text-xs text-neutral-500">
-      As of {asOf ? new Date(asOf).toLocaleString() : "—"}
+function KPICard({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div style={{
+      background: "#0f172a",
+      border: "1px solid #1e293b",
+      borderRadius: 8,
+      padding: "10px 14px",
+    }}>
+      <div style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: color ?? "#e2e8f0", fontVariantNumeric: "tabular-nums" }}>
+        {value}
+      </div>
     </div>
   );
+}
+
+function SparkLine({ data }: { data: { date: string; value: number }[] }) {
+  const w = 600; const h = 100;
+  if (!data.length) return (
+    <div style={{ height: h, display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontSize: 12 }}>
+      No performance data
+    </div>
+  );
+  const vals = data.map((d) => d.value);
+  const tMin = 0; const tMax = data.length - 1;
+  const yMin = Math.min(...vals); const yMax = Math.max(...vals);
+  const yRange = yMax - yMin || 1;
+  const px = (i: number) => (i / Math.max(1, tMax)) * (w - 40) + 20;
+  const py = (v: number) => h - 16 - ((v - yMin) / yRange) * (h - 30);
+  const d = data.map((p, i) => `${i === 0 ? "M" : "L"} ${px(i)} ${py(p.value)}`).join(" ");
+  const last = vals[vals.length - 1];
+  const lineColor = last >= 0 ? "#10b981" : "#ef4444";
+  return (
+    <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: "visible" }}>
+      <line x1={20} x2={w - 20} y1={h - 16} y2={h - 16} stroke="#1e293b" />
+      {yMin < 0 && yMax > 0 && (
+        <line x1={20} x2={w - 20} y1={py(0)} y2={py(0)} stroke="#334155" strokeDasharray="4 4" />
+      )}
+      <path
+        d={`${d} L ${px(tMax)} ${h - 16} L ${px(0)} ${h - 16} Z`}
+        fill={lineColor}
+        fillOpacity={0.12}
+      />
+      <path d={d} stroke={lineColor} fill="none" strokeWidth={1.8} />
+    </svg>
+  );
+}
+
+export function PortfolioOverview() {
+  const positions = useTradingStore((s) => s.positions);
+  const pnlHistory = useTradingStore((s) => s.pnlHistory);
+  const engine = useTradingStore((s) => s.engine);
+  const grossExposure = useTradingStore(selectGrossExposure);
+  const netExposure = useTradingStore(selectNetExposure);
+  const unrealizedPnL = useTradingStore(selectTotalUnrealizedPnL);
+
+  const posList = Object.values(positions);
+
+  const sectorAlloc = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const p of posList) {
+      const key = p.strategy || "Other";
+      map[key] = (map[key] ?? 0) + Math.abs(p.notional);
+    }
+    const total = Object.values(map).reduce((a, b) => a + b, 0) || 1;
+    return Object.entries(map)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([bucket, val]) => ({ bucket, weight: val / total }));
+  }, [posList]);
+
+  const perfData = pnlHistory.map((p) => ({ date: p.date, value: p.cumulativeNet }));
+
+  const pnlColor = engine.dailyPnl > 0 ? "#10b981" : engine.dailyPnl < 0 ? "#ef4444" : "#94a3b8";
 
   return (
-    <div className="w-full space-y-4">
-      {/* Header card with KPIs */}
-      <Card title={title} right={right}>
-        {kpis.length > 0 ? <KPIGrid items={kpis} /> : <div className="text-sm text-neutral-500">Add KPIs to see snapshot metrics.</div>}
-      </Card>
-
-      {/* Row: Performance + Allocations + Risk */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card title="Performance">
-          <SparkLine data={performance} asPercent={asPercent} />
-        </Card>
-
-        <Card title="Allocations">
-          {allocations.length ? (
-            <div className="space-y-3">
-              <StackedBar data={allocations} />
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {allocations.map((a) => (
-                  <div key={a.bucket} className="flex items-center justify-between rounded-md border border-neutral-200 px-2 py-1">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block h-2 w-4 rounded-sm" style={{ background: hashColor(a.bucket) }} />
-                      {a.bucket}
-                    </div>
-                    <div className="font-mono">{fmtPct(a.weight)}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-sm text-neutral-500">No allocation data</div>
-          )}
-        </Card>
-
-        <Card title="Risk Snapshot">
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <div className="text-[11px] uppercase text-neutral-500">Gross</div>
-              <div className="font-medium">{fmtNum(risk.gross)}×</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase text-neutral-500">Net</div>
-              <div className="font-medium">{fmtNum(risk.net)}×</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase text-neutral-500">VaR (95%)</div>
-              <div className="font-medium">{fmtPct(risk.var95)}</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase text-neutral-500">Vol</div>
-              <div className="font-medium">{fmtPct(risk.vol)}</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase text-neutral-500">Beta</div>
-              <div className="font-medium">{fmtNum(risk.beta)}</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase text-neutral-500">Max DD</div>
-              <div className="font-medium">{fmtPct(risk.maxDD)}</div>
-            </div>
-          </div>
-        </Card>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0" }}>Portfolio Overview</span>
+        <span style={{ fontSize: 11, color: "#64748b" }}>
+          {posList.length} open positions
+        </span>
       </div>
 
-      {/* Top positions */}
-      <Card title="Top Positions">
-        <PositionsTable rows={topPositions} />
-      </Card>
+      {/* KPI grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <KPICard
+          label="Daily P&L"
+          value={`${engine.dailyPnl >= 0 ? "+" : ""}$${fmtNum(Math.abs(engine.dailyPnl))}`}
+          color={pnlColor}
+        />
+        <KPICard
+          label="Unrealized"
+          value={`${unrealizedPnL >= 0 ? "+" : ""}$${fmtNum(Math.abs(unrealizedPnL))}`}
+          color={unrealizedPnL >= 0 ? "#10b981" : "#ef4444"}
+        />
+        <KPICard
+          label="Drawdown"
+          value={fmtPct(engine.drawdown)}
+          color={engine.drawdown < -0.05 ? "#ef4444" : "#94a3b8"}
+        />
+        <KPICard label="Gross Exposure" value={`$${fmtNum(grossExposure)}`} />
+        <KPICard
+          label="Net Exposure"
+          value={`${netExposure >= 0 ? "+" : ""}$${fmtNum(Math.abs(netExposure))}`}
+          color={netExposure >= 0 ? "#10b981" : "#ef4444"}
+        />
+        <KPICard
+          label="Strategies"
+          value={String(engine.nStrategies)}
+          color="#818cf8"
+        />
+      </div>
+
+      {/* Performance chart */}
+      <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, padding: "12px 16px" }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8, display: "block" }}>
+          Cumulative P&L
+        </span>
+        <SparkLine data={perfData} />
+      </div>
+
+      {/* Allocations */}
+      {sectorAlloc.length > 0 && (
+        <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, padding: "12px 16px" }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 10, display: "block" }}>
+            Strategy Allocation
+          </span>
+          {/* Stacked bar */}
+          <div style={{ display: "flex", height: 20, borderRadius: 6, overflow: "hidden", marginBottom: 10 }}>
+            {sectorAlloc.map((a) => (
+              <div
+                key={a.bucket}
+                title={`${a.bucket}: ${fmtPct(a.weight)}`}
+                style={{ width: `${a.weight * 100}%`, background: hashColor(a.bucket) }}
+              />
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            {sectorAlloc.map((a) => (
+              <div key={a.bucket} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#94a3b8" }}>
+                <span style={{ width: 10, height: 10, borderRadius: 2, background: hashColor(a.bucket), flexShrink: 0 }} />
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.bucket}</span>
+                <span style={{ marginLeft: "auto", fontVariantNumeric: "tabular-nums" }}>{fmtPct(a.weight)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Top positions table */}
+      {posList.length > 0 && (
+        <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, overflow: "hidden" }}>
+          <div style={{ padding: "10px 14px", borderBottom: "1px solid #1e293b", fontSize: 12, fontWeight: 700, color: "#94a3b8" }}>
+            Top Positions
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: "#020817" }}>
+                  {["Symbol", "Strategy", "Qty", "Avg Px", "Notional", "P&L"].map((h) => (
+                    <th key={h} style={{ padding: "7px 10px", textAlign: "left", color: "#475569", fontWeight: 600, fontSize: 11 }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {posList.slice(0, 8).map((p) => (
+                  <tr key={p.symbol} style={{ borderTop: "1px solid #0f172a" }}>
+                    <td style={{ padding: "6px 10px", color: "#e2e8f0", fontWeight: 600 }}>{p.symbol}</td>
+                    <td style={{ padding: "6px 10px", color: "#94a3b8" }}>{p.strategy}</td>
+                    <td style={{ padding: "6px 10px", color: p.qty >= 0 ? "#10b981" : "#ef4444", fontVariantNumeric: "tabular-nums" }}>
+                      {p.qty >= 0 ? "+" : ""}{p.qty}
+                    </td>
+                    <td style={{ padding: "6px 10px", color: "#94a3b8", fontVariantNumeric: "tabular-nums" }}>
+                      {p.avgPx.toFixed(2)}
+                    </td>
+                    <td style={{ padding: "6px 10px", color: "#cbd5e1", fontVariantNumeric: "tabular-nums" }}>
+                      ${fmtNum(Math.abs(p.notional))}
+                    </td>
+                    <td style={{ padding: "6px 10px", color: p.pnl >= 0 ? "#10b981" : "#ef4444", fontVariantNumeric: "tabular-nums" }}>
+                      {p.pnl >= 0 ? "+" : ""}${fmtNum(Math.abs(p.pnl))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+}
 
 export default PortfolioOverview;

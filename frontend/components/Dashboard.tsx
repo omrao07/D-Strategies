@@ -1,50 +1,38 @@
 // frontend/components/Dashboard.tsx
 // Main dashboard — wires the Zustand store + WS sync, renders all panels.
 
-"use client";
-import React, { Suspense } from "react";
-import dynamic from "next/dynamic";
+import React, { Suspense, lazy } from "react";
 import { useWsSync } from "@/store/useWsSync";
 import { useTradingStore } from "@/store/useTradingStore";
 import { EngineStatusBar } from "./live/EngineStatusBar";
 import { SignalBoard } from "./live/SignalBoard";
 import { RiskGatesPanel } from "./live/RiskGatesPanel";
 
-// Heavy panels loaded lazily
-const StrategiesTable = dynamic(
-  () =>
-    import("./strategies/StrategiesTable").then((m) => ({
-      default: m.StrategiesTable ?? m.default,
-    })),
-  { ssr: false, loading: () => <Spinner /> }
+// Heavy panels loaded lazily (Vite/React lazy — no next/dynamic)
+const StrategiesTable = lazy(() =>
+  import("./strategies/StrategiesTable").then((m) => ({
+    default: m.StrategiesTable ?? m.default,
+  }))
 );
-const PortfolioOverview = dynamic(
-  () =>
-    import("./dashboards/PortfolioOverview").then((m) => ({
-      default: m.PortfolioOverview ?? m.default,
-    })),
-  { ssr: false, loading: () => <Spinner /> }
+const PortfolioOverview = lazy(() =>
+  import("./dashboards/PortfolioOverview").then((m) => ({
+    default: m.PortfolioOverview ?? m.default,
+  }))
 );
-const RiskDashboard = dynamic(
-  () =>
-    import("./dashboards/RiskDashboard").then((m) => ({
-      default: m.RiskDashboard ?? m.default,
-    })),
-  { ssr: false, loading: () => <Spinner /> }
+const RiskDashboard = lazy(() =>
+  import("./dashboards/RiskDashboard").then((m) => ({
+    default: m.RiskDashboard ?? m.default,
+  }))
 );
-const IndiaFODashboard = dynamic(
-  () =>
-    import("./dashboards/IndiaFODashboard").then((m) => ({
-      default: m.IndiaFODashboard ?? m.default,
-    })),
-  { ssr: false, loading: () => <Spinner /> }
+const IndiaFODashboard = lazy(() =>
+  import("./dashboards/IndiaFODashboard").then((m) => ({
+    default: m.IndiaFODashboard ?? m.default,
+  }))
 );
-const BacktesterPanel = dynamic(
-  () =>
-    import("./dashboards/BacktesterPanel").then((m) => ({
-      default: m.BacktesterPanel ?? m.default,
-    })),
-  { ssr: false, loading: () => <Spinner /> }
+const BacktesterPanel = lazy(() =>
+  import("./dashboards/BacktesterPanel").then((m) => ({
+    default: m.BacktesterPanel ?? m.default,
+  }))
 );
 
 function Spinner() {
