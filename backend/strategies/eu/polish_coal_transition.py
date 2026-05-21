@@ -115,7 +115,7 @@ def load_capacity(path: str) -> pd.DataFrame:
     df["fuel"] = df["fuel"].apply(fuel_norm)
     df["capacity_mw"] = pd.to_numeric(df["capacity_mw"], errors="coerce")
     df["commission_year"] = pd.to_numeric(df.get("commission_year"), errors="coerce")
-    df["retirement_year"] = pd.to_numeric(df.get("retirement_year"), errors="coerce")
+    df["retirement_year"] = pd.to_numeric(df.get("retirement_year"), errors="coerce") # type: ignore
     return df
 
 
@@ -189,7 +189,7 @@ def dispatch(
     rows = []
 
     for d in demand["date"]:
-        load = float(demand.loc[demand["date"] == d, "demand_gwh"])
+        load = float(demand.loc[demand["date"] == d, "demand_gwh"]) # type: ignore
         cap_m = capacity[capacity["date"] == d]
 
         stack = []
@@ -236,7 +236,7 @@ def emissions(dispatch_df: pd.DataFrame) -> pd.DataFrame:
         df.groupby("date", as_index=False)["co2_mt"]
         .sum()
         .rename(columns={"co2_mt": "total_mtco2"})
-    )
+    ) # type: ignore
 
 
 # ─────────────────────────────────────────────────────────────

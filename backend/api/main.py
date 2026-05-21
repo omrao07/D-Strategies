@@ -481,8 +481,30 @@ def stub_risk_timeseries():
 
 # Strategies
 @app.get("/api/strategies")
-def stub_strategies():
-    _not_implemented("strategy list")
+def list_strategies():
+    """Return all registered strategies with metadata."""
+    try:
+        from backend.engine.registry import Registry
+        reg = Registry.get_instance()
+        strats = []
+        for name, cls in reg.items():
+            meta = {}
+            try:
+                meta = cls.get_metadata() or {}
+            except Exception:
+                pass
+            strats.append({
+                "id": name,
+                "name": name,
+                "family": meta.get("family", meta.get("category", "unknown")),
+                "region": meta.get("region", "global"),
+                "type": meta.get("type", "alpha"),
+                "risk": meta.get("risk", "medium"),
+            })
+        return {"strategies": strats}
+    except Exception as exc:
+        logger.warning("strategy list error: %s", exc)
+        return {"strategies": []}
 
 @app.patch("/api/strategy/{name}")
 def stub_strategy_patch(name: str, payload: Dict[str, Any]):
