@@ -114,8 +114,8 @@ def load_capacity(path: str) -> pd.DataFrame:
     df.columns = [c.lower() for c in df.columns]
     df["fuel"] = df["fuel"].apply(fuel_norm)
     df["capacity_mw"] = pd.to_numeric(df["capacity_mw"], errors="coerce")
-    df["commission_year"] = pd.to_numeric(df.get("commission_year"), errors="coerce")
-    df["retirement_year"] = pd.to_numeric(df.get("retirement_year"), errors="coerce") # type: ignore
+    for col in ("commission_year", "retirement_year"):
+        df[col] = pd.to_numeric(df[col] if col in df.columns else np.nan, errors="coerce")
     return df
 
 
@@ -189,8 +189,23 @@ def dispatch(
     rows = []
 
     for d in demand["date"]:
-        load = float(demand.loc[demand["date"] == d, "demand_gwh"]) # type: ignore
+        demand_rows = demand.loc[demand["date"] == d, "demand_gwh"]
+        if demand_rows.empty:
+            continue
+        load = float(demand_rows.iloc[0])
         cap_m = capacity[capacity["date"] == d]
+
+        # Build fuel→price dict for this month from the prices DataFrame.
+        # Expected format: one row per date with fuel columns (lignite, hard_coal, …).
+        fuel_prices: Dict[str, float] = {}
+        if not prices.empty and "date" in prices.columns:
+            price_row = prices[prices["date"] == d]
+            if not price_row.empty:
+                fuel_prices = {
+                    c: float(price_row.iloc[0][c])
+                    for c in price_row.columns
+                    if c != "date" and pd.notna(price_row.iloc[0][c])
+                }
 
         stack = []
         for _, r in cap_m.iterrows():
@@ -201,7 +216,7 @@ def dispatch(
                 * 24 * d.days_in_month / 1000
             )
             cost = (
-                prices.get(fuel, 0.0)
+                fuel_prices.get(fuel, 0.0)
                 / DEFAULTS["eff"].get(fuel, 0.4)
                 + ets_price * DEFAULTS["co2"].get(fuel, 0.0)
             )
@@ -236,7 +251,7 @@ def emissions(dispatch_df: pd.DataFrame) -> pd.DataFrame:
         df.groupby("date", as_index=False)["co2_mt"]
         .sum()
         .rename(columns={"co2_mt": "total_mtco2"})
-    ) # type: ignore
+    )
 
 
 # ─────────────────────────────────────────────────────────────

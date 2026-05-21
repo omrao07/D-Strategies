@@ -203,7 +203,7 @@ def load_funds(path: str) -> pd.DataFrame:
     df = df.rename(columns=ren)
     for c in ["hedge_ratio","rf_eur_m"]:
         if c in df.columns: df[c] = num(df[c])
-    df["policy_json"] = df.get("policy_json", "").apply(as_json)
+    df["policy_json"] = df["policy_json"].apply(as_json) if "policy_json" in df.columns else [{}] * len(df)
     return df
 
 def load_nav(path: str) -> pd.DataFrame:
@@ -483,7 +483,7 @@ def policy_compliance(alloc: pd.DataFrame, funds_meta: pd.DataFrame) -> pd.DataF
 def decarb_path(esg: pd.DataFrame) -> pd.DataFrame:
     if esg.empty: return pd.DataFrame()
     out = []
-    for (f), g in esg.groupby(["fund"]):
+    for f, g in esg.groupby("fund"):
         g = g.sort_values("date").copy()
         if "target_annual_reduction_pct" not in g.columns or g["target_annual_reduction_pct"].isna().all():
             g["target_annual_reduction_pct"] = 0.0
@@ -509,7 +509,7 @@ def scenario_pl(alloc: pd.DataFrame, funds_meta: pd.DataFrame, scen_df: pd.DataF
     def b_for_asset(a: str) -> Tuple[float,float,float]:
         x = a.lower()
         if "equity" in x or "stock" in x: return (beta["equity"], 0.0, 0.0)
-        if "gov" in x or "sovereign" in x or "rates" in x or "duration" in x or "bond" in x and "credit" not in x: return (0.0, beta["rates"], 0.0)
+        if "gov" in x or "sovereign" in x or "rates" in x or "duration" in x or ("bond" in x and "credit" not in x): return (0.0, beta["rates"], 0.0)
         if "credit" in x or "corp" in x or "ig" in x or "hy" in x or "em credit" in x: return (0.2, beta["rates"], beta["spread"])
         if "real" in x and "estate" in x: return (beta["real_estate"], -1.0, -0.5)
         if "infra" in x: return (beta["infra"], -1.5, -0.5)
@@ -533,6 +533,7 @@ def scenario_pl(alloc: pd.DataFrame, funds_meta: pd.DataFrame, scen_df: pd.DataF
             pl += float(r["weight"]) * dr
         # FX effect using currency exposures if provided
         fx_contrib = 0.0
+        hr = np.nan  # initialize before conditional so the append below always sees it
         if not ccy_exp.empty and (f in ccy_exp["fund"].unique()):
             exp = ccy_exp[ccy_exp["fund"]==f].copy()
             hr = float(funds_meta.set_index("fund").loc[f, "hedge_ratio"]) if "hedge_ratio" in funds_meta.columns else 0.0
@@ -543,7 +544,7 @@ def scenario_pl(alloc: pd.DataFrame, funds_meta: pd.DataFrame, scen_df: pd.DataF
                     pass  # keep default hedge ratio if override is not numeric
             fx_contrib = float(((exp["weight"] * (1-hr)).sum()) * (fx_base_pct/100.0))
         rows.append({"fund": f, "scenario": scenario, "equity_shock_pct": eq_shock, "rates_shock_bp": rt_bp, "spread_shock_bp": sp_bp,
-                     "fx_base_pct": fx_base_pct, "hedge_ratio_used": float(hedge_override) if hedge_override is not None else (float(hr) if 'hr' in locals() else np.nan),
+                     "fx_base_pct": fx_base_pct, "hedge_ratio_used": float(hedge_override) if hedge_override is not None else hr,
                      "portfolio_pl_pct": pl + fx_contrib})
     return pd.DataFrame(rows)
 
@@ -618,19 +619,22 @@ def main():
     # Filter by window
     start = pd.to_datetime(args.start).to_period("M").to_timestamp()
     end   = pd.to_datetime(args.end).to_period("M").to_timestamp()
-    for df in [nav, flows, alloc, rets, bench_ret, alloc_b, fx, cexp, esg, rf]:
-        if not df.empty:
-            df = df[(df["date"]>=start) & (df["date"]<=end)]
-            if df is nav: nav = df
-            elif df is flows: flows = df
-            elif df is alloc: alloc = df
-            elif df is rets: rets = df
-            elif df is bench_ret: bench_ret = df
-            elif df is alloc_b: alloc_b = df
-            elif df is fx: fx = df
-            elif df is cexp: cexp = df
-            elif df is esg: esg = df
-            elif df is rf: rf = df
+
+    def _filt(df: pd.DataFrame) -> pd.DataFrame:
+        if df.empty or "date" not in df.columns:
+            return df
+        return df[(df["date"] >= start) & (df["date"] <= end)].reset_index(drop=True)
+
+    nav       = _filt(nav)
+    flows     = _filt(flows)
+    alloc     = _filt(alloc)
+    rets      = _filt(rets)
+    bench_ret = _filt(bench_ret)
+    alloc_b   = _filt(alloc_b)
+    fx        = _filt(fx)
+    cexp      = _filt(cexp)
+    esg       = _filt(esg)
+    rf        = _filt(rf)
 
     # Compute portfolio TWR
     twr = compute_twr(nav, flows)
