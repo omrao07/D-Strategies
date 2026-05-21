@@ -386,81 +386,173 @@ def run_vec_backtest(req: VecBacktestRequest, _auth: None = Depends(_require_key
 def _not_implemented(name: str):
     raise HTTPException(501, f"Not implemented: {name}")
 
-# Alt-data
+# Alt-data — return empty payloads (external data feeds wired separately)
 @app.get("/api/altdata/card_spend")
-def stub_altdata_card_spend():
-    _not_implemented("card spend data")
+def get_altdata_card_spend():
+    return {"data": [], "source": "card_spend", "available": False}
 
 @app.get("/api/altdata/satellite_lights")
-def stub_altdata_satellite_lights():
-    _not_implemented("satellite lights data")
+def get_altdata_satellite_lights():
+    return {"data": [], "source": "satellite_lights", "available": False}
 
 @app.get("/api/altdata/shipping_traffic")
-def stub_altdata_shipping_traffic():
-    _not_implemented("shipping traffic data")
+def get_altdata_shipping_traffic():
+    return {"data": [], "source": "shipping_traffic", "available": False}
 
 @app.get("/api/altdata/geo_spatial")
-def stub_altdata_geo_spatial():
-    _not_implemented("geo spatial data")
+def get_altdata_geo_spatial():
+    return {"data": [], "source": "geo_spatial", "available": False}
 
 # Analyst
 @app.get("/api/analyst/screener")
-def stub_analyst_screener():
-    _not_implemented("analyst screener")
+def get_analyst_screener(q: str = ""):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("analyst:screener:results", 0, 49)
+        return {"results": [_json.loads(x) for x in items if x]}
+    except Exception:
+        return {"results": []}
 
 @app.get("/api/analyst/news")
-def stub_analyst_news():
-    _not_implemented("analyst news")
+def get_analyst_news(limit: int = 20):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("news:feed", -limit, -1)
+        return {"items": [_json.loads(x) for x in reversed(items) if x]}
+    except Exception:
+        return {"items": []}
 
 @app.get("/api/analyst/notes")
-def stub_analyst_notes_get():
-    _not_implemented("analyst notes GET")
+def get_analyst_notes():
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("analyst:notes", 0, -1)
+        return {"notes": [_json.loads(x) for x in items if x]}
+    except Exception:
+        return {"notes": []}
 
 @app.post("/api/analyst/notes")
-def stub_analyst_notes_post(payload: Dict[str, Any]):
-    _not_implemented("analyst notes POST")
+def post_analyst_note(payload: Dict[str, Any]):
+    try:
+        import redis as _redis, os as _os, json as _json, time as _time
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        note = {**payload, "id": str(int(_time.time() * 1000)), "ts": _time.time()}
+        r.rpush("analyst:notes", _json.dumps(note))
+        return {"ok": True, "note": note}
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.get("/api/analyst/tasks")
-def stub_analyst_tasks_get():
-    _not_implemented("analyst tasks GET")
+def get_analyst_tasks():
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("analyst:tasks", 0, -1)
+        return {"tasks": [_json.loads(x) for x in items if x]}
+    except Exception:
+        return {"tasks": []}
 
 @app.post("/api/analyst/tasks")
-def stub_analyst_tasks_post(payload: Dict[str, Any]):
-    _not_implemented("analyst tasks POST")
+def post_analyst_task(payload: Dict[str, Any]):
+    try:
+        import redis as _redis, os as _os, json as _json, time as _time
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        task = {**payload, "id": str(int(_time.time() * 1000)), "done": False, "ts": _time.time()}
+        r.rpush("analyst:tasks", _json.dumps(task))
+        return {"ok": True, "task": task}
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.post("/api/analyst/tasks/{task_id}/toggle")
-def stub_analyst_tasks_toggle(task_id: str):
-    _not_implemented(f"analyst task toggle {task_id}")
+def toggle_analyst_task(task_id: str):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("analyst:tasks", 0, -1)
+        updated = []
+        for raw in items:
+            t = _json.loads(raw)
+            if t.get("id") == task_id:
+                t["done"] = not t.get("done", False)
+            updated.append(_json.dumps(t))
+        r.delete("analyst:tasks")
+        if updated:
+            r.rpush("analyst:tasks", *updated)
+        return {"ok": True}
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.get("/api/analyst/sentiment")
-def stub_analyst_sentiment():
-    _not_implemented("analyst sentiment")
+def get_analyst_sentiment():
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        raw = r.get("sentiment:latest")
+        return _json.loads(raw) if raw else {"score": 0.0, "label": "neutral", "ts": None}
+    except Exception:
+        return {"score": 0.0, "label": "neutral", "ts": None}
 
 @app.get("/api/analyst/query")
-def stub_analyst_query(q: str = ""):
-    _not_implemented("analyst query")
+def analyst_query(q: str = "", _auth: None = Depends(_require_key)):
+    try:
+        from backend.ai.query_copilot import answer
+        return {"answer": answer(q)}
+    except Exception as exc:
+        return {"answer": f"Query copilot unavailable: {exc}"}
 
 # FNO
 @app.get("/api/fno/futures")
-def stub_fno_futures():
-    _not_implemented("FNO futures data")
+def get_fno_futures():
+    try:
+        from backend.india.nse_option_chain import put_call_ratio
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("fno:futures:latest", 0, 49)
+        return {"futures": [_json.loads(x) for x in items if x]}
+    except Exception:
+        return {"futures": []}
 
 @app.get("/api/fno/options")
-def stub_fno_options():
-    _not_implemented("FNO options data")
+def get_fno_options(symbol: str = "NIFTY"):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        raw = r.get(f"fno:options:{symbol}")
+        return _json.loads(raw) if raw else {"calls": [], "puts": [], "symbol": symbol}
+    except Exception:
+        return {"calls": [], "puts": [], "symbol": symbol}
 
 # Research
 @app.get("/api/research/notes")
-def stub_research_notes():
-    _not_implemented("research notes")
+def get_research_notes():
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("research:notes", 0, -1)
+        return {"notes": [_json.loads(x) for x in items if x]}
+    except Exception:
+        return {"notes": []}
 
 @app.get("/api/research/chart")
-def stub_research_chart():
-    _not_implemented("research chart data")
+def get_research_chart(symbol: str = "", tf: str = "1d", limit: int = 90):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange(f"bars:{symbol}:{tf}", -limit, -1)
+        return {"bars": [_json.loads(x) for x in items if x], "symbol": symbol, "tf": tf}
+    except Exception:
+        return {"bars": [], "symbol": symbol, "tf": tf}
 
 @app.get("/api/research/query")
-def stub_research_query(q: str = ""):
-    _not_implemented("research query")
+def research_query(q: str = "", _auth: None = Depends(_require_key)):
+    try:
+        from backend.ai.query_copilot import answer
+        return {"answer": answer(q), "query": q}
+    except Exception as exc:
+        return {"answer": f"Research copilot unavailable: {exc}", "query": q}
 
 # Risk (UI-facing thin wrappers not in risk_router)
 @app.get("/api/risk/kpis")
@@ -638,13 +730,25 @@ def get_terminal_trades(limit: int = 100):
         return {"trades": []}
 
 @app.get("/api/terminal/alerts")
-def stub_terminal_alerts():
-    _not_implemented("terminal alerts")
+def get_terminal_alerts(limit: int = 50):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        items = r.lrange("alerts:recent", -limit, -1)
+        return {"alerts": [_json.loads(x) for x in reversed(items) if x]}
+    except Exception:
+        return {"alerts": []}
 
 # Voice / AI
 @app.post("/api/voice/command")
-def stub_voice_command(payload: Dict[str, Any]):
-    _not_implemented("voice command")
+def handle_voice_command(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
+    try:
+        from backend.ai.voice_interface import process_command
+        text = str(payload.get("text", ""))
+        result = process_command(text)
+        return {"ok": True, "result": result}
+    except Exception as exc:
+        return {"ok": False, "result": str(exc)}
 
 # Jarvis — Natural Language Strategy Querying
 class JarvisRequest(BaseModel):
@@ -705,22 +809,42 @@ def set_regime_endpoint(payload: Dict[str, Any], _auth: None = Depends(_require_
 
 # Commodities
 @app.get("/api/commodities/{sym}")
-def stub_commodities(sym: str):
-    _not_implemented(f"commodities data for {sym}")
+def get_commodity(sym: str):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        raw = r.get(f"commodity:{sym.upper()}")
+        return _json.loads(raw) if raw else {"symbol": sym, "price": None, "available": False}
+    except Exception:
+        return {"symbol": sym, "price": None, "available": False}
 
 # Trades
 @app.get("/api/trades/{trade_id}")
-def stub_trade(trade_id: str):
-    _not_implemented(f"trade {trade_id}")
+def get_trade(trade_id: str):
+    try:
+        import redis as _redis, os as _os, json as _json
+        r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
+        raw = r.hget("fills:by_id", trade_id)
+        if not raw:
+            raise HTTPException(404, f"Trade {trade_id} not found")
+        return _json.loads(raw)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(500, str(exc))
 
 @app.get("/api/trades/{trade_id}/explain")
-def stub_trade_explain(trade_id: str):
-    _not_implemented(f"trade explanation {trade_id}")
+def explain_trade(trade_id: str, _auth: None = Depends(_require_key)):
+    try:
+        from backend.ai.explainable_trades import explain
+        return {"explanation": explain(trade_id)}
+    except Exception as exc:
+        return {"explanation": f"Explainability unavailable: {exc}"}
 
 # GEE
 @app.get("/api/gee/url")
-def stub_gee_url(q: str = ""):
-    _not_implemented("Google Earth Engine URL")
+def get_gee_url(q: str = ""):
+    return {"url": None, "available": False, "message": "Google Earth Engine not configured"}
 
 # ------------------------------------------------------------------------------
 # Entrypoint (Render / Docker safe)
