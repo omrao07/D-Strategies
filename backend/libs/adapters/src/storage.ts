@@ -96,9 +96,7 @@ export class MemoryStorage implements Storage {
 
   constructor(initial?: Array<{ key: string; body: PutInput; options?: PutOptions }>) {
     if (Array.isArray(initial)) {
-      for (let i = 0; i < initial.length; i++) {
-        const it = initial[i];
-        // fire and forget; ignore errors during boot
+      for (const it of initial) {
         this.putSync(it.key, it.body, it.options);
       }
     }
@@ -183,18 +181,17 @@ export class MemoryStorage implements Storage {
     }
 
     const items: StoredObject[] = [];
-    for (let i = start; i < allKeys.length; i++) {
-      const k = allKeys[i];
+    for (const k of allKeys.slice(start)) {
       if (prefix && !k.startsWith(prefix)) continue;
       if (delimiter) {
-        // If any remaining part after prefix contains the delimiter, skip (only shallow listing)
         const tail = k.slice(prefix.length);
         if (tail.includes(delimiter)) continue;
       }
-      items.push(shallowClone(this.map[k].meta));
+      const row = this.map[k];
+      if (!row) continue;
+      items.push(shallowClone(row.meta) as StoredObject);
       if (limit && items.length >= limit) {
-        const lastKey = k;
-        return { ok: true, items, truncated: true, nextCursor: lastKey };
+        return { ok: true, items, truncated: true, nextCursor: k };
       }
     }
     return { ok: true, items, truncated: false };
@@ -360,7 +357,7 @@ export function utf8Decode(b: Bytes | ArrayBuffer | null | undefined): string {
     try { return new (globalThis as any).TextDecoder("utf-8", { fatal: false }).decode(u8); } catch { /* noop */ }
   }
   let s = "";
-  for (let i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]);
+  for (const byte of u8) s += String.fromCharCode(byte);
   return s;
 }
 
@@ -374,8 +371,8 @@ export function shallowClone<T extends object>(o: T | undefined): T | undefined 
 export function hashHex(bytes: Bytes): string {
   // Tiny fast non-crypto hash (FNV-1a 32-bit)
   let h = 0x811c9dc5 >>> 0;
-  for (let i = 0; i < bytes.length; i++) {
-    h ^= bytes[i];
+  for (const byte of bytes) {
+    h ^= byte;
     h = (h * 0x01000193) >>> 0;
   }
   return ("00000000" + h.toString(16)).slice(-8);
@@ -390,7 +387,7 @@ function sortKeysDeep(v: any): any {
   if (v && typeof v === "object") {
     const o: Dict = {};
     const keys = Object.keys(v).sort();
-    for (let i = 0; i < keys.length; i++) o[keys[i]] = sortKeysDeep(v[keys[i]]);
+    for (const k of keys) o[k] = sortKeysDeep(v[k]);
     return o;
   }
   return v;
@@ -448,10 +445,9 @@ export function toCSV(rows: any[], opts?: CsvOptions): string {
   // rows of objects
   const headers = (opts && opts.headers) || inferHeadersFromObjects(rows);
   const lines: string[] = [headers.join(d)];
-  for (let i = 0; i < rows.length; i++) {
-    const r = rows[i];
+  for (const r of rows) {
     const cells: string[] = [];
-    for (let j = 0; j < headers.length; j++) cells.push(csvCell(r[headers[j]]));
+    for (const h of headers) cells.push(csvCell(r[h]));
     lines.push(cells.join(d));
   }
   return lines.join(nl);
@@ -467,8 +463,7 @@ function csvCell(v: any): string {
 
 function inferHeadersFromObjects(rows: any[]): string[] {
   const set: Dict<boolean> = Object.create(null);
-  for (let i = 0; i < rows.length; i++) {
-    const r = rows[i];
+  for (const r of rows) {
     for (const k in r) set[k] = true;
   }
   return Object.keys(set).sort();

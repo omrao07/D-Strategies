@@ -4,7 +4,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import * as api from "@/lib/api";
-import PnLChart from "@/components/pnlchart";
+import PnLChart from "@/components/PnLChart";
 
 function fmtMoney(v) {
   if (!Number.isFinite(v)) return "—";

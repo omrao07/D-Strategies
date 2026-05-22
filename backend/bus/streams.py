@@ -152,3 +152,10 @@ STREAM_FILLS = "fills"
 
 CHAN_TICKS = "ticks"           # UI live tape (Pub/Sub)
 CHAN_ORDERS = "orders_stream"  # UI order events (Pub/Sub)
+
+STREAM_ALT_SIGNALS = "signals.alt"
+STREAM_POLICY_SIGNALS = "signals.policy"
+STREAM_SIGNALS = "signals.strategies"
+CHAN_FILLS = "chan.fills"
+CHAN_RISK = "chan.risk.updates"
+CHAN_COMPLIANCE = "chan.compliance.alerts"

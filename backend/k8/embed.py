@@ -74,10 +74,25 @@ except Exception:
     pass
 
 # ---------- Local imports ----------
+def _default_chunk_any(text: str, source: str = "", kind_hint=None, max_tokens: int = 800, overlap: int = 120):
+    """Minimal fallback chunker: split on blank lines then by token count estimate."""
+    words = text.split()
+    chunks = []
+    i = 0
+    chunk_idx = 0
+    while i < len(words):
+        segment = words[i: i + max_tokens]
+        chunk_text = " ".join(segment)
+        chunk_id = f"{source}#chunk-{chunk_idx}"
+        chunks.append({"id": chunk_id, "text": chunk_text, "meta": {"source": source, "chunk_idx": chunk_idx}})
+        i += max_tokens - overlap
+        chunk_idx += 1
+    return chunks
+
 try:
     from chunker import chunk_any  # your chunker.py
-except Exception as e:
-    raise RuntimeError("embed.py requires chunker.py in PYTHONPATH") from e
+except Exception:
+    chunk_any = _default_chunk_any  # type: ignore
 
 
 # =========================================================
@@ -239,6 +254,60 @@ class OpenAIEmbedder(BaseEmbedder):
                 time.sleep(wait)
 
 
+# ---- TF-IDF fallback embedder (no ML deps) ----
+class TFIDFEmbedder(BaseEmbedder):
+    """
+    Bag-of-words TF-IDF embedder with a fixed vocabulary learned at fit time.
+    Used as last-resort fallback when no ML libraries are available.
+    Produces L2-normalised dense vectors of shape (n_texts, vocab_size).
+    """
+
+    def __init__(self, cfg: EmbeddingConfig, vocab_size: int = 512):
+        super().__init__(cfg)
+        self.vocab_size = vocab_size
+        self._vocab: Dict[str, int] = {}  # term -> column index
+        self._idf: Optional[np.ndarray] = None
+
+    @staticmethod
+    def _tokenize(text: str) -> List[str]:
+        return re.sub(r"[^a-z0-9 ]", " ", text.lower()).split()
+
+    def fit(self, corpus: List[str]) -> None:
+        """Build vocabulary and IDF from corpus."""
+        from collections import Counter
+        df: Dict[str, int] = {}
+        for doc in corpus:
+            for tok in set(self._tokenize(doc)):
+                df[tok] = df.get(tok, 0) + 1
+        # pick top vocab_size by df
+        top = sorted(df.items(), key=lambda kv: -kv[1])[: self.vocab_size]
+        self._vocab = {tok: i for i, (tok, _) in enumerate(top)}
+        n = max(len(corpus), 1)
+        idf = np.zeros(len(self._vocab), dtype=np.float32)
+        for tok, idx in self._vocab.items():
+            idf[idx] = math.log((n + 1) / (df.get(tok, 0) + 1)) + 1.0
+        self._idf = idf
+
+    def embed_texts(self, texts: List[str]) -> np.ndarray:
+        if not self._vocab:
+            self.fit(texts)
+        dim = len(self._vocab)
+        out = np.zeros((len(texts), dim), dtype=np.float32)
+        for row, text in enumerate(texts):
+            from collections import Counter
+            counts = Counter(self._tokenize(text))
+            total = max(sum(counts.values()), 1)
+            for tok, cnt in counts.items():
+                idx = self._vocab.get(tok)
+                if idx is not None:
+                    tf = cnt / total
+                    idf_val = self._idf[idx] if self._idf is not None else 1.0
+                    out[row, idx] = tf * idf_val
+        if self.cfg.normalize:
+            out = self._normalize(out)
+        return out
+
+
 # ---- factory ----
 def create_embedder(cfg: EmbeddingConfig) -> BaseEmbedder:
     backend = cfg.backend.lower()
@@ -249,14 +318,93 @@ def create_embedder(cfg: EmbeddingConfig) -> BaseEmbedder:
             return HFEmbedder(cfg)
         if _has_openai:
             return OpenAIEmbedder(cfg)
-        raise RuntimeError("No embedding backend available. Install sentence-transformers OR transformers OR openai.")
+        # TF-IDF fallback — always available
+        return TFIDFEmbedder(cfg)
     if backend in ("st", "sentence-transformers"):
         return STEmbedder(cfg)
     if backend in ("hf", "transformers"):
         return HFEmbedder(cfg)
     if backend == "openai":
         return OpenAIEmbedder(cfg)
+    if backend in ("tfidf", "bow"):
+        return TFIDFEmbedder(cfg)
     raise ValueError(f"Unknown backend: {cfg.backend}")
+
+
+# =========================================================
+# Standalone convenience functions (no CLI needed)
+# =========================================================
+
+def embed_text(text: str, model: str = "", backend: str = "auto") -> np.ndarray:
+    """
+    Embed a single text string. Returns 1-D numpy array.
+    Falls back to TF-IDF bag-of-words if no ML backend is available.
+
+    Args:
+        text:    Input text.
+        model:   Optional model name (e.g. "sentence-transformers/all-MiniLM-L6-v2").
+        backend: "auto" | "st" | "hf" | "openai" | "tfidf".
+
+    Returns:
+        np.ndarray of shape (dim,), dtype float32.
+    """
+    cfg = EmbeddingConfig(backend=backend, model=model, normalize=True)
+    embedder = create_embedder(cfg)
+    vecs = embedder.embed_texts([text])
+    return vecs[0]
+
+
+def embed_batch(texts: List[str], model: str = "", backend: str = "auto") -> np.ndarray:
+    """
+    Embed a list of texts. Returns 2-D numpy matrix of shape (len(texts), dim).
+
+    Args:
+        texts:   List of input strings.
+        model:   Optional model name.
+        backend: "auto" | "st" | "hf" | "openai" | "tfidf".
+
+    Returns:
+        np.ndarray of shape (N, dim), dtype float32.
+    """
+    if not texts:
+        return np.empty((0, 1), dtype=np.float32)
+    cfg = EmbeddingConfig(backend=backend, model=model, normalize=True)
+    embedder = create_embedder(cfg)
+    return embedder.embed_texts(list(texts))
+
+
+def save_embeddings(embeddings: np.ndarray, path: str, ids: Optional[List[str]] = None, meta: Optional[List[Dict[str, Any]]] = None) -> None:
+    """
+    Save embeddings to a .npz file (or .parquet / .jsonl if path ends with those).
+
+    Args:
+        embeddings: np.ndarray of shape (N, dim).
+        path:       Output file path. Extension determines format:
+                      .npz    → numpy compressed (default)
+                      .parquet → pandas parquet
+                      .jsonl  → newline-delimited JSON
+        ids:        Optional list of string IDs (length N).
+        meta:       Optional list of dicts (length N).
+    """
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    _ids = ids or [str(i) for i in range(len(embeddings))]
+    _meta = meta or [{} for _ in range(len(embeddings))]
+
+    if path.lower().endswith(".parquet"):
+        import pandas as _pd
+        df = _pd.DataFrame({
+            "id": _ids,
+            "embedding": [embeddings[i].astype(np.float32).tolist() for i in range(len(embeddings))],
+            "meta": [json.dumps(m, ensure_ascii=False) for m in _meta],
+        })
+        df.to_parquet(path, index=False)
+    elif path.lower().endswith(".jsonl"):
+        with open(path, "w", encoding="utf-8") as f:
+            for i in range(len(embeddings)):
+                f.write(json.dumps({"id": _ids[i], "embedding": embeddings[i].astype(np.float32).tolist(), "meta": _meta[i]}) + "\n")
+    else:
+        # default: .npz
+        np.savez_compressed(path, embeddings=embeddings.astype(np.float32), ids=np.array(_ids, dtype=object))
 
 
 # =========================================================

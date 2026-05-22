@@ -197,9 +197,56 @@ async def _fetch_positions(r: Any) -> list[Dict[str, Any]]:
     return msgs
 
 
+async def _fetch_pnl(r: Any) -> Optional[Dict[str, Any]]:
+    pnl_raw = await _hgetall(r, "engine:pnl")
+    if not pnl_raw:
+        return None
+    import datetime
+    return {
+        "type": "pnl",
+        "payload": {
+            "date": datetime.date.today().isoformat(),
+            "realized": float(pnl_raw.get("realized", 0.0)),
+            "unrealized": float(pnl_raw.get("unrealized", 0.0)),
+            "fees": float(pnl_raw.get("fees", 0.0)),
+            "net": float(pnl_raw.get("daily", 0.0)),
+            "cumulative_net": float(pnl_raw.get("cumulative", 0.0)),
+            "drawdown": float(pnl_raw.get("drawdown", 0.0)),
+            "hwm": float(pnl_raw.get("hwm", 0.0)),
+        },
+    }
+
+
+async def _fetch_india_status(r: Any) -> Optional[Dict[str, Any]]:
+    india_raw = await _hgetall(r, "india:status")
+    if not india_raw:
+        return None
+    fo_ban_str = india_raw.get("fo_ban_list", "[]")
+    circuit_str = india_raw.get("circuit_halted", "[]")
+    fo_ban = _safe_json(fo_ban_str) or []
+    circuit = _safe_json(circuit_str) or []
+    return {
+        "type": "india_status",
+        "payload": {
+            "is_open": india_raw.get("is_open", "false") == "true",
+            "next_event": india_raw.get("next_event", ""),
+            "circuit_halted": circuit,
+            "fo_ban_list": fo_ban,
+            "margin_used": float(india_raw.get("margin_used", 0.0)),
+            "margin_available": float(india_raw.get("margin_available", 0.0)),
+            "vix": float(india_raw.get("vix", 0.0)),
+            "pcr": float(india_raw.get("pcr", 0.0)),
+            "regime": india_raw.get("regime", "unknown"),
+        },
+    }
+
+
 # ---- Broadcast loop -------------------------------------------------------
 
+_last_heartbeat_ts: float = 0.0
+
 async def _broadcast_loop() -> None:
+    global _last_heartbeat_ts
     r = _mk_redis()
     interval = BROADCAST_INTERVAL_MS / 1000.0
 
@@ -220,6 +267,20 @@ async def _broadcast_loop() -> None:
 
             for pos_msg in await _fetch_positions(r):
                 await _manager.broadcast(pos_msg)
+
+            pnl_msg = await _fetch_pnl(r)
+            if pnl_msg:
+                await _manager.broadcast(pnl_msg)
+
+            india_msg = await _fetch_india_status(r)
+            if india_msg:
+                await _manager.broadcast(india_msg)
+
+            # Heartbeat every 30s
+            now = time.time()
+            if now - _last_heartbeat_ts >= 30.0:
+                _last_heartbeat_ts = now
+                await _manager.broadcast({"type": "heartbeat", "payload": {"t": now}})
 
         except Exception as exc:
             log.warning("broadcast error: %s", exc)

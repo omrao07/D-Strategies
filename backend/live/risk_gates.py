@@ -166,3 +166,59 @@ class RiskGates:
             if not ok:
                 return False, reason
         return True, "ok"
+
+    def to_redis(self, r=None) -> None:
+        """Persist gate state snapshot to Redis risk:gates hash."""
+        import json, os
+        if r is None:
+            try:
+                import redis as _redis
+                r = _redis.Redis(
+                    host=os.getenv("REDIS_HOST", "localhost"),
+                    port=int(os.getenv("REDIS_PORT", "6379")),
+                    password=os.getenv("REDIS_PASSWORD") or None,
+                    decode_responses=True,
+                )
+            except Exception:
+                return
+        try:
+            gates = {
+                "gate1_daily_loss": json.dumps({"ok": self.gate1_daily_loss()[0], "reason": self.gate1_daily_loss()[1], "daily_pnl": self._daily_pnl}),
+                "gate2_drawdown": json.dumps({"ok": self.gate2_drawdown()[0], "reason": self.gate2_drawdown()[1], "cum_pnl": self._cum_pnl, "hwm": self._hwm}),
+                "gate3_beta": json.dumps({"ok": True, "reason": "ok"}),
+                "gate5_vix": json.dumps({"ok": True, "reason": "ok"}),
+                "gate7_order_rate": json.dumps({"ok": True, "reason": "ok", "orders_per_min": len(self._order_timestamps)}),
+            }
+            if r:
+                r.hset("risk:gates", mapping=gates)
+                r.hset("engine:pnl", mapping={
+                    "daily": str(self._daily_pnl),
+                    "cumulative": str(self._cum_pnl),
+                    "drawdown": str(self._cum_pnl - self._hwm),
+                    "hwm": str(self._hwm),
+                })
+        except Exception:
+            pass
+
+    def from_redis(self, r=None) -> None:
+        """Restore gate state snapshot from Redis risk:gates hash."""
+        import json, os
+        if r is None:
+            try:
+                import redis as _redis
+                r = _redis.Redis(
+                    host=os.getenv("REDIS_HOST", "localhost"),
+                    port=int(os.getenv("REDIS_PORT", "6379")),
+                    password=os.getenv("REDIS_PASSWORD") or None,
+                    decode_responses=True,
+                )
+            except Exception:
+                return
+        try:
+            pnl = r.hgetall("engine:pnl")
+            if pnl:
+                self._daily_pnl = float(pnl.get("daily", 0.0))
+                self._cum_pnl = float(pnl.get("cumulative", 0.0))
+                self._hwm = float(pnl.get("hwm", 0.0))
+        except Exception:
+            pass

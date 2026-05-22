@@ -167,7 +167,12 @@ def capacity_time_series(
     rows = []
     for d in months:
         y = d.year
-        active = fleet[(fleet["commission_year"] <= y) & (fleet["retire_year"] >= y)]
+        # fillna so NaN commission/retire years don't silently drop plants:
+        # missing commission_year → treat as always commissioned; missing retire_year → never retires
+        active = fleet[
+            (fleet["commission_year"].fillna(-np.inf) <= y) &
+            (fleet["retire_year"].fillna(np.inf) >= y)
+        ]
         cap = (
             active.groupby("fuel")["capacity_mw"]
             .sum()
@@ -284,14 +289,12 @@ def main():
     disp.to_csv(out / "monthly_dispatch.csv", index=False)
     emis.to_csv(out / "emissions.csv", index=False)
 
+    total_gen = float(disp["generation_gwh"].sum()) if not disp.empty else 0.0
+    coal_gen = float(disp[disp["fuel"].isin(["lignite", "hard_coal"])]["generation_gwh"].sum()) if not disp.empty else 0.0
     summary = {
         "period": f"{args.start}..{args.end}",
-        "total_emissions_mt": float(emis["total_mtco2"].sum()),
-        "coal_share_pct": float(
-            disp[disp["fuel"].isin(["lignite", "hard_coal"])]["generation_gwh"].sum()
-            / disp["generation_gwh"].sum()
-            * 100
-        ),
+        "total_emissions_mt": float(emis["total_mtco2"].sum()) if not emis.empty else 0.0,
+        "coal_share_pct": coal_gen / total_gen * 100 if total_gen > 0 else 0.0,
     }
 
     (out / "summary.json").write_text(json.dumps(summary, indent=2))

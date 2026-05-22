@@ -65,8 +65,7 @@ export function validateDescriptorBasic(d: any): d is DatasetDescriptor {
 // Endpoint helpers
 // ------------------------------
 export function getEndpoint(d: DatasetDescriptor, kind: Endpoint["kind"]): Endpoint | undefined {
-  for (let i = 0; i < d.endpoints.length; i++) {
-    const e = d.endpoints[i];
+  for (const e of d.endpoints) {
     if (e.kind === kind) return e;
   }
   return undefined;
@@ -213,8 +212,7 @@ export function normalizeRowToColumns(
   opts: NormalizeOptions = {}
 ): Record<string, any> {
   const out: Record<string, any> = {};
-  for (let i = 0; i < columns.length; i++) {
-    const c = columns[i];
+  for (const c of columns) {
     let v = row[c.name];
     // special: normalize options 'right'
     if (c.name === "right" && opts.enumRightCanonical && v != null) {
@@ -319,8 +317,7 @@ export class BloombergClient {
       if (normalize && normalize.onError) normalize.onError(field, value, reason);
     };
 
-    for (let i = 0; i < (rsp.rows || []).length; i++) {
-      const r = rsp.rows![i]; // { id, data }
+    for (const r of (rsp.rows ?? [])) { // { id, data }
       const vendorRow = r.data || {};
       const canonRow = mapVendorToCanonical(vendorRow, aliases);
       if (attachIdAs) {
@@ -353,8 +350,7 @@ export function chunk<T>(arr: T[], size: number): T[][] {
 
 export function pick<T extends Record<string, any>>(obj: T, keys: string[]): Partial<T> {
   const o: Partial<T> = {};
-  for (let i = 0; i < keys.length; i++) {
-    const k = keys[i];
+  for (const k of keys) {
     if (k in obj) (o as any)[k] = obj[k];
   }
   return o;
@@ -362,8 +358,7 @@ export function pick<T extends Record<string, any>>(obj: T, keys: string[]): Par
 
 export function ensurePrimaryKey(row: Record<string, any>, pk: string[]): string {
   const parts: string[] = [];
-  for (let i = 0; i < pk.length; i++) {
-    const k = pk[i];
+  for (const k of pk) {
     const v = row[k];
     parts.push(`${v === undefined ? "" : String(v)}`);
   }

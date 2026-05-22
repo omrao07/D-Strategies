@@ -51,10 +51,10 @@ export default function Risk() {
       try {
         setLoading(true);
         const [k, m, s, h] = await Promise.all([
-          apiFetch("/api/risk/kpis"),
-          apiFetch("/api/risk/monte_carlo"),
-          apiFetch("/api/risk/scenarios"),
-          apiFetch("/api/risk/timeseries"),
+          apiFetch<RiskKpis>("/api/risk/kpis"),
+          apiFetch<McSummary>("/api/risk/monte_carlo"),
+          apiFetch<ScenarioRow[]>("/api/risk/scenarios"),
+          apiFetch<TimeseriesPoint[]>("/api/risk/timeseries"),
         ]);
         setKpis(k);
         setMc(m);

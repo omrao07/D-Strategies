@@ -427,6 +427,37 @@ async def _amain():
           ORDERS_UPDATES_STREAM, SIGNALS_STREAM, FEATURE_STORE_STREAM, "->", EXPLAIN_STREAM)
     await et.run_forever()
 
+def explain(trade_id: str) -> str:
+    """Synchronous wrapper used by the REST API (/api/trades/{id}/explain)."""
+    import asyncio
+    async def _run():
+        r = await _redis()
+        if r is None:
+            return f"Trade {trade_id}: Redis unavailable — no explanation"
+        try:
+            raw = await r.hget("fills:by_id", trade_id)
+            if not raw:
+                return f"Trade {trade_id} not found in fills ledger"
+            fill = json.loads(raw) if isinstance(raw, str) else raw
+            sym = fill.get("symbol", "?")
+            side = fill.get("side", "?")
+            qty = fill.get("qty", 0)
+            px = fill.get("exec_price", fill.get("price", 0))
+            strategy = fill.get("strategy", "unknown")
+            ts = fill.get("ts_ms", 0)
+            return (
+                f"Trade {trade_id}: {side.upper()} {qty} {sym} @ {px:.4f} "
+                f"via strategy '{strategy}' at ts={ts}. "
+                "Signal confidence and risk context not available synchronously — start ExplainableTrades daemon for full attribution."
+            )
+        except Exception as exc:
+            return f"Explain error for {trade_id}: {exc}"
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        return f"Explainability unavailable: {exc}"
+
+
 if __name__ == "__main__":
     try:
         import asyncio

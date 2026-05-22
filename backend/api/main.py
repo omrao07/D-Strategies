@@ -60,6 +60,73 @@ async def lifespan(app: FastAPI):
     if missing_recommended:
         logger.warning("Missing recommended env vars (defaults used): %s", missing_recommended)
     logger.info("API startup OK — version=%s", APP_VERSION)
+
+    # Start signal bus in a background thread
+    import threading
+    try:
+        from backend.engine.signal_bus import SignalBus
+        _signal_bus = SignalBus()
+        _sb_thread = threading.Thread(target=_signal_bus.run_forever, daemon=True, name="signal-bus")
+        _sb_thread.start()
+        logger.info("SignalBus started in background thread")
+    except Exception as _sb_err:
+        logger.warning("SignalBus could not be started: %s", _sb_err)
+
+    # Start compliance surveillance in a background asyncio task
+    try:
+        import asyncio
+        from backend.compliance.surveillance import Surveillance
+        _surv = Surveillance()
+
+        async def _run_surveillance():
+            try:
+                await _surv.run()
+            except Exception as _se:
+                logger.warning("Surveillance exited: %s", _se)
+
+        asyncio.get_event_loop().create_task(_run_surveillance())
+        logger.info("Compliance surveillance task started")
+    except Exception as _surv_err:
+        logger.warning("Compliance surveillance could not be started: %s", _surv_err)
+
+    # Start India market status poller — writes india:status hash every 60s
+    try:
+        import asyncio, json as _json, os as _os
+        async def _india_status_loop():
+            while True:
+                try:
+                    import redis as _redis_mod
+                    _r = _redis_mod.Redis(
+                        host=_os.getenv("REDIS_HOST", "localhost"),
+                        port=int(_os.getenv("REDIS_PORT", "6379")),
+                        decode_responses=True,
+                    )
+                    from backend.india import (
+                        IndiaMarketCalendar, get_india_vix,
+                    )
+                    vix = get_india_vix(_r) or 0.0
+                    is_open = IndiaMarketCalendar.is_market_open()
+                    status_data = {
+                        "is_open": str(is_open).lower(),
+                        "next_event": "",
+                        "vix": str(vix),
+                        "pcr": str(_r.get("india:pcr") or 0.0),
+                        "regime": _r.get("india:regime") or "unknown",
+                        "fo_ban_list": _r.get("india:fo_ban_list") or "[]",
+                        "circuit_halted": _r.get("india:circuit_halted") or "[]",
+                        "margin_used": _r.get("india:margin_used") or "0",
+                        "margin_available": _r.get("india:margin_available") or "0",
+                    }
+                    _r.hset("india:status", mapping=status_data)
+                except Exception as _ie:
+                    logger.debug("India status update error: %s", _ie)
+                await asyncio.sleep(60)
+
+        asyncio.get_event_loop().create_task(_india_status_loop())
+        logger.info("India status poller started")
+    except Exception as _india_err:
+        logger.warning("India status poller could not be started: %s", _india_err)
+
     yield
     logger.info("API shutdown complete")
 
@@ -386,22 +453,100 @@ def run_vec_backtest(req: VecBacktestRequest, _auth: None = Depends(_require_key
 def _not_implemented(name: str):
     raise HTTPException(501, f"Not implemented: {name}")
 
-# Alt-data — return empty payloads (external data feeds wired separately)
+# Alt-data — read from Redis, fall back to empty if unavailable
+def _redis_hgetall_list(key: str) -> List[Dict]:
+    """Read a Redis hash and return its values as a list of parsed JSON dicts."""
+    try:
+        import redis as _redis_mod, os as _os, json as _json
+        _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
+        raw = _r.hgetall(key)
+        return [_json.loads(v) for v in raw.values() if v]
+    except Exception:
+        return []
+
+
+def _redis_stream_last(stream: str, count: int = 50, filter_metric: Optional[str] = None) -> List[Dict]:
+    """Read last `count` entries from a Redis stream, optionally filtering by metric field."""
+    try:
+        import redis as _redis_mod, os as _os, json as _json
+        _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
+        entries = _r.xrevrange(stream, count=count)
+        out = []
+        for _id, fields in entries:
+            payload = fields.get("json", "")
+            if not payload:
+                continue
+            try:
+                obj = _json.loads(payload)
+            except Exception:
+                continue
+            if filter_metric and obj.get("metric") != filter_metric:
+                continue
+            out.append(obj)
+        return list(reversed(out))
+    except Exception:
+        return []
+
+
 @app.get("/api/altdata/card_spend")
 def get_altdata_card_spend():
-    return {"data": [], "source": "card_spend", "available": False}
+    try:
+        import redis as _redis_mod, os as _os, json as _json
+        _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
+        # Try hash key first, then fall back to stream filter
+        raw = _r.hgetall("altdata:card_spend")
+        if raw:
+            data = [_json.loads(v) for v in raw.values() if v]
+        else:
+            data = _redis_stream_last("signals.alt", count=100, filter_metric="card_spend")
+        return {"data": data, "source": "card_spend", "available": bool(data)}
+    except Exception:
+        return {"data": [], "source": "card_spend", "available": False}
+
 
 @app.get("/api/altdata/satellite_lights")
 def get_altdata_satellite_lights():
-    return {"data": [], "source": "satellite_lights", "available": False}
+    try:
+        import redis as _redis_mod, os as _os, json as _json
+        _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
+        raw = _r.hgetall("altdata:satellite_lights")
+        if raw:
+            data = [_json.loads(v) for v in raw.values() if v]
+        else:
+            data = _redis_stream_last("signals.alt", count=100, filter_metric="satellite_lights")
+        return {"data": data, "source": "satellite_lights", "available": bool(data)}
+    except Exception:
+        return {"data": [], "source": "satellite_lights", "available": False}
+
 
 @app.get("/api/altdata/shipping_traffic")
 def get_altdata_shipping_traffic():
-    return {"data": [], "source": "shipping_traffic", "available": False}
+    try:
+        import redis as _redis_mod, os as _os, json as _json
+        _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
+        raw = _r.hgetall("altdata:shipping")
+        if raw:
+            data = [_json.loads(v) for v in raw.values() if v]
+        else:
+            data = _redis_stream_last("signals.alt", count=100, filter_metric="shipping_traffic")
+        return {"data": data, "source": "shipping_traffic", "available": bool(data)}
+    except Exception:
+        return {"data": [], "source": "shipping_traffic", "available": False}
+
 
 @app.get("/api/altdata/geo_spatial")
 def get_altdata_geo_spatial():
-    return {"data": [], "source": "geo_spatial", "available": False}
+    try:
+        import redis as _redis_mod, os as _os, json as _json
+        _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
+        raw = _r.hgetall("altdata:geo")
+        if raw:
+            data = [_json.loads(v) for v in raw.values() if v]
+        else:
+            data = _redis_stream_last("signals.alt", count=100, filter_metric="geo_spatial")
+        return {"data": data, "source": "geo_spatial", "available": bool(data)}
+    except Exception:
+        return {"data": [], "source": "geo_spatial", "available": False}
 
 # Analyst
 @app.get("/api/analyst/screener")
@@ -618,13 +763,20 @@ def get_risk_timeseries(metric: str = "pnl", days: int = 30, _auth: None = Depen
 def list_strategies():
     """Return all registered strategies with metadata."""
     try:
-        from backend.engine.registry import Registry
-        reg = Registry.get_instance()
+        from backend.engine.registry import HUB, auto_register_strategies
+        if not HUB.strategies.all():
+            try:
+                auto_register_strategies()
+            except Exception:
+                pass
         strats = []
-        for name, cls in reg.items():
+        for name, cls in HUB.strategies.all().items():
             meta = {}
             try:
-                meta = cls.get_metadata() or {}
+                # get_metadata is an instance method; create a bare instance to call it
+                inst = cls.__new__(cls)
+                if hasattr(inst, "get_metadata"):
+                    meta = inst.get_metadata() or {}
             except Exception:
                 pass
             strats.append({

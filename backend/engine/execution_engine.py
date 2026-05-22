@@ -362,6 +362,26 @@ def _process_order(order: Dict) -> None:
     publish_stream(STREAM_FILLS, fill)
     publish_pubsub(CHAN_ORDERS, {"event": "fill", **fill})
 
+    # Persist fill to fills:by_id hash (API reads this at /api/trades/{trade_id})
+    try:
+        r.hset("fills:by_id", fill_id, json.dumps(fill))
+    except Exception:
+        pass
+
+    # Mirror PnL to engine:pnl hash (ws_live.py reads this key)
+    try:
+        pnl_raw = kv_get(_pnl_key())
+        if pnl_raw:
+            pnl_obj = json.loads(pnl_raw) if isinstance(pnl_raw, str) else pnl_raw
+            r.hset("engine:pnl", mapping={
+                "daily": str(pnl_obj.get("total", 0.0)),
+                "cumulative": str(pnl_obj.get("total", 0.0)),
+                "realized": str(pnl_obj.get("realized", 0.0)),
+                "unrealized": str(pnl_obj.get("unrealized", 0.0)),
+            })
+    except Exception:
+        pass
+
 def run():
     # heartbeat
     kv_set("execution:alive", {"ts": int(time.time())})

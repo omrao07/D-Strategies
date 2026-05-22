@@ -25,6 +25,8 @@ export function useWsSync() {
     appendPnL,
     upsertTick,
     setIndia,
+    setIndiaDash,
+    setPnl,
     setWsStatus,
     setHeartbeat,
   } = useTradingStore();
@@ -97,6 +99,13 @@ export function useWsSync() {
             net: Number(payload.net ?? 0),
             cumulativeNet: Number(payload.cumulative_net ?? 0),
           });
+          // Also update the pnl summary slice
+          setPnl({
+            daily: Number(payload.net ?? 0),
+            cumulative: Number(payload.cumulative_net ?? 0),
+            drawdown: Number(payload.drawdown ?? 0),
+            hwm: Number(payload.hwm ?? 0),
+          });
           break;
 
         case "tick":
@@ -123,6 +132,30 @@ export function useWsSync() {
             marginUsed: Number(payload.margin_used ?? 0),
             marginAvailable: Number(payload.margin_available ?? 0),
           });
+          // Also update the indiaDash summary slice
+          setIndiaDash({
+            vix: Number(payload.vix ?? 0),
+            pcr: Number(payload.pcr ?? 0),
+            regime: String(payload.regime ?? "unknown"),
+            fo_ban: Array.isArray(payload.fo_ban_list)
+              ? (payload.fo_ban_list as unknown[]).map(String)
+              : [],
+          });
+          break;
+
+        case "india":
+          setIndiaDash({
+            vix: Number(payload.vix ?? 0),
+            pcr: Number(payload.pcr ?? 0),
+            regime: String(payload.regime ?? "unknown"),
+            fo_ban: Array.isArray(payload.fo_ban)
+              ? (payload.fo_ban as unknown[]).map(String)
+              : [],
+          });
+          break;
+
+        case "heartbeat":
+          setHeartbeat();
           break;
 
         case "pong":

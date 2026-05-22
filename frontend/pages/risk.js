@@ -3,7 +3,7 @@
 // Works with the RiskPanel you added earlier (which can self-fetch from /api/risk).
 
 import React, { useEffect, useMemo, useState } from "react";
-import RiskPanel from "@/components/riskpanel";
+import RiskPanel from "@/components/RiskPanel";
 import * as api from "@/lib/api";
 
 function fmtMoney(v) {

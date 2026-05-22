@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts"
-import { Card, CardContent } from "../../ components/ui/card"
+import { Card, CardContent } from "../../components/ui/card"
 
 // Types
 interface DepthPoint {

@@ -156,6 +156,21 @@ async def _amain():
         res = await qc.query(q)
         print(q, "->", json.dumps(res, indent=2))
 
+def answer(q: str) -> str:
+    """Synchronous wrapper used by the REST API (/api/analyst/query, /api/research/query)."""
+    import asyncio
+    async def _run():
+        qc = QueryCopilot(use_llm=True)
+        result = await qc.query(q)
+        if "error" in result:
+            return f"Query error: {result['error']}"
+        return result.get("summary", str(result))
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        return f"Query copilot error: {exc}"
+
+
 if __name__ == "__main__":
     import asyncio
     try:

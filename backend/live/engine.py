@@ -163,3 +163,7 @@ class LiveEngine:
                 self.stop()
                 break
             log.info("LiveEngine heartbeat: %d strategies alive", len(self._runners))
+            try:
+                self.risk.to_redis()
+            except Exception:
+                pass

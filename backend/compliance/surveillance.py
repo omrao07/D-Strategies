@@ -18,7 +18,7 @@ def now_ms() -> int: return int(time.time() * 1000)
 # -------- Env / Streams ------------------------------------------------------
 REDIS_URL        = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 S_ORD_IN         = os.getenv("ORDERS_INCOMING", "orders.incoming")
-S_ORD_FILLED     = os.getenv("ORDERS_FILLED", "orders.filled")
+S_ORD_FILLED     = os.getenv("ORDERS_FILLED", "fills")        # aligns with STREAM_FILLS in bus/streams.py
 S_ORD_REJ        = os.getenv("ORDERS_REJECTED", "orders.rejected")
 S_BARS           = os.getenv("PRICES_STREAM", "prices.bars")
 S_ORDERBOOK      = os.getenv("WS_ORDERBOOK", "ws.orderbook")    # optional L2/L1 updates

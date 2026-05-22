@@ -369,4 +369,154 @@ class PayoutRailsAdapter(BankAdapterBase):
         PAYOUT_BASE_URL, PAYOUT_API_KEY, PAYOUT_API_SECRET
     """
 
+    name = "payout_rails"
+
+    def __init__(self):
+        super().__init__(rps=5.0, per_min_limit=120)
+        self._base_url = os.getenv("PAYOUT_BASE_URL", "")
+        self._api_key = secrets.get("PAYOUT_API_KEY", default="")
+        self._api_secret = secrets.get("PAYOUT_API_SECRET", default="")
+        # In-memory fallback for when credentials not set (returns failures gracefully)
+        self._mock = MockBankAdapter()
+
+    def _has_creds(self) -> bool:
+        return bool(self._base_url and self._api_key)
+
+    def _http_get(self, path: str, params: Optional[Dict] = None) -> Dict[str, Any]:
+        """HTTP GET against payout rail API. Override/extend with your SDK."""
+        try:
+            import urllib.request, urllib.parse, base64 as _b64
+            url = self._base_url.rstrip("/") + "/" + path.lstrip("/")
+            if params:
+                url += "?" + urllib.parse.urlencode(params)
+            cred = _b64.b64encode(f"{self._api_key}:{self._api_secret}".encode()).decode()
+            req = urllib.request.Request(url, headers={"Authorization": f"Basic {cred}", "Accept": "application/json"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                import json as _j
+                return _j.loads(resp.read().decode())
+        except Exception as exc:
+            raise RuntimeError(f"payout_rails GET {path}: {exc}") from exc
+
+    def _http_post(self, path: str, body: Dict[str, Any]) -> Dict[str, Any]:
+        """HTTP POST against payout rail API. Override/extend with your SDK."""
+        try:
+            import urllib.request, urllib.parse, base64 as _b64, json as _j
+            url = self._base_url.rstrip("/") + "/" + path.lstrip("/")
+            cred = _b64.b64encode(f"{self._api_key}:{self._api_secret}".encode()).decode()
+            data = _j.dumps(body).encode()
+            req = urllib.request.Request(url, data=data, method="POST", headers={
+                "Authorization": f"Basic {cred}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            })
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return _j.loads(resp.read().decode())
+        except Exception as exc:
+            raise RuntimeError(f"payout_rails POST {path}: {exc}") from exc
+
+    def list_accounts(self) -> List[BankAccount]:
+        self._guard("list_accounts")
+        if not self._has_creds():
+            return self._mock.list_accounts()
+        try:
+            raw = self._http_get("/v1/accounts")
+            accounts = raw.get("items", raw.get("data", []))
+            return [
+                BankAccount(
+                    bank_name="PayoutRails",
+                    account_id=str(a.get("id", "")),
+                    account_number_masked=str(a.get("account_number", "****"))[-8:],
+                    currency=str(a.get("currency", "USD")),
+                    meta={"raw": a},
+                )
+                for a in accounts
+            ]
+        except Exception:
+            return self._mock.list_accounts()
+
+    def get_balance(self, account_id: str) -> Balance:
+        self._guard(f"bal:{account_id}")
+        if not self._has_creds():
+            return self._mock.get_balance("acct-operating")
+        try:
+            raw = self._http_get(f"/v1/accounts/{account_id}/balance")
+            return Balance(
+                available=float(raw.get("available", 0.0)),
+                ledger=float(raw.get("balance", raw.get("ledger", 0.0))),
+                currency=str(raw.get("currency", "USD")),
+                ts=now_iso(),
+            )
+        except Exception:
+            return self._mock.get_balance("acct-operating")
+
+    def list_transactions(self, account_id: str, *, since: Optional[str] = None, until: Optional[str] = None, limit: int = 200) -> List[Transaction]:
+        self._guard(f"tx:{account_id}")
+        if not self._has_creds():
+            return self._mock.list_transactions(account_id, since=since, until=until, limit=limit)
+        try:
+            params: Dict[str, Any] = {"count": str(min(limit, 200))}
+            if since:
+                params["from"] = since
+            if until:
+                params["to"] = until
+            raw = self._http_get(f"/v1/accounts/{account_id}/transactions", params=params)
+            items = raw.get("items", raw.get("data", []))
+            out = []
+            for it in items:
+                amt_raw = float(it.get("amount", 0.0))
+                out.append(Transaction(
+                    tx_id=str(it.get("id", uuid.uuid4().hex[:16])),
+                    account_id=account_id,
+                    amount=amt_raw,
+                    currency=str(it.get("currency", "USD")),
+                    description=str(it.get("description", it.get("narration", ""))),
+                    booked_at=str(it.get("created_at", it.get("date", now_iso()))),
+                    counterparty=it.get("counterparty"),
+                    meta={k: v for k, v in it.items() if k not in {"id","amount","currency","description","created_at","counterparty"}},
+                ))
+            return out
+        except Exception:
+            return self._mock.list_transactions(account_id, since=since, until=until, limit=limit)
+
+    def initiate_transfer(self, req: TransferRequest) -> TransferResult:
+        self._guard("transfer")
+        if not self._has_creds():
+            return self._mock.initiate_transfer(req)
+        try:
+            body: Dict[str, Any] = {
+                "account_number": req.to_beneficiary,
+                "amount": int(req.amount * 100),  # many rails use minor units
+                "currency": req.currency,
+                "narration": req.reference,
+                "reference": req.idempotency_key or f"{req.from_account_id}:{int(time.time())}",
+            }
+            raw = self._http_post("/v1/transfers", body)
+            status_map = {"pending": "processing", "successful": "settled", "failed": "failed", "queued": "queued"}
+            api_status = raw.get("status", "processing")
+            return TransferResult(
+                ok=api_status not in ("failed", "reversed"),
+                transfer_id=str(raw.get("id", "")),
+                status=status_map.get(api_status, "processing"),
+                raw=raw,
+            )
+        except Exception as exc:
+            return TransferResult(ok=False, transfer_id=None, status="failed", reason=str(exc))
+
+    def transfer_status(self, transfer_id: str) -> TransferResult:
+        self._guard("status")
+        if not self._has_creds():
+            return self._mock.transfer_status(transfer_id)
+        try:
+            raw = self._http_get(f"/v1/transfers/{transfer_id}")
+            api_status = raw.get("status", "processing")
+            status_map = {"pending": "processing", "successful": "settled", "failed": "failed", "queued": "queued"}
+            return TransferResult(
+                ok=api_status not in ("failed", "reversed"),
+                transfer_id=transfer_id,
+                status=status_map.get(api_status, "processing"),
+                raw=raw,
+            )
+        except Exception as exc:
+            return TransferResult(ok=False, transfer_id=transfer_id, status="failed", reason=str(exc))
+
    

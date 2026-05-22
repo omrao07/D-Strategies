@@ -133,7 +133,7 @@ export function BacktesterPanel() {
         method: "POST",
         body: JSON.stringify(config),
       });
-      setResult(data.summary ?? data);
+      setResult((data.summary ?? data) as BacktestResult);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {

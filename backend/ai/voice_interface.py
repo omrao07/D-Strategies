@@ -272,6 +272,18 @@ async def publish_voice_command(text: str, meta: Dict[str, Any] | None = None) -
     except Exception:
         pass
 
+def process_command(text: str) -> str:
+    """Synchronous wrapper used by the REST API (/api/voice/command)."""
+    import asyncio
+    async def _run():
+        await publish_voice_command(text)
+        return f"Command published: {text}"
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        return f"Voice command error: {exc}"
+
+
 async def submit_swarm_query(text: str) -> None:
     """Optional: push a natural-language query to your Query Copilot capability."""
     r = await get_redis()

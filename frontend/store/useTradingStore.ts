@@ -70,6 +70,28 @@ export interface IndiaMarketState {
   marginAvailable: number;
 }
 
+// Additional slices required by the dashboard
+
+export interface IndiaDashState {
+  vix: number;
+  pcr: number;
+  regime: string;
+  fo_ban: string[];
+}
+
+export interface PnLSummary {
+  daily: number;
+  cumulative: number;
+  drawdown: number;
+  hwm: number;
+}
+
+export interface TickSummary {
+  price: number;
+  change: number;
+  ts: number;
+}
+
 // ---- Store ----------------------------------------------------------------
 
 interface TradingStore {
@@ -114,10 +136,19 @@ interface TradingStore {
   toggleSidebar: () => void;
 
   // WebSocket health
-  wsStatus: "idle" | "connecting" | "open" | "closed" | "error";
+  wsStatus: "idle" | "connecting" | "open" | "closed" | "error" | "connected" | "disconnected" | "reconnecting";
   setWsStatus: (s: TradingStore["wsStatus"]) => void;
   lastHeartbeatMs: number;
+  heartbeat: number;
   setHeartbeat: () => void;
+
+  // India dash state (vix/pcr/regime/fo_ban summary)
+  indiaDash: IndiaDashState;
+  setIndiaDash: (s: Partial<IndiaDashState>) => void;
+
+  // P&L summary slice
+  pnl: PnLSummary;
+  setPnl: (s: Partial<PnLSummary>) => void;
 }
 
 export const useTradingStore = create<TradingStore>()(
@@ -205,7 +236,31 @@ export const useTradingStore = create<TradingStore>()(
     wsStatus: "idle",
     setWsStatus: (s) => set({ wsStatus: s }),
     lastHeartbeatMs: 0,
-    setHeartbeat: () => set({ lastHeartbeatMs: Date.now() }),
+    heartbeat: 0,
+    setHeartbeat: () => {
+      const now = Date.now();
+      set({ lastHeartbeatMs: now, heartbeat: now });
+    },
+
+    // India dash state
+    indiaDash: {
+      vix: 0,
+      pcr: 0,
+      regime: "unknown",
+      fo_ban: [],
+    },
+    setIndiaDash: (s) =>
+      set((state) => ({ indiaDash: { ...state.indiaDash, ...s } })),
+
+    // P&L summary
+    pnl: {
+      daily: 0,
+      cumulative: 0,
+      drawdown: 0,
+      hwm: 0,
+    },
+    setPnl: (s) =>
+      set((state) => ({ pnl: { ...state.pnl, ...s } })),
   }))
 );
 

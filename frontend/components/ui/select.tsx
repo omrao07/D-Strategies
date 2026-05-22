@@ -41,7 +41,7 @@ export function Select({
 
   const ctx: SelectContextValue = {
     value: current,
-    onValueChange: (v) => {
+    onValueChange: (v: string) => {
       if (!controlled) setVal(v);
       onValueChange?.(v);
     },

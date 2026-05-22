@@ -116,8 +116,7 @@ export async function runPipeline<T = any>(
   const outSteps: Array<{ name: string; ok: boolean; meta?: Dict; error?: string }> = [];
   let current: any = initialData;
 
-  for (let i = 0; i < steps.length; i++) {
-    const name = steps[i];
+  for (const name of steps) {
     const res = await runAdapter<any, any>(name, current, _ctx);
     outSteps.push({ name, ok: res.ok, meta: res.meta, error: res.error });
     if (!res.ok) {
@@ -165,8 +164,7 @@ export function mapFields(row: Dict, aliases: Dict<string>): Dict {
 
 export function pick<T extends Dict>(obj: T, keys: string[]): Partial<T> {
   const o: Partial<T> = {};
-  for (let i = 0; i < keys.length; i++) {
-    const k = keys[i];
+  for (const k of keys) {
     if (k in obj) (o as any)[k] = obj[k];
   }
   return o;
@@ -174,7 +172,7 @@ export function pick<T extends Dict>(obj: T, keys: string[]): Partial<T> {
 
 export function omit<T extends Dict>(obj: T, keys: string[]): Partial<T> {
   const set: Dict<boolean> = {};
-  for (let i = 0; i < keys.length; i++) set[keys[i]] = true;
+  for (const k of keys) set[k] = true;
   const o: Partial<T> = {};
   for (const k in obj) {
     if (!set[k]) (o as any)[k] = obj[k];

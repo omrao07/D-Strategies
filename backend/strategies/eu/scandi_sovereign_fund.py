@@ -151,7 +151,7 @@ def dd_stats(returns: pd.Series) -> Dict[str, float]:
     rec_idx = rec[rec >= peak.loc[start_idx]].index
     rec_months = (rec_idx[0].to_period("M") - end_idx.to_period("M")).n if len(rec_idx) > 0 else np.nan
     return {"max_dd": float(min_dd), "dd_start": str(start_idx.date()) if start_idx is not None else None,
-            "dd_end": str(end_idx.date()) if end_idx is not None else None, "rec_months": float(rec_months) if rec_months==rec_months else np.nan}
+            "dd_end": str(end_idx.date()) if end_idx is not None else None, "rec_months": float(rec_months) if pd.notna(rec_months) else np.nan}
 
 def rolling_annualized_vol(r: pd.Series) -> float:
     if r.dropna().empty: return np.nan
@@ -255,7 +255,11 @@ def load_returns(path: Optional[str], colname: str) -> pd.DataFrame:
            (ncol(df,"asset_class") or "asset_class"): "asset_class"}
     df = df.rename(columns=ren)
     df["date"] = to_month(df["date"])
-    df[colname] = num(df[ncol(df, colname)] if ncol(df, colname) else df[df.columns[-1]])
+    col_found = ncol(df, colname)
+    if col_found is None:
+        numeric_cols = [c for c in df.columns if c not in ("date", "asset_class", "fund") and pd.api.types.is_numeric_dtype(df[c])]
+        col_found = numeric_cols[-1] if numeric_cols else df.columns[-1]
+    df[colname] = num(df[col_found])
     if ncol(df,"fund"): df["fund"] = df[ncol(df,"fund")]
     return df.sort_values(["date","asset_class"])
 
@@ -428,7 +432,7 @@ def currency_effect(ccy_exp: pd.DataFrame, fx: pd.DataFrame, funds_meta: pd.Data
 def tracking_error(active_ret: pd.Series) -> Tuple[float, float]:
     te = float(active_ret.std(ddof=0) * np.sqrt(ann_factor()))
     ar = float((1 + active_ret).prod() ** (ann_factor()/len(active_ret.dropna())) - 1.0) if active_ret.dropna().size>0 else np.nan
-    ir = float(ar / te) if te and te==te and te>0 else np.nan
+    ir = float(ar / te) if pd.notna(te) and te > 0 else np.nan
     return te, ir
 
 def liquidity_coverage(alloc: pd.DataFrame, nav: pd.DataFrame, liq: pd.DataFrame, outflow_pct: float, horizons=[30,60,90]) -> pd.DataFrame:
@@ -490,8 +494,8 @@ def decarb_path(esg: pd.DataFrame) -> pd.DataFrame:
         base = float(g["carbon_intensity"].dropna().iloc[0]) if g["carbon_intensity"].notna().any() else np.nan
         for i, r in g.iterrows():
             years = max(0, r["date"].year - g["date"].min().year)
-            target = base * ((1 - r["target_annual_reduction_pct"]/100.0) ** years) if base==base else np.nan
-            out.append({"date": r["date"], "fund": f, "carbon_intensity": r["carbon_intensity"], "target_path": target, "gap": (r["carbon_intensity"] - target) if (target==target and r["carbon_intensity"]==r["carbon_intensity"]) else np.nan})
+            target = base * ((1 - r["target_annual_reduction_pct"]/100.0) ** years) if pd.notna(base) else np.nan
+            out.append({"date": r["date"], "fund": f, "carbon_intensity": r["carbon_intensity"], "target_path": target, "gap": (r["carbon_intensity"] - target) if (pd.notna(target) and pd.notna(r["carbon_intensity"])) else np.nan})
     return pd.DataFrame(out).sort_values(["fund","date"])
 
 def scenario_pl(alloc: pd.DataFrame, funds_meta: pd.DataFrame, scen_df: pd.DataFrame, scenario: str, ccy_exp: pd.DataFrame) -> pd.DataFrame:
@@ -651,9 +655,9 @@ def main():
     ft = ft.merge(cur, on=["date","fund"], how="left") if not cur.empty else ft.assign(currency=np.nan)
     # Hedge effect is proxied by 'currency' here; device to show columns clearly
     ft["net_return"] = ft["twr"]
-    ft["asset_return"] = ft.get("asset_return", np.nan)
-    ft["bench_total_return"] = ft.get("bench_total_return", np.nan)
-    ft["currency_effect"] = ft.get("currency", np.nan)
+    ft["asset_return"] = ft["asset_return"] if "asset_return" in ft.columns else np.nan
+    ft["bench_total_return"] = ft["bench_total_return"] if "bench_total_return" in ft.columns else np.nan
+    ft["currency_effect"] = ft["currency"] if "currency" in ft.columns else np.nan
     # Add RF if available
     if not rf.empty:
         ft = ft.merge(rf, on=["date","fund"], how="left")
@@ -751,7 +755,12 @@ def main():
     # Console
     print("== Scandi Sovereign/Public Funds Analytics ==")
     for r in kpi_rows:
-        print(f"{r['fund']}: NAV {r['latest_nav']:.2f} | YTD {r['ytd']*100: .2f}% | 5y ann {r['ann_5y']*100: .2f}% | TE {r['tracking_error_ann'] if r['tracking_error_ann']==r['tracking_error_ann'] else float('nan'): .2f} | IR {r['information_ratio'] if r['information_ratio']==r['information_ratio'] else float('nan'): .2f}")
+        nav_s = f"{r['latest_nav']:.2f}" if pd.notna(r['latest_nav']) else "nan"
+        ytd_s = f"{r['ytd']*100:.2f}%" if pd.notna(r['ytd']) else "nan%"
+        ann5_s = f"{r['ann_5y']*100:.2f}%" if pd.notna(r['ann_5y']) else "nan%"
+        te_s = f"{r['tracking_error_ann']:.2f}" if pd.notna(r['tracking_error_ann']) else "nan"
+        ir_s = f"{r['information_ratio']:.2f}" if pd.notna(r['information_ratio']) else "nan"
+        print(f"{r['fund']}: NAV {nav_s} | YTD {ytd_s} | 5y ann {ann5_s} | TE {te_s} | IR {ir_s}")
     print("Outputs in:", outdir.resolve())
 
 if __name__ == "__main__":

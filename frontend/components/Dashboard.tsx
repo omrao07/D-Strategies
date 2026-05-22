@@ -2,7 +2,6 @@
 // Main dashboard — wires the Zustand store + WS sync, renders all panels.
 
 import React, { Suspense, lazy } from "react";
-import { useWsSync } from "@/store/useWsSync";
 import { useTradingStore } from "@/store/useTradingStore";
 import { EngineStatusBar } from "./live/EngineStatusBar";
 import { SignalBoard } from "./live/SignalBoard";
@@ -205,15 +204,13 @@ function TabContent() {
 // ---- Root Dashboard -------------------------------------------------------
 
 export default function Dashboard() {
-  // Mount WS sync once at the root
-  useWsSync();
-
+  // useWsSync is called at the App root in main.tsx — don't duplicate here.
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        height: "100vh",
+        minHeight: "100%",
         background: "#020817",
         color: "#e2e8f0",
         fontFamily:

@@ -2,7 +2,6 @@ import React from "react";
 import CommoditiesTicker from "../components/CommoditiesTicker";
 import GeeDashboard from "../components/GeeDashboard";
 import AISLive from "../components/AISLive";
-import AISlive from "../components/AISLive";
 
 const Dashboard: React.FC = () => {
   return (
@@ -23,7 +22,7 @@ const Dashboard: React.FC = () => {
         {/* AIS Live */}
         <section className="bg-white rounded-xl shadow-md p-4">
           <h2 className="text-lg font-semibold mb-2">Live Ship Tracking (AIS)</h2>
-          <AISlive />
+          <AISLive />
         </section>
       </main>
     </div>
