@@ -80,7 +80,7 @@ try:
         strategy = Column(Text, primary_key=True)
         score    = Column(Double, nullable=False)
         vol      = Column(Double)
-        metadata = Column(JSONB)
+        meta     = Column("metadata", JSONB)
 
     class RiskEvent(Base):
         __tablename__ = "risk_events"
@@ -88,7 +88,7 @@ try:
         gate      = Column(Text, primary_key=True)
         triggered = Column(Boolean, nullable=False)
         reason    = Column(Text)
-        metadata  = Column(JSONB)
+        meta      = Column("metadata", JSONB)
 
 except ImportError:
     # SQLAlchemy not installed — models unavailable, graceful degradation

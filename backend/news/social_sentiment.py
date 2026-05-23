@@ -83,10 +83,10 @@ class SocialSentiment:
     def score_batch(
         self,
         texts: List[str],
-        langs: Optional[List[str]] = None,
+        langs: Optional[List[Optional[str]]] = None,
     ) -> List[Dict[str, Any]]:
-        langs = langs or [None] * len(texts)
-        return [self.score_text(t, l) for t, l in zip(texts, langs)]
+        resolved: List[Optional[str]] = langs or [None] * len(texts)
+        return [self.score_text(t, l) for t, l in zip(texts, resolved)]
 
     def extract_entities(self, text: str) -> Dict[str, List[str]]:
         upper = text.upper()

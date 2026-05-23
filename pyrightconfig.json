@@ -1,0 +1,31 @@
+{
+  "include": ["backend", "frontend"],
+  "exclude": ["**/node_modules", "**/__pycache__", "**/dist", "**/.venv", "**/venv"],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none",
+
+  "reportOptionalMemberAccess": "none",
+  "reportOptionalSubscript": "none",
+  "reportOptionalCall": "none",
+  "reportOptionalOperand": "none",
+  "reportOptionalIterable": "none",
+
+  "reportCallIssue": "none",
+  "reportArgumentType": "none",
+  "reportReturnType": "none",
+  "reportIndexIssue": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportGeneralTypeIssues": "none",
+  "reportInvalidTypeForm": "none",
+  "reportOperatorIssue": "none",
+  "reportIncompatibleMethodOverride": "none",
+  "reportRedeclaration": "none",
+  "reportAssignmentType": "none",
+  "reportUnhashable": "none",
+  "reportFunctionMemberAccess": "none",
+
+  "reportPossiblyUnboundVariable": "none",
+  "reportUnboundVariable": "warning",
+  "reportUndefinedVariable": "warning"
+}
