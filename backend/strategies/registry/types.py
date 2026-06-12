@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Dict, Optional
+
 
 # -----------------------------------------
 # Registry Row = what’s inside CSV/JSONL

@@ -41,8 +41,8 @@ from __future__ import annotations
 import math
 import os
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional, List
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List
 
 # optional deps
 try:
@@ -303,7 +303,8 @@ def _probe():
           f"default12m={100*s.default_prob_12m:.2f}%")
 
 def main():
-    import argparse, json
+    import argparse
+    import json
     ap = argparse.ArgumentParser(description="Sovereign Risk Engine")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--run", action="store_true")

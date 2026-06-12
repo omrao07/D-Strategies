@@ -19,9 +19,11 @@ outdir/edge_analysis.csv      date, iv, garch_21d, vrp (iv-garch), signal
 outdir/summary.json
 """
 
-import argparse, json, os
-from dataclasses import dataclass, asdict
-from typing import Optional
+import argparse
+import json
+import os
+from dataclasses import asdict, dataclass
+
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize

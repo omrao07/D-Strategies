@@ -27,16 +27,19 @@ Configuration via MarketMakerConfig (can be per symbol).
 
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 
-from backend.execution_plus.adapters import ( # type: ignore
-    AdapterBase, Order, OrderType, Side, Quote, AdapterRegistry
+from backend.execution_plus.adapters import (  # type: ignore
+    AdapterBase,
+    AdapterRegistry,
+    Order,
+    OrderType,
+    Quote,
+    Side,
 )
-from backend.execution_plus.cost_model import DefaultCostModel, get_default_model # type: ignore
-
+from backend.execution_plus.cost_model import DefaultCostModel, get_default_model  # type: ignore
 
 # ---------------------------------------------------------------------
 # Config & State

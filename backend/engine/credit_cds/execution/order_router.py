@@ -1,10 +1,12 @@
 # engines/credit_cds/order_router.py
 from __future__ import annotations
+
+import math
 import time
 import uuid
-import math
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Any, Iterable, Callable
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import pandas as pd
 
 # =============================================================================
@@ -221,7 +223,7 @@ class FixAdapter(BaseBrokerAdapter):
         if self._connected:
             resp = self._send_recv(msg)
             ord_status = resp.get(b"39", b"").decode()  # OrdStatus
-            exec_type = resp.get(b"150", b"").decode()  # ExecType
+            resp.get(b"150", b"").decode()  # ExecType
 
             if ord_status in ("2", "1"):  # 2=Filled, 1=PartiallyFilled
                 cum_qty = float(resp.get(b"14", b"0") or 0)

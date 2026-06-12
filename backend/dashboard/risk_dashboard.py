@@ -15,20 +15,18 @@ Env (optional):
 
 from __future__ import annotations
 
-import json
 import os
 import time
-from typing import Dict, Any, List
+from typing import Any, Dict
 
-import requests
-import pandas as pd
+import dash  # type: ignore
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
-import dash # type: ignore
-from dash import Dash, dcc, html, dash_table # type: ignore
-from dash.dependencies import Input, Output # type: ignore
+import requests
+from dash import Dash, dash_table, dcc, html  # type: ignore
+from dash.dependencies import Input, Output  # type: ignore
 
 API_URL = os.getenv("DATA_API_URL", "http://localhost:8000").rstrip("/")
 API_KEY = os.getenv("DATA_API_KEY", "").strip()

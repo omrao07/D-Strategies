@@ -1,14 +1,14 @@
 # backend/api/ws_candles.py
 from __future__ import annotations
 
+import json
 import os
 import time
-import json
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 # ---------- Optional deps ----------

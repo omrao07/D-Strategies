@@ -6,13 +6,11 @@ Bayesian optimization, and genetic algorithm.
 from __future__ import annotations
 
 import math
-import random
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
-
 
 # ── Parameter space ───────────────────────────────────────────────────────────
 
@@ -237,7 +235,7 @@ def bayesian_optimization(
 
     # Normalize continuous dims to [0,1] for GP
     continuous = [p for p in param_space if p.choices is None]
-    categorical = [p for p in param_space if p.choices is not None]
+    [p for p in param_space if p.choices is not None]
 
     def encode(params: Dict) -> np.ndarray:
         row = []

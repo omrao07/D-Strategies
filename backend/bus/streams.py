@@ -3,10 +3,10 @@
 # the risk gateway, execution engine, shadow engine, and causal attribution loop.
 # backend/bus/python/bus.py is an alternative async Kafka/NATS/Redis façade retained
 # for future migration — it is NOT imported by the live engine path.
-import os
 import json
+import os
 from dataclasses import asdict, is_dataclass
-from typing import Any, Generator, Iterable, Optional, Union
+from typing import Any, Generator, Optional, Union
 
 import redis
 

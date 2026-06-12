@@ -23,11 +23,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 PNOTE_SHARE_HIGH = 12.0   # % share of FPI — high foreign interest
 PNOTE_SHARE_LOW  = 6.0    # % share — low/declining interest

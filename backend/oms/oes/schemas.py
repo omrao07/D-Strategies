@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import math
 import time
-from typing import Any, Dict, List, Optional, Tuple, Mapping, Union
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 # ---------- Pydantic or dataclasses fallback ----------
 
@@ -40,7 +40,7 @@ try:
     _HAS_PD = True
 except Exception:  # pragma: no cover
     _HAS_PD = False
-    from dataclasses import dataclass, field as dc_field
+    from dataclasses import dataclass
 
 # ---------- helpers ----------
 

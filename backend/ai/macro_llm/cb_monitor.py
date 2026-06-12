@@ -28,8 +28,8 @@ import json
 import os
 import re
 import time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional
 
 # ---------- Optional Redis / Bus glue (graceful fallback) ----------
 try:
@@ -41,7 +41,7 @@ except Exception:
 
 try:
     # Your bus helpers if present
-    from backend.bus.streams import publish_stream, hset  # type: ignore
+    from backend.bus.streams import hset, publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:
         pass

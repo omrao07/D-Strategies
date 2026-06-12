@@ -41,7 +41,8 @@ import functools
 import threading
 import time
 from collections import deque
-from typing import Callable, Deque, Dict, Optional
+from typing import Callable, Deque, Dict
+
 
 class _ThrottleBucket:
     def __init__(self, calls: int, per: float):
@@ -126,7 +127,6 @@ throttle = ThrottleManager()
 
 # CLI demo
 if __name__ == "__main__":
-    import random
     @throttle.limit("demo", calls=3, per=5)
     def work(i): 
         print(f"{time.strftime('%X')} call {i}")

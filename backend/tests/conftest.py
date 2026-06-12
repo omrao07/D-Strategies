@@ -9,11 +9,12 @@ don't error when the plugin is not installed.
 
 Provides per-strategy-family fixtures with minimal synthetic price DataFrames.
 """
-import time
 import math as _math_module
-import pytest
-import pandas as pd
+import time
+
 import numpy as np
+import pandas as pd
+import pytest
 
 _orig_isclose = _math_module.isclose
 

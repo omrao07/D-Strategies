@@ -1,8 +1,14 @@
 # backend/finance/bank_adapters.py
 from __future__ import annotations
 
-import os, hmac, json, time, math, uuid, base64, hashlib, random
-from dataclasses import dataclass, asdict, field
+import hashlib
+import hmac
+import json
+import math
+import os
+import time
+import uuid
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Protocol, Tuple, runtime_checkable
 
 # ---------- optional Redis (graceful fallback) ----------
@@ -282,12 +288,19 @@ class SandboxUPI(BankAdapter):
 # =========================================================
 # --- Optional Plaid SDK ---
 try:
+    import datetime as _plaid_dt
+
     import plaid  # type: ignore # pip install plaid-python
     from plaid.api import plaid_api as _plaid_api  # type: ignore
-    from plaid.model.accounts_balance_get_request import AccountsBalanceGetRequest as _PlaidBalReq  # type: ignore
-    from plaid.model.transactions_get_request import TransactionsGetRequest as _PlaidTxnReq  # type: ignore
-    from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions as _PlaidTxnOpts  # type: ignore
-    import datetime as _plaid_dt
+    from plaid.model.accounts_balance_get_request import (
+        AccountsBalanceGetRequest as _PlaidBalReq,  # type: ignore
+    )
+    from plaid.model.transactions_get_request import (
+        TransactionsGetRequest as _PlaidTxnReq,  # type: ignore
+    )
+    from plaid.model.transactions_get_request_options import (
+        TransactionsGetRequestOptions as _PlaidTxnOpts,  # type: ignore
+    )
     _HAVE_PLAID = True
 except Exception:
     _HAVE_PLAID = False

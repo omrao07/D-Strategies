@@ -32,7 +32,7 @@ Supply concentration:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -40,8 +40,10 @@ import pandas as pd
 
 try:
     from backend.commodities.base import (
-        CommodityStrategy, CommoditySignal, CommoditySector,
-        SignalDirection, SignalSource, CommodityRiskParams,
+        CommoditySector,
+        CommodityStrategy,
+        SignalDirection,
+        SignalSource,
     )
 except Exception:
     CommodityStrategy = object  # type: ignore

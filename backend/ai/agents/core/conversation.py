@@ -5,8 +5,8 @@ import json
 import os
 import re
 import time
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, List, Optional, Callable, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ------------------------------------------------------------
 # Optional: BaseAgent (safe shim)

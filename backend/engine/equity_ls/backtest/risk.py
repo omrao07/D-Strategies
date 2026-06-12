@@ -1,8 +1,10 @@
 # engines/equity_ls/backtest/risk.py
 from __future__ import annotations
+
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Iterable, Optional, Tuple
 
 BPS = 1e-4
 TRADING_DAYS = 252

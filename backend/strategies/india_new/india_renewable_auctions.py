@@ -23,11 +23,12 @@ outdir/backtest.csv           cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 GREEN_TICKERS = ["adanigreen", "tatapower", "ntpc", "greenko", "sjvn", "cesc", "torrent", "acme"]
 TARIFF_DECLINE_THRESHOLD = -0.10  # ₹/kWh YoY decline → improving economics

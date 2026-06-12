@@ -34,14 +34,14 @@ python materialize_jobs/backfill_macro.py \
 
 from __future__ import annotations
 
-import time
 import argparse
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Tuple
 
 import pandas as pd
-from feast import FeatureStore # type: ignore
-from feast.feature_view import FeatureView # type: ignore
+from feast import FeatureStore  # type: ignore
+from feast.feature_view import FeatureView  # type: ignore
 
 ISO_FMT = "%Y-%m-%d"
 

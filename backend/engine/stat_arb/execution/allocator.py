@@ -1,9 +1,11 @@
 # engines/stat_arb/execution/allocator.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Iterable, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Iterable
 
 # --------------------------------------------------------------------
 # Data models

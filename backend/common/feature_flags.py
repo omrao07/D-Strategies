@@ -7,9 +7,10 @@ Central switchboard for experimental + critical features.
 """
 
 import os
-import yaml
 from pathlib import Path
 from typing import Dict
+
+import yaml
 
 # --- Default flags (safe OFF in live) ---
 DEFAULT_FLAGS: Dict[str, bool] = {

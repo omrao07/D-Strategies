@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Iterable, Tuple, Optional, Literal
+from typing import Iterable, Literal, Tuple
 
 import numpy as np
+
 try:
     import pandas as pd  # optional, only used if inputs are Series/DataFrame
 except Exception:
@@ -65,7 +66,6 @@ def es_parametric_gaussian(mu: float, sigma: float, alpha: float = 0.975) -> flo
     _validate_alpha(alpha)
     if sigma <= 0:
         return float(max(mu, 0.0))
-    from math import sqrt, pi, exp
     from scipy.stats import norm  # optional but standard; falls back if missing
     try:
         z = norm.ppf(alpha)

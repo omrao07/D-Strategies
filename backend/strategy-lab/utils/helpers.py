@@ -16,12 +16,11 @@ Keep light; stdlib-only.
 
 from __future__ import annotations
 
+import datetime
 import math
 import statistics
 import time
-import datetime
-from typing import Dict, Iterable, List, Tuple, Any, Generator
-
+from typing import Any, Dict, Generator, Iterable, List, Tuple
 
 # --------------------------- math helpers ---------------------------
 

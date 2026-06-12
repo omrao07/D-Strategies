@@ -9,27 +9,31 @@ Execution Engine (paper mode):
 """
 
 from __future__ import annotations
+
 import json
 import logging
 import os
 import time
-from typing import Dict, Tuple, Optional, Any
+from typing import Any, Dict, Optional, Tuple
 
 import redis
 
 log = logging.getLogger(__name__)
 
 from backend.bus.streams import (
-    consume_stream,
-    publish_stream,
-    publish_pubsub,
-    hgetall,
-    hset,
-    get as kv_get,
-    set as kv_set,
-    STREAM_ORDERS,
-    STREAM_FILLS,
     CHAN_ORDERS,
+    STREAM_FILLS,
+    STREAM_ORDERS,
+    consume_stream,
+    hgetall,
+    publish_pubsub,
+    publish_stream,
+)
+from backend.bus.streams import (
+    get as kv_get,
+)
+from backend.bus.streams import (
+    set as kv_set,
 )
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")

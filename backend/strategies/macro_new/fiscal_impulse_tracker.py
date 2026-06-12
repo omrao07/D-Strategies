@@ -23,11 +23,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 FISCAL_REGIMES = {
     "large_stimulus": 2.0,     # Impulse > 2% of GDP

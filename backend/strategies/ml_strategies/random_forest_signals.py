@@ -23,14 +23,15 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, roc_auc_score
-
 
 FEATURE_COLS = ["mom_1d", "mom_5d", "mom_21d", "vol_zscore", "rsi_14",
                 "bb_pct_b", "atr_ratio", "price_zscore_63d", "volume_trend"]

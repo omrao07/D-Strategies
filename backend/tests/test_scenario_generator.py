@@ -1,10 +1,9 @@
 # tests/test_scenario_generator.py
 import importlib
 import json
-import math
+
 import numpy as np
-import pytest # type: ignore
-from typing import Any, Dict, Optional, Tuple, List
+import pytest  # type: ignore
 
 """
 Expected public APIs (any one is fine)
@@ -239,7 +238,7 @@ def test_export_import_roundtrip_optional(api, base_inputs):
         pytest.skip("No export/import helpers")
     res = api.sample(n_scenarios=100, horizon_days=5, seed=13, **base_inputs)
     blob = api.call("export_json", res)
-    s = json.dumps(blob, default=str)
+    json.dumps(blob, default=str)
     out = api.call("import_json", blob)
     assert out is not None
 
@@ -265,7 +264,7 @@ def test_time_grid_and_freq_metadata(api, base_inputs):
     assert meta.get("freq","D") in ("D","H","W","M")
 
 def test_scenario_means_and_vols_roughly_track_inputs(api, base_inputs):
-    mu, Sigma = base_inputs["mu"], base_inputs["Sigma"]
+    _mu, Sigma = base_inputs["mu"], base_inputs["Sigma"]
     res = api.sample(n_scenarios=12000, horizon_days=1, seed=17, **base_inputs)
     X, _, _ = _ensure_result_dict(res)
     # estimate per-asset mean/vol over scenarios

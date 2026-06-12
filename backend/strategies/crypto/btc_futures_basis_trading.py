@@ -21,10 +21,12 @@ outdir/carry_backtest.csv       cumulative carry P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-
 
 ANNUALIZE = 365.0
 

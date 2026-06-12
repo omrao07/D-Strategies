@@ -21,11 +21,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy.linalg import svd
-
 
 WINDOW = 20       # look-back window for feature vector
 N_LATENT = 5      # bottleneck dimension

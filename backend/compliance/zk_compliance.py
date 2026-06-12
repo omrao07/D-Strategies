@@ -1,5 +1,6 @@
 # backend/compliance/zk_compliance.py
 from __future__ import annotations
+
 """
 ZK-Style Compliance Attestations (Commit & Attest)
 --------------------------------------------------
@@ -71,8 +72,14 @@ ZK_SIGN_PRIV (hex or base64; for ed25519) | ZK_SIGN_SECRET (for HMAC)
 ZK_SIGN_PUB  (hex/base64 public key for verifiers; ed25519 only)
 """
 
-import os, json, hmac, hashlib, secrets, base64, time
-from dataclasses import dataclass, asdict
+import base64
+import hashlib
+import hmac
+import json
+import os
+import secrets
+import time
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 # -------- Optional Ed25519 via PyNaCl --------

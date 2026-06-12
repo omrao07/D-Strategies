@@ -45,9 +45,10 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-
-from simulation_farm.artifacts.reports.report_generator import ReportGenerator, ReportInputs # type: ignore
-
+from simulation_farm.artifacts.reports.report_generator import (  # type: ignore
+    ReportGenerator,
+    ReportInputs,
+)
 
 # ----------------------------- Spec -----------------------------
 
@@ -107,7 +108,6 @@ class StressTestJob:
         # Aggregate scenarios
         run_equity_dates: List[str] = []
         run_equity_values: List[float] = []
-        benchmark: Optional[List[float]] = None
         drawdown: Optional[List[float]] = None
         pnl_series: Optional[List[float]] = None
 
@@ -173,7 +173,7 @@ class StressTestJob:
             stress_rows.append({"name": "Factor shocks", "pnl_pct": pnl_pct*100, "note": "; ".join(notes)})
 
         # KPIs
-        kpis = _basic_kpis(run_equity_dates, run_equity_values, pnl_series)
+        _basic_kpis(run_equity_dates, run_equity_values, pnl_series)
 
         # Build reports
         rg = ReportGenerator(
@@ -214,7 +214,7 @@ class StressTestJob:
             var_hist=var_hist,
             factors=self.spec.factor_betas or {},
             sectors={},  # optional
-            drawdowns_table=_top_drawdowns(run_equity_dates, run_equity_values, k=10), # type: ignore
+            drawdowns_table=_top_drawdowns(run_equity_dates, run_equity_values, k=10),
             stress=[{"name": r["name"], "pnl_pct": r["pnl_pct"], "note": r.get("note", "")} for r in stress_rows],
             diag={"warnings": []},
         )
@@ -329,6 +329,84 @@ def _compute_drawdown(equity: List[float]) -> List[float]:
         dd.append((v / peak - 1.0) if peak > 0 else 0.0)
     return dd
 
+
+def _days_between(d0: str, d1: str) -> Optional[int]:
+    """Whole days between two ISO dates; None if either is unparseable."""
+    try:
+        import datetime as _dt
+        a = _dt.date.fromisoformat(str(d0)[:10])
+        b = _dt.date.fromisoformat(str(d1)[:10])
+        return (b - a).days
+    except Exception:
+        return None
+
+
+def _top_drawdowns(dates: List[str], values: List[float], k: int = 10) -> List[Dict]:
+    """
+    Identify the `k` deepest peak-to-trough drawdown episodes in an equity curve.
+
+    Each episode dict contains:
+      - start:        ISO date of the peak the drawdown began from
+      - trough:       ISO date of the lowest point
+      - recovery:     ISO date equity regained the prior peak ("" if not recovered)
+      - depth_pct:    trough/peak - 1 (negative), as a percentage
+      - length_days:  peak → trough duration in days (None if unddatable)
+      - recovered:    whether equity returned to the prior peak
+    """
+    n = min(len(dates), len(values))
+    if n == 0:
+        return []
+
+    episodes: List[Dict] = []
+    peak_val = values[0]
+    peak_idx = 0
+    trough_val = values[0]
+    trough_idx = 0
+    in_dd = False
+
+    def _close(recovery_idx: Optional[int]) -> None:
+        if peak_val <= 0:
+            return
+        depth = trough_val / peak_val - 1.0
+        if depth >= 0:
+            return
+        episodes.append({
+            "start": dates[peak_idx],
+            "trough": dates[trough_idx],
+            "recovery": dates[recovery_idx] if recovery_idx is not None else "",
+            "depth_pct": round(depth * 100.0, 4),
+            "length_days": _days_between(dates[peak_idx], dates[trough_idx]),
+            "recovered": recovery_idx is not None,
+        })
+
+    for i in range(1, n):
+        v = values[i]
+        if v >= peak_val:
+            # New peak: close any open drawdown as recovered here, then reset.
+            if in_dd:
+                _close(i)
+                in_dd = False
+            peak_val = v
+            peak_idx = i
+            trough_val = v
+            trough_idx = i
+        else:
+            # Below peak: we are (or just entered) a drawdown.
+            if not in_dd:
+                in_dd = True
+                trough_val = v
+                trough_idx = i
+            elif v < trough_val:
+                trough_val = v
+                trough_idx = i
+
+    # Close a still-open drawdown at series end (never recovered).
+    if in_dd:
+        _close(None)
+
+    episodes.sort(key=lambda e: e["depth_pct"])  # most negative first
+    return episodes[: max(0, int(k))]
+
 def _basic_kpis(dates: List[str], equity: List[float], pnl: Optional[List[float]]) -> Dict:
     if not equity:
         return {}
@@ -429,6 +507,7 @@ def _parse_cli():
 
 if __name__ == "__main__":
     spec = _parse_cli()
+    import json
     job = StressTestJob(spec)
     urls = job.run()
-    import json; print(json.dumps(urls, indent=2))
+    print(json.dumps(urls, indent=2))

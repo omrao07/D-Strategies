@@ -1,8 +1,10 @@
 # engines/equity_ls/signals/overnight_reversal.py
 from __future__ import annotations
+
+from typing import Dict, Iterable, Literal, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, Literal, Iterable
 
 Method = Literal["overnight", "intraday"]  # which move to reverse
 

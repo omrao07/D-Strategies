@@ -1,9 +1,11 @@
 # engines/rates/signals/breakevens.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Iterable, List
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Iterable
 
 TRADING_DAYS = 252
 

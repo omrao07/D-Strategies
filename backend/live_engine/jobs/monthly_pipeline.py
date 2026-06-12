@@ -12,11 +12,11 @@ Steps:
 """
 from __future__ import annotations
 
+import datetime
 import json
 import logging
 import os
 import time
-import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -60,7 +60,6 @@ def run() -> Dict[str, Any]:
     try:
         log.info("Starting full parallel backtest for all strategies...")
         from backend.backtester.parallel_runner import ParallelRunner
-        from backend.backtester.data_feeds import SyntheticFeed
 
         end_date = today
         start_date = (datetime.date.today() - datetime.timedelta(days=5 * 365)).isoformat()
@@ -154,8 +153,8 @@ def run() -> Dict[str, Any]:
 def _run_hrp_rebalance(r) -> int:
     """Compute HRP weights and generate rebalance order list."""
     try:
-        from backend.risk.institutional_risk_engine import PositionSizer
         from backend.live_engine.pnl_tracker import PnLTracker
+        from backend.risk.institutional_risk_engine import PositionSizer
 
         strategy_names = r.hkeys("strategy:monthly_rankings") if r else []
         if not strategy_names:

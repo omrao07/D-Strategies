@@ -52,7 +52,6 @@ except Exception:
 
 from .policy_sim import Shock  # type: ignore # reuse the Shock dataclass
 
-
 # --------------------------- base interface ------------------------------
 
 class ShockModel:
@@ -245,7 +244,7 @@ class FXGap(ShockModel):
         diff = r1 - r2
         if abs(diff) < 1e-6:
             return []
-        gap = self.scale * diff + self.overshoot_std * _randn()
+        self.scale * diff + self.overshoot_std * _randn()
         # Represent via risk/liquidity proxies (simulator maps to FX via policy differentials anyway)
         return [Shock(key="global", risk_z_jump=0.0, liq_z_jump=0.0, infl_z_jump=0.0, step=t, name=f"{self.name}_{t}")]
 
@@ -342,7 +341,7 @@ def apply_to_sim(sim, engine: ShockEngine) -> None:
 # --------------------------- tiny demo ----------------------------------
 
 if __name__ == "__main__":
-    from .policy_sim import PolicySimConfig, PolicySimulator # type: ignore
+    from .policy_sim import PolicySimConfig, PolicySimulator  # type: ignore
 
     cfg = PolicySimConfig(seed=7, dt_days=1.0, horizon_days=30)
     sim = PolicySimulator(cfg)

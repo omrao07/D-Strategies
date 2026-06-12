@@ -116,13 +116,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -566,7 +565,7 @@ def risk_components(P: pd.DataFrame, PROD: pd.DataFrame) -> pd.DataFrame:
 
 def composite_risk(RC: pd.DataFrame, weights: List[float]) -> pd.DataFrame:
     if RC.empty: return pd.DataFrame()
-    used = RC["risk_components_used"].iloc[0].split(",") if "risk_components_used" in RC.columns else []
+    RC["risk_components_used"].iloc[0].split(",") if "risk_components_used" in RC.columns else []
     # map provided weights to groups: dependence, HHI, vol(=avg of vols), stock_cover, climate
     # Build a per-row risk score
     w_dep, w_hhi, w_vol, w_stock, w_clim = weights
@@ -600,7 +599,7 @@ def run_scenarios(P: pd.DataFrame, EL: pd.DataFrame, PT: pd.DataFrame,
     rows = []
     for com, r in last.iterrows():
         base_vol = float(r["volume_tons"])
-        base_bill = float(r["import_bill_usd"])
+        float(r["import_bill_usd"])
         # elasticities
         e_p  = pick_coef(EL, com, "dlog_gprice_cum_0..L", default=-0.30)
         e_fx = pick_coef(EL, com, "dlog_fx_cum_0..L",     default=-0.20)
@@ -626,7 +625,7 @@ def run_scenarios(P: pd.DataFrame, EL: pd.DataFrame, PT: pd.DataFrame,
         fx     = float(r.get("usd_local", np.nan))
         ship   = float(r.get("freight_usd", 0.0))
         gprice_new = gprice * (1 + PR_shock/100.0) if gprice==gprice else np.nan
-        fx_new     = fx * (1 + FX_shock/100.0) if fx==fx else np.nan
+        fx * (1 + FX_shock/100.0) if fx==fx else np.nan
         ship_new   = ship * (1 + SH_shock/100.0) if ship==ship else np.nan
         # import bill approximation (CIF): (gprice_new*vol + ship_new*vol)
         bills = []
@@ -675,13 +674,13 @@ def stress_var_es(P: pd.DataFrame, n_sims: int=10000, horizon: int=12) -> pd.Dat
     out = []
     for _, r in last.iterrows():
         g = float(r.get("gprice_usd", np.nan)); f = float(r.get("usd_local", np.nan)); s = float(r.get("freight_usd", 0.0))
-        base_vol = float(r["volume_tons"]); base_bill = float(r["import_bill_usd"])
+        base_vol = float(r["volume_tons"]); float(r["import_bill_usd"])
         # map sims to unit value change
         # assume unit value ∝ gprice * fx + ship; apply one-month shock, multiply by vol (hold vol constant for VaR)
         for i in range(n_sims):
             d = dict(zip(avail, sims[i,:]))
             ug = g * np.exp(d.get("dlog_gprice", 0.0)) if g==g else float(r["unit_value_usd"])
-            uf = f * np.exp(d.get("dlog_fx", 0.0))     if f==f else 1.0
+            f * np.exp(d.get("dlog_fx", 0.0))     if f==f else 1.0
             us = s * np.exp(d.get("dlog_ship", 0.0))   if s==s else 0.0
             unit = (ug if g==g else float(r["unit_value_usd"])) + (us if s==s else 0.0)
             bill = base_vol * unit

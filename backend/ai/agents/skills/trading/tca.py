@@ -5,6 +5,7 @@ import statistics
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+
 @dataclass
 class Trade:
     order_id: str

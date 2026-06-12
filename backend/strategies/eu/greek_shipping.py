@@ -87,13 +87,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -668,7 +667,7 @@ def main():
     fixtures = load_fixtures(args.fixtures) if args.fixtures else pd.DataFrame()
     prices = load_prices(args.prices) if args.prices else pd.DataFrame()
     orderbook = load_orderbook(args.orderbook) if args.orderbook else pd.DataFrame()
-    demolition = load_demolition(args.demolition) if args.demolition else pd.DataFrame()
+    load_demolition(args.demolition) if args.demolition else pd.DataFrame()
     sanctions = load_sanctions(args.sanctions) if args.sanctions else pd.DataFrame()
     activity = load_activity(args.activity) if args.activity else pd.DataFrame()
 

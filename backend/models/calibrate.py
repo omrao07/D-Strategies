@@ -38,17 +38,16 @@ cal.save_artifacts(out_dir="outputs/calibration/my_strategy")
 """
 
 from __future__ import annotations
-import os
+
 import json
 import math
-import random
-import itertools
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Optional: Optuna for Bayesian optimization
 try:

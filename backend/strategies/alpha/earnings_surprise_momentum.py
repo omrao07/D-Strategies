@@ -1,9 +1,12 @@
 # backend/strategies/diversified/earnings_surprise_momentum.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, List, Optional
 
 try:
     import redis as _redis_mod
@@ -210,7 +213,7 @@ class EarningsSurpriseMomentum(Strategy):
 
         # ----- entries (respect caps, confirmations) -----
         n_open = len(open_names)
-        fee = _fees_bps("EXCH") * 1e-4
+        _fees_bps("EXCH") * 1e-4
 
         # Prefer larger |z| and nearer announcements
         cands = sorted(zmap.items(), key=lambda kv: (abs(kv[1]), -1.0/max(1e-6, recency[kv[0]])), reverse=True)

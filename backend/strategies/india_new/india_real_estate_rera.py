@@ -24,11 +24,12 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 REALTY_TICKERS = ["dlf", "godrejprop", "oberoirealty", "prestige", "brigade", "sobha", "sunteck", "mahindralife"]
 HOME_LOAN_TICKERS = ["hdfcltd", "lichf", "can_fin", "repco"]

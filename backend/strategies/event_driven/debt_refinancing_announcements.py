@@ -22,7 +22,10 @@ outdir/trade_returns.csv          30/60-day forward returns (if --returns provid
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

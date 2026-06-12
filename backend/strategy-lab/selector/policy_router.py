@@ -71,7 +71,7 @@ class SymbolRouter:
 
 # Optional: import bandit/hash routers if available for composition
 try:
-    from .ab_tests import HashSplitRouter, EpsilonGreedyRouter  # type: ignore
+    from .ab_tests import EpsilonGreedyRouter, HashSplitRouter  # type: ignore
 except Exception:  # fallback stubs to keep this file standalone-friendly
     class HashSplitRouter(SymbolRouter):  # type: ignore
         def __init__(self, arms: Iterable[str], share_map: Optional[Dict[str,float]]=None):
@@ -202,7 +202,6 @@ class WeightedRule(Rule):
         cyc = self._cycles.get(symbol)
         if cyc:
             return cyc
-        seq = []
         wsum = sum(max(0.0, w) for w in self.weights.values()) or 1.0
         norm = {a: max(0.0, w)/wsum for a,w in self.weights.items()}
         # build a 100-step discrete wheel

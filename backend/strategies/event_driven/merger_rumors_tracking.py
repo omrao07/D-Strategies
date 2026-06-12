@@ -3,7 +3,10 @@
 """
 merger_rumors_tracking.py — M&A rumors → pre-announcement drift analysis
 """
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

@@ -22,10 +22,8 @@ Output:
 from __future__ import annotations
 
 import datetime
-import math
-import random
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -36,19 +34,16 @@ except Exception:
     _HAS_COT = False
 
 try:
-    from backend.commodities.curve_analytics import ForwardCurve, CurvePoint, carry_signal, classify_structure
     _HAS_CURVE = True
 except Exception:
     _HAS_CURVE = False
 
 try:
-    from backend.data_ext.altdata.satellites import fetch as fetch_satellite
     _HAS_SAT = True
 except Exception:
     _HAS_SAT = False
 
 try:
-    from backend.data_ext.altdata.shipping_ais import fetch as fetch_ais
     _HAS_AIS = True
 except Exception:
     _HAS_AIS = False
@@ -245,7 +240,7 @@ class CommoditySignalHub:
             if commodity in ("copper", "iron_ore"):
                 # Nightlights for industrial metals
                 val = self._demo_float(commodity + "_nightlights", 0.3, 0.15)
-                score = (val - 0.3) / 0.15  # z-score proxy
+                (val - 0.3) / 0.15  # z-score proxy
                 return SatelliteSignal(commodity=commodity, nightlights_score=val,
                                        ndvi_anomaly_zscore=None, region="china_industrial",
                                        timestamp=datetime.datetime.utcnow().isoformat()+"Z")

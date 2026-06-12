@@ -25,7 +25,8 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 # Optional deps (silently skipped)
 try:
-    from shapely.geometry import Point as _ShPoint, Polygon as _ShPoly  # type: ignore
+    from shapely.geometry import Point as _ShPoint  # type: ignore
+    from shapely.geometry import Polygon as _ShPoly
 except Exception:
     _ShPoint = _ShPoly = None  # type: ignore
 
@@ -36,6 +37,41 @@ RAD2DEG = 180.0 / math.pi
 # ---------------------------------------------------------------------------
 # Core primitives
 # ---------------------------------------------------------------------------
+
+def _central_angle(p1: Tuple[float, float], p2: Tuple[float, float]) -> float:
+    """Great-circle angular distance (radians) between two (lat_rad, lon_rad) points."""
+    la1, lo1 = p1
+    la2, lo2 = p2
+    dlat = la2 - la1
+    dlon = lo2 - lo1
+    h = math.sin(dlat / 2.0) ** 2 + math.cos(la1) * math.cos(la2) * math.sin(dlon / 2.0) ** 2
+    return 2.0 * math.asin(min(1.0, math.sqrt(max(0.0, h))))
+
+
+def _spherical_triangle_area(
+    a: Tuple[float, float],
+    b: Tuple[float, float],
+    c: Tuple[float, float],
+) -> float:
+    """
+    Spherical excess (steradians) of the triangle with the three given
+    (lat_rad, lon_rad) vertices, via l'Huilier's theorem. Multiply by R^2
+    to obtain surface area. Degenerate triangles return 0.0.
+    """
+    side_a = _central_angle(b, c)
+    side_b = _central_angle(a, c)
+    side_c = _central_angle(a, b)
+    s = (side_a + side_b + side_c) / 2.0
+    prod = (
+        math.tan(s / 2.0)
+        * math.tan((s - side_a) / 2.0)
+        * math.tan((s - side_b) / 2.0)
+        * math.tan((s - side_c) / 2.0)
+    )
+    if prod <= 0.0:
+        return 0.0
+    return 4.0 * math.atan(math.sqrt(prod))
+
 
 @dataclass(frozen=True)
 class GeoPoint:
@@ -82,7 +118,7 @@ class GeoPolygon:
         A = 0.0
         a0 = rad[0]
         for i in range(1, len(rad) - 1):
-            A += _spherical_triangle_area(a0, rad[i], rad[i + 1]) # type: ignore
+            A += _spherical_triangle_area(a0, rad[i], rad[i + 1])
         return abs(A) * (EARTH_RADIUS_KM ** 2)
 
 

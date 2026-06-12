@@ -1,7 +1,10 @@
 # backend/strategies/diversified/prediction_market_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time, uuid
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -100,7 +103,6 @@ def _fees_bps(venue: str, ob: Optional[dict]) -> float:
 def _now_ms() -> int: return int(time.time()*1000)
 
 # -------------------- EWMA --------------------
-from dataclasses import dataclass
 @dataclass
 class EwmaMV:
     mean: float

@@ -68,13 +68,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -410,7 +409,7 @@ def debtrank(A: np.ndarray, equity: np.ndarray, alpha: float=0.9, T: int=20, ini
     # DebtRank score R = sum_i (h_i(T) - h_i(0)) * v_i, v_i = economic value weight (use out_strength)
     v = A.sum(axis=1)
     v_sum = v.sum() if v.sum() > 0 else 1.0
-    R = float(((h - s) * v).sum() / v_sum)
+    float(((h - s) * v).sum() / v_sum)
     scores = pd.DataFrame({"node_idx": np.arange(n), "h0": s, "hT": h, "value_weight": v/v_sum})
     scores["debt_rank"] = (scores["hT"] - scores["h0"]) * scores["value_weight"]
     path_df = pd.DataFrame(path)

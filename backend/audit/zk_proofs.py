@@ -48,8 +48,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # ---------------- RFC-3526 MODP 2048-bit (group 14) ----------------
 
@@ -238,7 +238,7 @@ def verify_sum_under_cap(proof: Dict[str, Any], *, context: Optional[Dict[str, A
         return False
 
     domain = proof["domain"]
-    scale = int(proof["scale"])
+    int(proof["scale"])
     cap_scaled = int(proof["cap_scaled"])
     S_scaled = int(proof["sum_scaled"])
     R = _hex_to_int(proof["R"])

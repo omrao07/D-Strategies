@@ -19,9 +19,9 @@ txt = clean_text("<p>Microsoft earnings beat expectations!</p>")
 
 from __future__ import annotations
 
+import html
 import re
 import unicodedata
-import html
 from typing import List
 
 # optional deps
@@ -31,7 +31,6 @@ except Exception:
     BeautifulSoup = None  # type: ignore
 
 try:
-    import nltk
     from nltk.corpus import stopwords  # type: ignore
     from nltk.stem import PorterStemmer  # type: ignore
     _HAVE_NLTK = True

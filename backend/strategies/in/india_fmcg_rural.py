@@ -83,13 +83,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -465,7 +464,7 @@ def simple_forecast(panel: pd.DataFrame, elastic: pd.DataFrame, horizon: int=6) 
     # fill with zeros by default (flat)
     for c in ["dlog_asp","dlog_wages","dlog_wd","rain_anom"]:
         if c in drv.columns:
-            base = drv[["date", c]].tail(12).copy()
+            drv[["date", c]].tail(12).copy()
             # forward assume zero change / neutral anomaly
             fut[c] = 0.0 if c!="rain_anom" else 0.0
         else:

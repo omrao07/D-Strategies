@@ -4,14 +4,14 @@ from __future__ import annotations
 import heapq
 import itertools
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 # -----------------------------------------------------------------------------
 # Quotes / price utils (soft import to play nice with your codebase)
 # -----------------------------------------------------------------------------
 try:
-    from backend.execution.pricer import Quote # type: ignore
+    from backend.execution.pricer import Quote  # type: ignore
 except Exception:
     @dataclass
     class Quote:

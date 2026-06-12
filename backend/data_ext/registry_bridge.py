@@ -14,12 +14,11 @@ Design goals:
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import os
-from typing import Dict, List, Any, Iterable, Optional
 from datetime import datetime, timezone
-
+from typing import Any, Dict, Iterable
 
 # ============================
 # Types

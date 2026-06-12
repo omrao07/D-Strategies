@@ -1,9 +1,13 @@
 # backend/execution/vwap.py
 from __future__ import annotations
 
-import math, time, uuid, random
+import math
+import random
+import time
+import uuid
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Any, Tuple, List
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 
 # ---------- helpers ----------------------------------------------------------
 def now_ms() -> int: return int(time.time() * 1000)

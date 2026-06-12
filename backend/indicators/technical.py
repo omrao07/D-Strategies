@@ -6,9 +6,10 @@ All functions accept pandas Series or numpy arrays; return Series.
 """
 from __future__ import annotations
 
+from typing import Tuple, Union
+
 import numpy as np
 import pandas as pd
-from typing import Optional, Tuple, Union
 
 ArrayLike = Union[pd.Series, np.ndarray]
 
@@ -209,7 +210,7 @@ def supertrend(
     direction = pd.Series(1, index=c.index)
     for i in range(1, len(c)):
         prev_upper = upper_band.iat[i - 1]
-        prev_lower = lower_band.iat[i - 1]
+        lower_band.iat[i - 1]
         if c.iat[i] <= (prev_upper if np.isnan(trend.iat[i - 1]) else trend.iat[i - 1]):
             trend.iat[i] = upper_band.iat[i]
             direction.iat[i] = -1

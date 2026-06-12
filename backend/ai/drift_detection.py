@@ -28,12 +28,12 @@ where JSON looks like:
 }
 """
 
-from dataclasses import dataclass, asdict, field
-from typing import Dict, List, Optional, Any, Tuple
 import json
 import math
 import os
 import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 # ---- Optional libs ---------------------------------------------------
 try:

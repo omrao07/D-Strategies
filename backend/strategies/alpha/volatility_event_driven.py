@@ -1,9 +1,12 @@
 # backend/strategies/diversified/volatility_event_driven.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional
 
 try:
     import redis as _redis_mod

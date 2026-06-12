@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Tuple, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # ---------------------------------------------------------------------
 # Helpers (no external deps)
@@ -242,7 +242,7 @@ class ExpectedShortfall:
         base = ExpectedShortfall.portfolio_historical(returns_by_asset, weights, alpha)
         contrib: Dict[str, float] = {}
         keys = [k for k in weights.keys() if k in returns_by_asset]
-        wsum = sum(weights.get(k, 0.0) for k in keys) or 1.0
+        sum(weights.get(k, 0.0) for k in keys) or 1.0
 
         for k in keys:
             w_up = dict(weights);  w_down = dict(weights)

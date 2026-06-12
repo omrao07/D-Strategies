@@ -32,8 +32,7 @@ intents, notes = recipes.collar(
 # -> feed intents into risk/OMS; show `notes` in Explain UI.
 """
 
-import math
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ------------------------------- Types ---------------------------------------

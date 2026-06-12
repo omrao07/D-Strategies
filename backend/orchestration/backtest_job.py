@@ -6,10 +6,9 @@ import concurrent.futures as futures
 import importlib
 import json
 import logging
-import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import pandas as pd
 import yaml
@@ -196,7 +195,7 @@ def _adapter_tail_hedge_from_yaml(cfg_path: Path, overrides: Dict[str, Any]) -> 
     Options tail-hedge engine (engines/options/hedging/tail_hedges.py)
     YAML should include data loader params or paths.
     """
-    from engines.options.hedging import tail_hedges as th # type: ignore
+    from engines.options.hedging import tail_hedges as th  # type: ignore
 
     cfg_yaml = _safe_read_yaml(cfg_path)
     cfg_yaml.update(overrides or {})
@@ -210,7 +209,7 @@ def _adapter_tail_hedge_from_yaml(cfg_path: Path, overrides: Dict[str, Any]) -> 
         index_px = pd.read_parquet(idx_px_path)["close"]
     else:
         idx = pd.date_range("2020-01-02", periods=750, freq="B")
-        rng = pd.Series(pd.Series(1 + 0.0003).reindex(idx)).fillna(1.0003)
+        pd.Series(pd.Series(1 + 0.0003).reindex(idx)).fillna(1.0003)
         index_px = pd.Series(4_000.0, index=idx) * (1 + 0.0005 * pd.Series(range(len(idx)), index=idx)).astype(float)
         index_px += pd.Series(pd.Series(pd.np.random.normal(0, 5, len(idx))), index=idx)  # type: ignore # noqa
 
@@ -223,7 +222,7 @@ def _adapter_tail_hedge_from_yaml(cfg_path: Path, overrides: Dict[str, Any]) -> 
     return {"signals": {"tail_signals": sig}, "summary": bt["summary"]}
 
 def _adapter_hy_vs_ig_from_yaml(cfg_path: Path, overrides: Dict[str, Any]) -> Dict[str, Any]:
-    from engines.credit import hy_vs_ig as hyig # type: ignore
+    from engines.credit import hy_vs_ig as hyig  # type: ignore
     cfg_yaml = _safe_read_yaml(cfg_path); cfg_yaml.update(overrides or {})
     hy = _load_series(cfg_yaml.get("hy_path"), default_level=400, noise=0.8)
     ig = _load_series(cfg_yaml.get("ig_path"), default_level=100, noise=0.2)
@@ -232,7 +231,7 @@ def _adapter_hy_vs_ig_from_yaml(cfg_path: Path, overrides: Dict[str, Any]) -> Di
     return {"signals": {"hy_vs_ig": sig["features"]}, "summary": bt["summary"]}
 
 def _adapter_cds_basis_from_yaml(cfg_path: Path, overrides: Dict[str, Any]) -> Dict[str, Any]:
-    from engines.cap_struct import cds_basis # type: ignore
+    from engines.cap_struct import cds_basis  # type: ignore
     cfg_yaml = _safe_read_yaml(cfg_path); cfg_yaml.update(overrides or {})
     cds = _load_series(cfg_yaml.get("cds_path"), default_level=120, noise=0.4)
     gy  = _load_series(cfg_yaml.get("gov_yield_path"), default_level=0.02, noise=0.00005)
@@ -253,7 +252,7 @@ def _load_series(path: Optional[str], default_level: float, noise: float, index_
         s = pd.read_parquet(path) if path.endswith(".parquet") else pd.read_csv(path, parse_dates=[0], index_col=0).iloc[:, 0]
         return s.astype(float) # type: ignore
     idx = index_like if index_like is not None else pd.date_range("2020-01-02", periods=600, freq="B")
-    rng = pd.Series(0.0, index=idx)
+    pd.Series(0.0, index=idx)
     vals = default_level + pd.Series(pd.np.random.normal(0, noise, len(idx)), index=idx)  # type: ignore # noqa
     return vals.astype(float)
 

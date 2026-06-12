@@ -4,11 +4,11 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Optional: hook your cost model (kept optional to avoid hard deps)
 try:
-    from backend.execution.cost_model_v2 import CostModel # type: ignore
+    from backend.execution.cost_model_v2 import CostModel  # type: ignore
 except Exception:
     CostModel = None  # type: ignore
 
@@ -253,7 +253,7 @@ class LiquidityAdapter:
         if not (self.cm and st.cfg.max_cost_bps_per_slice and qty > 0 and px_ref):
             return True
         try:
-            venue = getattr(st.cfg, "venue", "us_ibkr")
+            getattr(st.cfg, "venue", "us_ibkr")
             cm: Any = self.cm if not isinstance(self.cm, type) else self.cm()  # instance or class?
             symbol = st.parent.symbol
             side = st.parent.side

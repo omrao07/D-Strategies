@@ -34,11 +34,10 @@ Returned record schema (raw):
 
 from __future__ import annotations
 
-import os
+import datetime as dt
+import random
 import re
 import time
-import random
-import datetime as dt
 from typing import Any, Dict, List, Optional
 
 # Try optional community client (often fragile; safe-guarded)

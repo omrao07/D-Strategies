@@ -35,10 +35,8 @@ CLI
 
 from __future__ import annotations
 
-import math
-import os
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Optional
 
 # Optional bus
@@ -277,8 +275,8 @@ class LiquiditySpiral:
 
         impact_k    = params.get("impact_k") or {}
         impact_alpha = float(params.get("impact_alpha") or 0.65)
-        illiquid_hc  = float(params.get("illiquid_haircut") or 0.25)
-        margin_req   = float(params.get("margin_req_pct") or 0.20)
+        float(params.get("illiquid_haircut") or 0.25)
+        float(params.get("margin_req_pct") or 0.20)
         half_spread  = params.get("half_spread_bps") or {}
 
         def _nav():
@@ -377,7 +375,8 @@ def _probe():
     print("Last:", sim.trail[-1])
 
 def main():
-    import argparse, json
+    import argparse
+    import json
     ap = argparse.ArgumentParser(description="Liquidity Spiral Simulator")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--steps", type=int, default=48)

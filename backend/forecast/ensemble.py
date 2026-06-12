@@ -59,7 +59,7 @@ except Exception:
 
 # Optional bus + redis
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hget, hset # type: ignore
+    from backend.bus.streams import consume_stream, hget, hset, publish_stream  # type: ignore
 except Exception:
     consume_stream = publish_stream = hget = hset = None  # type: ignore
 

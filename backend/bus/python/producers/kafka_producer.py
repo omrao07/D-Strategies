@@ -7,7 +7,7 @@ import socket
 import time
 from typing import Any, Dict, Optional
 
-from confluent_kafka import Producer # type: ignore
+from confluent_kafka import Producer  # type: ignore
 
 
 class KafkaProducerWrapper:

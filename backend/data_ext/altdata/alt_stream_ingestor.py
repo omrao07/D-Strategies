@@ -1,9 +1,15 @@
 # backend/altdata/alt_stream_ingestor.py
 from __future__ import annotations
 
-import os, asyncio, time, json, hashlib, math, re
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Callable, Tuple, Iterable
+import asyncio
+import hashlib
+import json
+import math
+import os
+import re
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---------------- optional deps (graceful) -----------------------------------
 HAVE_FEEDPARSER = True
@@ -79,7 +85,6 @@ def jget(obj: Any, path: str, default: Any = None) -> Any:
         cur = obj
         ok = True
         tokens = [m for m in _PATH_RE.finditer(alt)]
-        i = 0
         # assemble segments: keys or [idx]
         segs: List[Tuple[str, Optional[int]]] = []
         buf = ""

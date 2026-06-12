@@ -34,10 +34,11 @@ print(var_es(pnl[:, -1], levels=[0.95, 0.99]))
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Tuple
 
 # Optional SciPy for CDFs
 try:

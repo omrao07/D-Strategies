@@ -25,7 +25,7 @@ from __future__ import annotations
 import json
 import logging
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import numpy as np
 
@@ -371,7 +371,7 @@ def _async_var_snapshot(state) -> None:
             if len(raw) < 30:
                 return
             rets = np.array([float(x) for x in raw])
-            from backend.risk.institutional_risk_engine import VaREngine, PortfolioRiskEngine
+            from backend.risk.institutional_risk_engine import PortfolioRiskEngine, VaREngine
             var_e = VaREngine()
             port_e = PortfolioRiskEngine()
             snap = {

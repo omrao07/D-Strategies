@@ -28,9 +28,14 @@ Optional: if you add a config at config/deepfake_guard.yaml it will load overrid
 """
 
 from __future__ import annotations
-import os, re, time, json, math, hashlib
-from typing import Any, Dict, List, Optional, Tuple, Set
+
+import hashlib
+import json
+import os
+import re
+import time
 from collections import defaultdict, deque
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 try:
     import yaml  # optional config
@@ -39,7 +44,7 @@ except Exception:
 
 # Your bus helpers
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception:
     consume_stream = publish_stream = hset = None  # type: ignore
 
@@ -132,7 +137,7 @@ class DeepfakeGuard:
         title = (event.get("title") or "").strip()
         summary = (event.get("summary") or "").strip()
         url = event.get("url") or ""
-        source = (event.get("source") or "").lower()
+        (event.get("source") or "").lower()
         domain = _norm_domain(url)
 
         reasons: List[str] = []
@@ -198,7 +203,7 @@ class DeepfakeGuard:
     def run(self, in_stream="news.events", out_stream="news.vetted", alert_stream="ai.insight", poll_ms=300):
         assert consume_stream and publish_stream, "bus streams not wired"
         cur = "$"
-        lows = self.th["low_trust"]; highs = self.th["high_trust"]
+        lows = self.th["low_trust"]; self.th["high_trust"]
         while True:
             for _, msg in consume_stream(in_stream, start_id=cur, block_ms=poll_ms, count=200):
                 cur = "$"

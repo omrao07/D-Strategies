@@ -51,12 +51,13 @@ from __future__ import annotations
 
 import argparse
 import json
+from math import erf, sqrt
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from math import erf, sqrt, log
+
 
 # -------- I/O --------
 def read_wide_csv(path: str) -> pd.DataFrame:

@@ -18,16 +18,15 @@ import threading
 import time
 from collections import deque
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
-import redis
 import yaml
 
 from backend.bus.streams import (
+    STREAM_FILLS,
+    STREAM_ORDERS,
     consume_stream,
     publish_pubsub,
-    STREAM_ORDERS,
-    STREAM_FILLS,
 )
 
 # ---------------- Config ----------------
@@ -52,6 +51,7 @@ REG_FILE = CFG_DIR / "register.yaml"
 FEEDS_DIR = CFG_DIR / "feeds"
 
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 # ---------------- Utils ----------------

@@ -39,7 +39,7 @@ import os
 import time
 import traceback
 from dataclasses import asdict, is_dataclass
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # Ray is an optional dependency for the project
 try:
@@ -53,16 +53,16 @@ except Exception as e:  # pragma: no cover
 def _job_class_for(kind: str):
     kind = kind.lower()
     if kind == "backtest":
-        from simulation_farm.jobs.backtest_job import BacktestJob # type: ignore
+        from simulation_farm.jobs.backtest_job import BacktestJob  # type: ignore
         return BacktestJob
     if kind in ("mc", "monte_carlo", "montecarlo"):
-        from simulation_farm.jobs.monte_carlo_job import MonteCarloJob# type: ignore
+        from simulation_farm.jobs.monte_carlo_job import MonteCarloJob  # type: ignore
         return MonteCarloJob
     if kind == "replay":
-        from simulation_farm.jobs.replay_job import ReplayJob# type: ignore
+        from simulation_farm.jobs.replay_job import ReplayJob  # type: ignore
         return ReplayJob
     if kind in ("stress", "stress_test", "stresstest"):
-        from simulation_farm.jobs.stress_test_job import StressTestJob# type: ignore
+        from simulation_farm.jobs.stress_test_job import StressTestJob  # type: ignore
         return StressTestJob
     raise ValueError(f"Unknown job kind: {kind}")
 
@@ -299,15 +299,15 @@ def _parse_cli():
 
     # Build the right spec
     if args.job == "backtest":# type: ignore
-        from simulation_farm.jobs.backtest_job import BacktestSpec# type: ignore
+        pass  # type: ignore
     elif args.job == "monte_carlo":# type: ignore
-        from simulation_farm.jobs.monte_carlo_job import MonteCarloSpec# type: ignore
+        from simulation_farm.jobs.monte_carlo_job import MonteCarloSpec  # type: ignore
         Spec = MonteCarloSpec
     elif args.job == "replay":
-        from simulation_farm.jobs.replay_job import ReplaySpec# type: ignore
+        from simulation_farm.jobs.replay_job import ReplaySpec  # type: ignore
         Spec = ReplaySpec
     else:
-        from simulation_farm.jobs.stress_test_job import StressTestSpec# type: ignore
+        from simulation_farm.jobs.stress_test_job import StressTestSpec  # type: ignore
         Spec = StressTestSpec
 
     spec = Spec(**spec_kwargs)

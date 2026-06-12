@@ -1,8 +1,8 @@
 # tests/test_policy_router.py
-import time
-import math
 import importlib
+
 import pytest
+
 
 def _optional_import(modname):
     try:
@@ -100,7 +100,7 @@ def test_bandit_rule_learns_from_feedback(monkeypatch):
 
 def test_build_from_config_yaml_like():
     pr = _optional_import("selector.policy_router")
-    ab = _optional_import("selector.ab_tests")
+    _optional_import("selector.ab_tests")
 
     cfg = {
         "arms": ["A","B"],

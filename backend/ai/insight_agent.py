@@ -41,18 +41,18 @@ Output example:
 
 from __future__ import annotations
 
+import json
+import math
 import os
 import re
 import time
-import math
-import json
 from collections import defaultdict, deque
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 # Your existing bus helpers
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
-except Exception as e:  # dev fallback for tests
+    from backend.bus.streams import consume_stream, hset, publish_stream
+except Exception:  # dev fallback for tests
     consume_stream = publish_stream = hset = None  # type: ignore
 
 # Optional HF sentiment (auto-disabled if not installed)

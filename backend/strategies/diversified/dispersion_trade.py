@@ -232,7 +232,7 @@ class DispersionTrade(Strategy):
 
         # implied correlation & anchor guard
         rho_imp = _implied_corr(sigma_I, comp_pairs) or 0.0
-        rho_anchor = self._anchor_corr(idx_iv, comps, rho_imp)
+        self._anchor_corr(idx_iv, comps, rho_imp)
 
         # EWMA stats on D
         ew = _load_ewma()

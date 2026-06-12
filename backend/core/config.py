@@ -9,8 +9,8 @@ import os
 from typing import List, Optional
 
 try:
-    from pydantic_settings import BaseSettings  # pydantic v2
     from pydantic import Field
+    from pydantic_settings import BaseSettings  # pydantic v2
     _HAVE_PYDANTIC = True
 except ImportError:
     try:

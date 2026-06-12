@@ -1,8 +1,10 @@
 # engines/equity_ls/signals/momentum.py
 from __future__ import annotations
+
+from typing import Dict, Iterable, Literal, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Iterable, Optional, Tuple, Literal
 
 Method = Literal["cross", "timeseries"]
 

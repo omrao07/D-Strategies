@@ -64,7 +64,7 @@ except Exception:
 
 try:
     # if you added a base class
-    from backend.ingestion.news.news_base import NewsSource # type: ignore
+    from backend.ingestion.news.news_base import NewsSource  # type: ignore
 except Exception:
     class NewsSource:  # minimal stand-in
         pass

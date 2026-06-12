@@ -30,10 +30,11 @@ from __future__ import annotations
 
 import argparse
 import json
+from math import sqrt
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from math import sqrt
 from scipy.stats import norm, t
 
 

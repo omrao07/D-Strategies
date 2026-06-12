@@ -1,5 +1,6 @@
 # backend/ledger/ledger.py
 from __future__ import annotations
+
 """
 SQLite Ledger (append-only events + trades + positions)
 -------------------------------------------------------
@@ -28,8 +29,14 @@ CLI:
     python -m backend.ledger.ledger export --db data/ledger.db --out events.jsonl
 """
 
-import os, json, sqlite3, hashlib, time, pathlib, argparse
-from dataclasses import dataclass, asdict
+import argparse
+import hashlib
+import json
+import os
+import pathlib
+import sqlite3
+import time
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 # ---------- helpers ----------
@@ -249,7 +256,7 @@ class Ledger:
         # update order status (best-effort)
         row = self.conn.execute("SELECT qty, side, status FROM orders WHERE id=?", (f["order_id"],)).fetchone()
         if row:
-            ord_qty, side, status = float(row[0]), row[1], row[2]
+            ord_qty, side, _status = float(row[0]), row[1], row[2]
             filled_qty = self._order_filled_qty(f["order_id"])
             new_status = "filled" if abs(filled_qty - ord_qty) <= 1e-9 else "partially_filled"
             self.conn.execute("UPDATE orders SET status=? WHERE id=?", (new_status, f["order_id"]))

@@ -37,8 +37,6 @@ import json
 import os
 import random
 import signal
-import sys
-import threading
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -155,7 +153,7 @@ class Chaos:
 
     def memory_leak(self, mb: int, hold_ms: int = 5000) -> None:
         """Allocate ~mb megabytes and hold for a while (then GC)."""
-        block = bytearray(mb * 1024 * 1024)
+        bytearray(mb * 1024 * 1024)
         _sleep_ms(hold_ms)
         # release by scope end; caller controls repetition for leak simulation
 

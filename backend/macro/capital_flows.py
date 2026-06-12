@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import dataclass, asdict, field
-from datetime import date, datetime, timedelta
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from dataclasses import asdict, dataclass, field
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Tuple
 
 # --------- Optional adapters (kept soft so this file stands alone) ----------
 try:
-    from backend.treasury.bank_adapters import BankAdapterBase, Transaction as BankTx # type: ignore
+    from backend.treasury.bank_adapters import BankAdapterBase  # type: ignore
+    from backend.treasury.bank_adapters import Transaction as BankTx
 except Exception:
     class BankAdapterBase:  # minimal stub
         def list_transactions(self, *_a, **_k): return []

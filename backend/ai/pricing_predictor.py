@@ -1,5 +1,6 @@
 # backend/ai/models/pricing_predictor.py
 from __future__ import annotations
+
 """
 Pricing Predictor
 -----------------
@@ -23,9 +24,11 @@ CLI (CSV: timestamp,symbol,price,volume?):
     python -m backend.ai.models.pricing_predictor --predict bars_tail.csv --model model.pkl --out preds.csv
 """
 
-import json, os, math, time, pickle, warnings
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+import json
+import math
+import pickle
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # ---------- Optional deps (graceful fallbacks) ----------
 try:
@@ -39,27 +42,26 @@ except Exception:
     _pd = None
 
 try:
+    from sklearn.ensemble import RandomForestRegressor  # type: ignore
     from sklearn.linear_model import Ridge  # type: ignore
-    from sklearn.ensemble import RandomForestRegressor # type: ignore
-    from sklearn.metrics import r2_score, mean_squared_error  # type: ignore
     _has_sklearn = True
 except Exception:
     _has_sklearn = False
 
 try:
-    import xgboost as _xgb 
+    import xgboost as _xgb
     _has_xgb = True
 except Exception:
     _has_xgb = False
 
 try:
-    import lightgbm as _lgb     
+    import lightgbm as _lgb
     _has_lgb = True
 except Exception:
     _has_lgb = False
 
 try:
-    import torch as _torch 
+    import torch as _torch
     import torch.nn as _nn
     _has_torch = True
 except Exception:
@@ -483,7 +485,7 @@ def _read_csv(path: str):
     return df
 
 def _main():
-    import argparse, csv
+    import argparse
     p = argparse.ArgumentParser(description="Pricing Predictor (train/predict)")
     p.add_argument("--train", type=str, help="CSV for training")
     p.add_argument("--predict", type=str, help="CSV for prediction")

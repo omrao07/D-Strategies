@@ -1,10 +1,11 @@
 # backend/allocator/meta_allocator.py
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict
 import math
 import time
+from dataclasses import dataclass
+from typing import Dict
+
 
 @dataclass
 class StratMetrics:

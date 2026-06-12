@@ -24,10 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 
 def detect_miner_capitulation(series_price: pd.Series, series_hashrate: pd.Series,

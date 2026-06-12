@@ -74,13 +74,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -161,10 +160,8 @@ def ewma_var_from_returns(r: pd.Series, alpha: float=0.94, p: float=0.99) -> flo
     # assume normal; sigma = last EWMA vol; VaR = z * sigma; z at p
     sig = float(ewma_vol(r, alpha=alpha).iloc[-1])
     # z-score for one-sided p (e.g., 99% -> 2.33)
-    from math import sqrt, log, pi
     # Approx inverse-CDF via Beasley-Springer/Moro simplified (or fallback)
     try:
-        import math
         # Simple approx: use scipy-like constants (hardcoded)
         # For p close to 1:
         t = np.sqrt(-2*np.log(1-p))

@@ -13,9 +13,9 @@
 #   - ExecutionPlan has: venue, qty, price
 #
 
-import pytest
 from dataclasses import dataclass
 
+import pytest
 
 # ─────────────────────────────────────────────────────────────
 # Test fixtures (pure, deterministic)
@@ -46,7 +46,6 @@ class ExecutionPlan:
 
 
 from backend.engine.execution.dark_pool_router import DarkPoolRouter
-
 
 # ─────────────────────────────────────────────────────────────
 # Fixtures

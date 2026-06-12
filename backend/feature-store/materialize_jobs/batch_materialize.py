@@ -53,18 +53,16 @@ python materialize_jobs/batch_materialize.py --repo ./feature-store --prefixes e
 
 from __future__ import annotations
 
-import os
-import sys
-import time
-import yaml
 import argparse
-from dataclasses import dataclass, field
-from typing import List, Optional, Iterable, Tuple, Dict, Any
-from datetime import datetime, timedelta, timezone
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from feast import FeatureStore # type: ignore
-from feast.feature_view import FeatureView # type: ignore
+import yaml
+from feast import FeatureStore  # type: ignore
+from feast.feature_view import FeatureView  # type: ignore
 
 ISO_FMT = "%Y-%m-%d"
 

@@ -1,13 +1,20 @@
 # backend/altdata/social_sentiment.py
 from __future__ import annotations
-import os, re, time, json, math, asyncio, random, hashlib, statistics
-from dataclasses import dataclass, asdict, field
+
+import asyncio
+import hashlib
+import json
+import os
+import re
+import statistics
+import time
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 # ---------- Optional deps (graceful) -----------------------------------------
 HAVE_AIOHTTP = True
 try:
-    import aiohttp # type: ignore
+    import aiohttp  # type: ignore
 except Exception:
     HAVE_AIOHTTP = False
     aiohttp = None  # type: ignore
@@ -21,8 +28,8 @@ except Exception:
 
 HAVE_TRANSFORMERS = True
 try:
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification  # type: ignore
     import torch  # type: ignore
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer  # type: ignore
 except Exception:
     HAVE_TRANSFORMERS = False
 

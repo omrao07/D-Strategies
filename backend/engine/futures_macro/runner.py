@@ -17,22 +17,19 @@ Usage:
 
 import argparse
 import logging
-import yaml
-import pandas as pd
 from pathlib import Path
-from datetime import datetime
+
+import pandas as pd
+import yaml
+from engines.equity_ls.execution.allocator import allocate_from_scores  # type: ignore
 
 # Import engines
-from engines.equity_ls.signals import momentum, value, quality, sector_rotation # type: ignore
-from engines.stat_arb.signals import pairs, dispersion, overnight_reversal # type: ignore
-from engines.futures_macro.signals import breakevens, commodity_spreads # type: ignore
-from engines.fx.signals import fx_carry # type: ignore
-from engines.rates.signals import yield_curve # type: ignore
-from engines.macro.signals import macro_quadrants # type: ignore
-
-from engines.equity_ls.execution.allocator import allocate_from_scores # type: ignore
-from engines.equity_ls.execution.order_router import default_router # type: ignore
-from engines.futures_macro.execution.allocator import allocate_from_weights as futs_allocator # type: ignore
+from engines.equity_ls.signals import momentum, quality, sector_rotation, value  # type: ignore
+from engines.futures_macro.signals import breakevens, commodity_spreads  # type: ignore
+from engines.fx.signals import fx_carry  # type: ignore
+from engines.macro.signals import macro_quadrants  # type: ignore
+from engines.rates.signals import yield_curve  # type: ignore
+from engines.stat_arb.signals import dispersion, overnight_reversal, pairs  # type: ignore
 
 # ---------------------------------------------------------------------
 # Setup

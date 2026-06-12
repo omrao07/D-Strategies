@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import json
 import time
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-import pytest # type: ignore
+import pytest  # type: ignore
 
 try:
     import fakeredis  # pip install fakeredis

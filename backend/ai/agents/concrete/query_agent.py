@@ -23,7 +23,7 @@ try:
     from ..skills.market.quotes import get_candles  # type: ignore
 except Exception:
     def get_candles(symbol: str, interval: str = "1d", lookback: int = 30) -> List[Dict[str, Any]]:
-        import math, random
+        import random
         px = 100.0
         out = []
         now = int(time.time() * 1000)

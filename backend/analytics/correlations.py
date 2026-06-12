@@ -18,9 +18,12 @@ Streams (env):
 This file is dependency-light: requires numpy; pandas/scipy optional.
 """
 
-import os, json, time, math
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Tuple, Iterable, Optional
+import json
+import math
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # ---- deps (graceful) --------------------------------------------------------
 try:
@@ -35,7 +38,7 @@ except Exception:
 
 HAVE_SCIPY = True
 try:
-    from scipy.cluster.hierarchy import linkage, dendrogram
+    from scipy.cluster.hierarchy import dendrogram, linkage
     from scipy.spatial.distance import squareform
 except Exception:
     HAVE_SCIPY = False
@@ -296,7 +299,7 @@ class CorrWorker:
                         except Exception:
                             continue
                         sym = str(j.get("symbol") or "").upper()
-                        ts  = int(j.get("ts_ms") or 0)
+                        int(j.get("ts_ms") or 0)
                         if not sym: 
                             continue
 
@@ -398,7 +401,8 @@ def demo():
     print("rolling mats:", len(mats), "last non-nan mean:", np.nanmean(mats[-1]))
 
 if __name__ == "__main__":
-    import argparse, asyncio
+    import argparse
+    import asyncio
     ap = argparse.ArgumentParser("correlations")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--worker", action="store_true")

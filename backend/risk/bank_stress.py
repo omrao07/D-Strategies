@@ -62,11 +62,10 @@ defaults:
 
 from __future__ import annotations
 
-import math
 import os
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional, List
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 # optional deps
 try:
@@ -397,7 +396,8 @@ def _probe():
     print(f"CET1={s.cet1_ratio:.3%}  LCR={s.lcr:.2f}  NSFR={s.nsfr:.2f}  Breaches={s.breaches}")
 
 def main():
-    import argparse, json
+    import argparse
+    import json
     ap = argparse.ArgumentParser(description="Bank Stress Engine")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--yaml", type=str, help="config/bank_stress.yaml")

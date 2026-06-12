@@ -1,9 +1,10 @@
 # tests/test_capacity.py
-import math
 import importlib
+import math
 from copy import deepcopy
 from typing import Any, Dict
-import pytest # type: ignore
+
+import pytest  # type: ignore
 
 """
 What this validates

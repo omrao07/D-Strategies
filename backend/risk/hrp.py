@@ -9,11 +9,11 @@ Implements the algorithm described by Marcos López de Prado (2016):
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import List, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Optional
-from dataclasses import dataclass
-
 
 # =============================================================================
 # Core helpers

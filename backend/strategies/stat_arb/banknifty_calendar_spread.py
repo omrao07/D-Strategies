@@ -26,7 +26,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -55,7 +58,6 @@ def run(cfg):
     spot.columns = [c.lower().strip() for c in spot.columns]
     spot_col = spot.columns[0]
 
-    rbi_rate = RISK_FREE
     if cfg.rbi_file and os.path.exists(cfg.rbi_file):
         rbi_df = pd.read_csv(cfg.rbi_file, parse_dates=["date"]).set_index("date").sort_index()
         rbi_df.columns = [c.lower().strip() for c in rbi_df.columns]
@@ -93,7 +95,7 @@ def run(cfg):
     merged["z_score"] = (merged["basis_error"] - mu) / sigma
 
     entry_bps = ENTRY_BPS / 10000 * merged["spot"].mean()
-    exit_bps = EXIT_BPS / 10000 * merged["spot"].mean()
+    EXIT_BPS / 10000 * merged["spot"].mean()
 
     records = []
     for dt, row in merged.iterrows():

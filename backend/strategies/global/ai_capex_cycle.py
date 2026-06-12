@@ -91,13 +91,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -167,7 +166,7 @@ def load_financials(path: str, cohort_key: str) -> pd.DataFrame:
     df["date"] = to_quarter(df["date"])
     df["company"] = df["company"].astype(str)
     # Pick capex column
-    cap_cols = [c for c in df.columns if c.lower().startswith("capex")]
+    [c for c in df.columns if c.lower().startswith("capex")]
     pref = ["capex_usd_m", "capexusd", "capex_usd", "capex_musd", "capex_chf_m", "capex_eur_m", "capex"]
     cap = None
     for p in pref:

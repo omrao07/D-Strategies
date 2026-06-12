@@ -1,10 +1,10 @@
 # tests/test_policy_engine.py
 import importlib
 import time
-from datetime import datetime, timedelta, timezone
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
-import pytest # type: ignore
+from datetime import datetime, timezone
+
+import pytest  # type: ignore
 
 """
 Expected public API (any one is fine)

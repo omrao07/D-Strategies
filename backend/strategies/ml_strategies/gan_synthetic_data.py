@@ -21,10 +21,12 @@ outdir/tail_scenarios.csv     worst-case synthetic scenarios (5th percentile pat
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-
 
 LATENT_DIM = 8
 HIDDEN_G = 32

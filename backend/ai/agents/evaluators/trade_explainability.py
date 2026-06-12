@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import math
 import time
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
+
 
 # ---------------------------------------------------------------------
 # Data schemas (lightweight)

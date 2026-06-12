@@ -26,8 +26,11 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
 from datetime import timedelta
+
 import numpy as np
 import pandas as pd
 

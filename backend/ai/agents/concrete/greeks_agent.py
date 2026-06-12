@@ -15,8 +15,8 @@ from __future__ import annotations
 
 import math
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Literal, Optional
 
 try:
     from ..core.base_agent import BaseAgent  # type: ignore
@@ -30,10 +30,16 @@ except Exception:
 
 try:
     from ..skills.market.greeks import (  # type: ignore
-        bsm_greeks, b76_greeks, bsm_price, b76_price,
-        implied_vol_bsm, implied_vol_b76,
-        charm, vanna, BSMResult, B76Result,
-        put_from_call_bsm, call_from_put_bsm,
+        b76_greeks,
+        b76_price,
+        bsm_greeks,
+        bsm_price,
+        call_from_put_bsm,
+        charm,
+        implied_vol_b76,
+        implied_vol_bsm,
+        put_from_call_bsm,
+        vanna,
     )
     _HAS_GREEKS = True
 except Exception:

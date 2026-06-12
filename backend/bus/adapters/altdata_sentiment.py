@@ -32,8 +32,8 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 # VADER scorer (default)
 try:
@@ -44,7 +44,7 @@ except ImportError:
 
 # Optional: FinBERT (HuggingFace)
 try:
-    from transformers import pipeline # type: ignore
+    from transformers import pipeline  # type: ignore
     _FINBERT = pipeline("sentiment-analysis", model="ProsusAI/finbert")  # may be heavy # type: ignore
     _HAS_FINBERT = True
 except Exception:
@@ -52,7 +52,7 @@ except Exception:
 
 # Hook into your bus
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except ImportError:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:
         print(f"[stub publish_stream] {stream} <- {json.dumps(payload)}")

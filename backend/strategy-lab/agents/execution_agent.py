@@ -20,11 +20,10 @@ You can plug this into simulators/backtests by:
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, Optional, Iterable, List, Tuple
-import time
-
+from typing import Dict, Iterable, List, Optional
 
 # ----------------------------- Domain Models ---------------------------------
 
@@ -96,7 +95,7 @@ class Position:
             self.qty = new_qty
         else:
             # Closing or flipping
-            close_qty = min(abs(self.qty), abs(signed_qty)) * (1 if signed_qty > 0 else 1)
+            min(abs(self.qty), abs(signed_qty)) * (1 if signed_qty > 0 else 1)
             # Realized PnL is (exit - entry) * closed_quantity with sign of original position
             if self.qty > 0:  # closing long => sell fill
                 self.realized_pnl += (fill.price - self.avg_px) * min(abs(self.qty), abs(signed_qty))

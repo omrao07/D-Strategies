@@ -78,13 +78,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -296,7 +295,6 @@ def load_events(path: Optional[str]) -> pd.DataFrame:
 
 def aggregate_sales(S: pd.DataFrame) -> pd.DataFrame:
     """Sum across vendor/segment if present, otherwise pass-through."""
-    keys = ["date"]
     for c in ["vendor","segment"]:
         if c in S.columns: 
             # keep for later mixes but return both aggregated and disagg

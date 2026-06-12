@@ -14,11 +14,12 @@ Scenario tool for AI datacenter power planning:
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from datetime import datetime
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
 
 try:
     import matplotlib.pyplot as plt

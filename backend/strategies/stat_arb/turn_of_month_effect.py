@@ -18,7 +18,10 @@ outdir/backtest.csv        cumulative P&L: long TOM, flat otherwise
 outdir/summary.json        avg TOM return, t-stat, Sharpe
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats

@@ -21,7 +21,10 @@ outdir/outcome_stats.csv      approval vs rejection average returns
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -80,8 +83,8 @@ def run(cfg):
         ).reset_index()
         outcome_stats.to_csv(os.path.join(cfg.outdir, "outcome_stats.csv"), index=False)
 
-        approved = df[df.get("approved", pd.Series(False))]
-        rejected = df[~df.get("approved", pd.Series(False))]
+        df[df.get("approved", pd.Series(False))]
+        df[~df.get("approved", pd.Series(False))]
         approval_rate = float(df["approved"].mean()) if "approved" in df.columns else None
     else:
         approval_rate = None

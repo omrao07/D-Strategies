@@ -30,7 +30,7 @@ import math
 import os
 import sqlite3
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 # Optional numeric stack
@@ -40,14 +40,18 @@ except Exception:
     np = None  # type: ignore
 
 try:
-    import scipy.optimize as spo  # type: ignore
     import scipy.interpolate as spi  # type: ignore
+    import scipy.optimize as spo  # type: ignore
 except Exception:
     spo = spi = None  # type: ignore
 
 # Option data model (shared with option_chain)
 try:
-    from backend.data.option_chain import ChainSnapshot, OptionQuote, _tenor_years_from_exp # type: ignore
+    from backend.data.option_chain import (  # type: ignore
+        ChainSnapshot,
+        OptionQuote,
+        _tenor_years_from_exp,
+    )
 except Exception:
     ChainSnapshot = Any  # type: ignore
     OptionQuote = Any  # type: ignore
@@ -76,7 +80,7 @@ def _sabr_vol(F: float, K: float, T: float, alpha: float, beta: float, rho: floa
     if F == K:
         num = alpha
         den = (F ** (1 - beta))
-        zeta = (nu/alpha) * (F ** (1 - beta)) * math.log(F/K if K>0 else 1.0)
+        (nu/alpha) * (F ** (1 - beta)) * math.log(F/K if K>0 else 1.0)
         xz = 1.0  # at-the-money limit; avoid 0/0
         term1 = ((1 - beta) ** 2 / 24) * (alpha ** 2) / (F ** (2 - 2*beta))
         term2 = (rho * beta * nu * alpha) / (4 * (F ** (1 - beta)))
@@ -448,7 +452,7 @@ def main():
             ap.error("--symbol required unless --from-json is used")
         # Lazy import to avoid hard dependency
         try:
-            from backend.data.option_chain import get_chain # type: ignore
+            from backend.data.option_chain import get_chain  # type: ignore
         except Exception as e:
             raise RuntimeError("backend.data.option_chain.get_chain not available") from e
         snap = get_chain(args.symbol, provider=args.provider, expiry="ALL")

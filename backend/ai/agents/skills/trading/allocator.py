@@ -1,8 +1,8 @@
 # backend/portfolio/allocator.py
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Literal
+from dataclasses import dataclass, field
+from typing import Dict, List, Literal, Optional
 
 Side = Literal["buy", "sell"]
 

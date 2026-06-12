@@ -3,11 +3,10 @@ from __future__ import annotations
 
 import collections
 import json
-import math
 import os
 import time
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, Deque, List, Optional, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Deque, Dict, List, Optional
 
 # -------- Optional YAML + Redis (safe fallbacks) -------------------------
 try:
@@ -233,7 +232,7 @@ class RiskEngine:
         return gross_now + delta
 
     def _symbol_weight_after(self, order: OrderRequest, pf: PortfolioSnapshot, px: float) -> float:
-        nav = max(1e-9, pf.nav)
+        max(1e-9, pf.nav)
         pos = pf.positions.get(order.symbol, Position(order.symbol))
         after_qty = pos.qty + (order.qty if order.side.lower() == "buy" else -order.qty)
         after_notional = abs(after_qty) * (px or pos.last_price or pos.avg_price or 0.0)

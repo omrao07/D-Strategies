@@ -1,7 +1,11 @@
 from __future__ import annotations
-import os, time, json
-from typing import Optional, Dict
+
+import json
+import os
+import time
 from dataclasses import dataclass
+from typing import Dict, Optional
+
 try:
     import redis as _redis_mod
     _HAVE_REDIS = True

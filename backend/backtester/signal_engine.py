@@ -6,11 +6,10 @@ regime detection, and signal aggregation for the backtesting engine.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ── Technical indicators ──────────────────────────────────────────────────────
 

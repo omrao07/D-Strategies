@@ -49,8 +49,8 @@
 import argparse
 import os
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Tuple
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -66,8 +66,6 @@ except Exception:
     plt = None
 
 import statsmodels.api as sm
-from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 

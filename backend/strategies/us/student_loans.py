@@ -54,7 +54,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, Dict, List, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -70,8 +70,6 @@ except Exception:
     plt = None
 
 import statsmodels.api as sm
-from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 
@@ -328,7 +326,7 @@ def event_windows(df: pd.DataFrame, series: str, pre: int = 12, post: int = 18,
                 continue
         else:
             idx = ev
-        center = s.index.get_loc(idx)
+        s.index.get_loc(idx)
         # Build relative window based on integer positions
         pos = s.index.get_indexer([idx])[0]
         start = max(0, pos - pre); end = min(len(s)-1, pos + post)

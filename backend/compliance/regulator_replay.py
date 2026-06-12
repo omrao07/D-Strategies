@@ -1,5 +1,6 @@
 # backend/compliance/regulator_replay.py
 from __future__ import annotations
+
 """
 Regulator Replay
 ----------------
@@ -36,11 +37,13 @@ Notes:
   provide enough venues to approximate NBBO.
 """
 
-import json, os, math, statistics, argparse
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple
-from collections import defaultdict
+import argparse
+import json
+import os
 from bisect import bisect_left
+from collections import defaultdict
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---- optional bus (no-op if absent) ----
 try:

@@ -22,13 +22,13 @@ You can extend/adjust inside each source module to map your providers cleanly.
 
 from __future__ import annotations
 
+import logging
 import os
 import time
-import logging
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from backend.config.feature_flags import is_enabled
 from backend.bus import streams
+from backend.config.feature_flags import is_enabled
 
 try:
     import yaml  # type: ignore
@@ -39,7 +39,6 @@ except Exception:  # pragma: no cover
 from .satellites import fetch as fetch_satellites
 from .shipping_ais import fetch as fetch_shipping
 from .web_trends import fetch as fetch_trends
-
 
 log = logging.getLogger(__name__)
 if not log.handlers:

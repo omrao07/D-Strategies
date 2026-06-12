@@ -1,9 +1,11 @@
 # engines/credit_cds/allocator.py
 from __future__ import annotations
-import pandas as pd
-import numpy as np
+
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
+
+import pandas as pd
+
 
 @dataclass
 class AllocatorConfig:
@@ -81,7 +83,6 @@ def compute_trades(
 # ---------------------------------------------------------------------
 
 if __name__ == "__main__":
-    import numpy as np
 
     nav = 1_000_000
     raw_weights = pd.Series({"IG_A": 0.6, "HY_B": -0.2, "EM_C": 0.3})

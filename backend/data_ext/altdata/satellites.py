@@ -60,7 +60,7 @@ def fetch(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
         return []
 
     provider = cfg.get("provider", "demo")
-    api_key = cfg.get("api_key")  # not used in stub
+    cfg.get("api_key")  # not used in stub
     regions = cfg.get("regions", [])
     ts = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 

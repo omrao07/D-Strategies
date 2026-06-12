@@ -52,8 +52,8 @@ snapshot = adapter.snapshot(now_ts=time.time(), with_raw=True)
 from __future__ import annotations
 
 import json
-import time
 import math
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -66,7 +66,7 @@ except Exception:
 
 # Optional mixer
 try:
-    from backend.common.mixer import SignalMixer, MixerConfig # type: ignore
+    from backend.common.mixer import MixerConfig, SignalMixer  # type: ignore
     _HAVE_MIXER = True
 except Exception:
     _HAVE_MIXER = False
@@ -76,7 +76,7 @@ except Exception:
 
 # Optional stats for z-score
 try:
-    from backend.common.predictor import OnlineStats # type: ignore
+    from backend.common.predictor import OnlineStats  # type: ignore
 except Exception:
     @dataclass
     class OnlineStats:  # minimal fallback
@@ -179,7 +179,7 @@ class SignalsAdapter:
                 cooked = self._apply_transform(raw, xform, now)
                 per_src[spec.name] = cooked
                 timestamps[spec.name] = now
-            except Exception as e:
+            except Exception:
                 if spec.required:
                     raise
                 # else, skip source

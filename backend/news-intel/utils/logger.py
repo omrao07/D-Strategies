@@ -24,7 +24,6 @@ import time
 from logging.handlers import RotatingFileHandler
 from typing import Any, Dict
 
-
 # ------------------ formatters ------------------
 
 class JsonFormatter(logging.Formatter):

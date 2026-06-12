@@ -1,9 +1,11 @@
 # engines/core/simulator.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Callable, Dict, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Callable
 
 # ---------------------------------------------------------------------
 # Config

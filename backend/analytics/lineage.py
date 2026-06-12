@@ -1,11 +1,17 @@
 # backend/infra/lineage.py
 from __future__ import annotations
 
-import os, io, json, time, hashlib, inspect, typing as T, uuid as _uuid
+import hashlib
+import inspect
+import json
+import os
+import time
+import typing as T
+import uuid as _uuid
 from collections import deque
-from dataclasses import dataclass, asdict, field
-from pathlib import Path
 from contextlib import contextmanager
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
 
 # -------- optional Redis (graceful) ------------------------------------------
 USE_REDIS = True

@@ -18,8 +18,11 @@ outdir/spread_signals.csv        date, pair, spread_zscore, signal
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
 from itertools import combinations
+
 import numpy as np
 import pandas as pd
 

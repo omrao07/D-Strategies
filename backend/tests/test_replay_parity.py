@@ -12,8 +12,7 @@ import pytest
 
 from backend.engine.core.engine import Engine
 from backend.engine.core.replay import Replayer
-from backend.engine.core.types import Event, EngineResult, hash_state
-
+from backend.engine.core.types import EngineResult, Event, hash_state
 
 # ─────────────────────────────────────────────────────────────
 # Fixtures

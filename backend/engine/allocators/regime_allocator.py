@@ -1,15 +1,14 @@
 # backend/engine/allocators/regime_allocator.py
 from __future__ import annotations
 
-import os
 import json
-import time
+import os
 import signal
+import time
 from dataclasses import dataclass
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 import yaml
-import redis
 
 # --- Shared bus helpers (you already have these) -----------------------------
 from backend.bus.streams import hset, publish_stream
@@ -50,6 +49,7 @@ INCLUDE = {s for s in os.getenv("REGIME_INCLUDE", "").split(",") if s.strip()}
 EXCLUDE = {s for s in os.getenv("REGIME_EXCLUDE", "").split(",") if s.strip()}
 
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 

@@ -8,9 +8,15 @@ from datetime import date, datetime
 from typing import Dict, Iterable, List, Optional, Tuple
 
 # Reuse your adapter (we wrote this earlier)
-from backend.treasury.soverign_adapter import ( # type: ignore
-    YieldCurve, CurvePoint, BondSpec, SovereignAdapter,
-    price_from_curve, ytm_from_price, duration_convexity, dv01,
+from backend.treasury.soverign_adapter import (  # type: ignore
+    BondSpec,
+    CurvePoint,
+    SovereignAdapter,
+    YieldCurve,
+    duration_convexity,
+    dv01,
+    price_from_curve,
+    ytm_from_price,
 )
 
 # ------------------------------ Facade ---------------------------------
@@ -103,7 +109,7 @@ class SovereignService:
     def carry_roll(self, spec: BondSpec, asof: date | str, horizon_days: int = 30) -> Dict[str, float]:
         # Reuse adapter’s carry/roll
         curve = self.get_curve(spec.currency, asof)
-        from backend.treasury.soverign_adapter import carry_roll_down # type: ignore
+        from backend.treasury.soverign_adapter import carry_roll_down  # type: ignore
         return carry_roll_down(spec, curve, _d(asof), horizon_days=horizon_days)
 
 

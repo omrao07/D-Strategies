@@ -14,16 +14,13 @@
 
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass, field
-from datetime import date
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import pytest
 
-from backend.analytics.tca import TCA, FillInfo, OrderInfo, OrderTCA
-
+from backend.analytics.tca import TCA
 
 # ---------------------------------------------------------------------------
 # Minimal stub objects (no external dependencies)

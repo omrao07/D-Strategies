@@ -23,13 +23,14 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, roc_auc_score
-
 
 SIGNAL_COLS = ["signal_rf", "signal_hmm", "signal_momentum", "signal_meanrev", "signal_volume"]
 FORWARD_DAYS = 5

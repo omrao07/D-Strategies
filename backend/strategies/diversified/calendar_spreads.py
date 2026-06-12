@@ -40,7 +40,6 @@ from typing import Optional, Tuple
 import numpy as np
 import pandas as pd
 
-
 # ------------- Black–Scholes helpers -------------
 SQRT_2PI = math.sqrt(2 * math.pi)
 

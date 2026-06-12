@@ -14,10 +14,9 @@ Designed to:
 No async, no external libs, safe everywhere.
 """
 
-from typing import Callable, Dict, Optional
-import time
 import threading
-
+import time
+from typing import Callable, Dict, Optional
 
 # ─────────────────────────────────────────────────────────────
 # Errors

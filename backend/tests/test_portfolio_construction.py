@@ -2,11 +2,13 @@
 """Tests for backend/portfolio_construction/ modules."""
 import numpy as np
 import pandas as pd
-import pytest
 
-from backend.portfolio_construction.kelly import kelly_position_size, vol_parity_weights, continuous_kelly
+from backend.portfolio_construction.kelly import (
+    continuous_kelly,
+    kelly_position_size,
+    vol_parity_weights,
+)
 from backend.portfolio_construction.risk_parity import risk_parity_weights
-
 
 # ---- Kelly tests -----------------------------------------------------------
 

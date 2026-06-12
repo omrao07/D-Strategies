@@ -1,9 +1,11 @@
 # backend/execution/pov.py
 from __future__ import annotations
 
-import math, time, uuid, dataclasses
-from dataclasses import dataclass, asdict
-from typing import Callable, Dict, Optional, Tuple, Any
+import time
+import uuid
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, Optional, Tuple
+
 
 # ---------- helpers ----------
 def now_ms() -> int: return int(time.time() * 1000)
@@ -239,7 +241,7 @@ class POVExecutor:
     def status(self) -> Dict[str, Any]:
         cfg, st = self.cfg, self.state
         remaining = max(0.0, cfg.target_qty - st.filled_qty)
-        desired_cum = cfg.target_participation * max(st.printed_qty, 1.0)
+        cfg.target_participation * max(st.printed_qty, 1.0)
         part_now = (st.filled_qty / st.printed_qty) if st.printed_qty > 0 else 0.0
         return {
             "symbol": cfg.symbol.upper(),

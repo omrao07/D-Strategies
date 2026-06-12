@@ -19,12 +19,17 @@ feast materialize <start> <end>
 """
 
 from datetime import timedelta
+
 # type: ignore
-from feast import Entity, FeatureView, Field# type: ignore
-from feast.types import Float32, String# type: ignore
-from feast.infra.offline_stores.file_source import FileSource# type: ignore
-from feast.on_demand_feature_view import on_demand_feature_view# type: ignore
-from feast import RequestSource# type: ignore
+from feast import (  # type: ignore
+    Entity,
+    FeatureView,
+    Field,
+    RequestSource,  # type: ignore
+)
+from feast.infra.offline_stores.file_source import FileSource  # type: ignore
+from feast.on_demand_feature_view import on_demand_feature_view  # type: ignore
+from feast.types import Float32, String  # type: ignore
 
 # ---------------------------------------------------------------------
 # Entity

@@ -1,9 +1,8 @@
 # tests/test_candle_aggregator.py
 import importlib
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
 
-import pytest # type: ignore
+import pytest  # type: ignore
 
 """
 What this tests

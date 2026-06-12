@@ -1,12 +1,14 @@
 # engines/commodities/signals/commodity_spreads.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, List, Literal, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Tuple, Literal, Optional
 
 # Reuse your futures contract spec (multiplier, tick, currency)
-from engines.futures_macro.backtest.pnl import ContractSpec # type: ignore
+from engines.futures_macro.backtest.pnl import ContractSpec  # type: ignore
 
 SignalMode = Literal["mean_revert", "trend", "carry"]
 TRADING_DAYS = 252
@@ -147,7 +149,7 @@ def _carry_snapshot(prices: pd.DataFrame, specs: Dict[str, ContractSpec], spread
     """
     # You can pass metadata (days to maturity) via symbol naming or an external mapping.
     # Here we try to infer tenor distance if the symbols end with numbers like "CL1", "CL2".
-    last = prices.iloc[-1]
+    prices.iloc[-1]
     carry_scores = {}
 
     for sp in spreads:

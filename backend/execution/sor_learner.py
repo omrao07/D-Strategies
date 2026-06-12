@@ -44,20 +44,20 @@ Dependencies
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
 import time
-import hashlib
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 import numpy as np
 
 # ---------------- Bus hooks (safe stubs if missing) ----------------
 
 try:
-    from backend.bus.streams import publish_stream, consume_stream # type: ignore
+    from backend.bus.streams import consume_stream, publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload):
         head = {k: payload.get(k) for k in ("ts","kind","symbol","decision_id")}

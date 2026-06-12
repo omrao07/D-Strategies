@@ -21,7 +21,10 @@ outdir/settlement_analysis.csv    CAR from filing to settlement, post-settlement
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

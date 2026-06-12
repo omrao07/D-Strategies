@@ -1,8 +1,7 @@
 # tests/test_cds_basis.py
+import engines.cap_struct.cds_basis as basis  # type: ignore
 import numpy as np
 import pandas as pd
-
-import engines.cap_struct.cds_basis as basis # type: ignore
 
 
 def make_idx(n=300, start="2023-01-02"):

@@ -35,20 +35,19 @@ from __future__ import annotations
 import os
 import sys
 import time
-import threading
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 # Optional deps
 try:
     from prometheus_client import (
+        CONTENT_TYPE_LATEST,
         CollectorRegistry,
         Gauge,
-        start_http_server,
+        generate_latest,  # type: ignore
         push_to_gateway,
+        start_http_server,
         write_to_textfile,
-        CONTENT_TYPE_LATEST,
-        generate_latest,# type: ignore
     )  # type: ignore
 except Exception:
     CollectorRegistry = None  # type: ignore

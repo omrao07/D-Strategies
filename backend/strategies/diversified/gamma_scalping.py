@@ -1,9 +1,12 @@
 # backend/strategies/diversified/gamma_scalping.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 try:
     import redis as _redis_mod
@@ -194,7 +197,7 @@ class GammaScalping(Strategy):
         # size → shares per leg from USD_PER_STRADDLE
         K = _round_strike(S, STRIKE_STEP)
         # quick vega sanity to avoid dust sizing on very low vol
-        vega = _vega(S, K, iv, T_YEARS)  # per 1.00 vol per 1 straddle ~ 2*call vega, but close enough
+        _vega(S, K, iv, T_YEARS)  # per 1.00 vol per 1 straddle ~ 2*call vega, but close enough
         qty_approx = max(1.0, USD_PER_STRADDLE / max(1e-9, S))  # shares per leg proxy
         if qty_approx * S < MIN_TICKET_USD:
             return

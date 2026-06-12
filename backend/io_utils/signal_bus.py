@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
@@ -12,8 +12,9 @@ try:
 except Exception:
     _HAVE_PD = False
 
+from backend.common.metrics import hist_obs, incr
+
 from . import streams
-from backend.common.metrics import incr, hist_obs
 
 # ---------------------------------------------------------------------
 # Keys & Streams

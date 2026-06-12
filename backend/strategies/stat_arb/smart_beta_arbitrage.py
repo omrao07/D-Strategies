@@ -19,7 +19,10 @@ outdir/arb_backtest.csv   cumulative arb P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -57,7 +60,7 @@ def run(cfg):
         avail = weight_dates[weight_dates <= date]
         if len(avail) == 0:
             continue
-        w_date = avail[-1]
+        avail[-1]
         nav = compute_nav(weights, cons_wide, date, etf)
         if np.isnan(nav) or nav == 0:
             continue

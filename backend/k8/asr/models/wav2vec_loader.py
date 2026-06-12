@@ -15,12 +15,13 @@ Dependencies:
 """
 
 from __future__ import annotations
+
+import argparse
+import glob
+import json
 import os
 import sys
-import json
 import time
-import glob
-import argparse
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 

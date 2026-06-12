@@ -3,8 +3,10 @@
 """
 thirteenf_fund_mimicry.py — Copy top hedge fund 13F filings with 45-day lag
 """
-import argparse, json, os
-import numpy as np
+import argparse
+import json
+import os
+
 import pandas as pd
 
 

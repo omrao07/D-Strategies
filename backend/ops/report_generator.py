@@ -1,5 +1,6 @@
 # backend/reporting/report_generator.py
 from __future__ import annotations
+
 """
 Report Generator — PnL / TCA / Risk snapshot from the SQLite ledger
 -------------------------------------------------------------------
@@ -20,7 +21,12 @@ CLI:
       --out reports/aug_report.md --fmt md
 """
 
-import argparse, contextlib, datetime as dt, json, os, sqlite3, time
+import argparse
+import contextlib
+import datetime as dt
+import json
+import os
+import sqlite3
 from typing import Any, Dict, List, Optional
 
 # -------- optional redis (vol/drawdown metrics) ----------

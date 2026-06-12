@@ -1,10 +1,12 @@
 # engines/cap_struct/capital_structure.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from math import erf, sqrt
+from typing import Dict, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
-from math import log, sqrt, exp, erf
 
 TRADING_DAYS = 252
 
@@ -179,7 +181,7 @@ def estimate_hedge_ratio(
     dS = cds.diff().rolling(lb).mean()  # smoother ΔS (avoid noise)
     rE = np.log(eq).diff() # type: ignore
     x = rE.dropna().align(dS.dropna(), join="inner")[0]
-    y = dS.dropna().align(rE.dropna(), join="inner")[0]
+    dS.dropna().align(rE.dropna(), join="inner")[0]
     X, Y = rE.reindex(x.index), dS.reindex(x.index)
     X = X.dropna(); Y = Y.dropna()
     common = X.index.intersection(Y.index)

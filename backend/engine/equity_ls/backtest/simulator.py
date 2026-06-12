@@ -1,8 +1,10 @@
 # engines/equity_ls/backtest/simulator.py
 from __future__ import annotations
-import pandas as pd
-import numpy as np
+
 from typing import Callable, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 from .pnl import compute_pnl  # summary + per_ticker pnl$
 

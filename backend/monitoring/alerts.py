@@ -1,18 +1,17 @@
 # orchestrator/alerts.py
 from __future__ import annotations
 
+import json
+import logging
 import os
 import smtplib
 import ssl
 import time
-import json
-import logging
 from dataclasses import dataclass, field
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
 
 # --------------------------------------------------------------------------------------
 # Logging

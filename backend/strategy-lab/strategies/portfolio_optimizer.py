@@ -23,13 +23,11 @@ All functions are pure-Python and work fine up to a few hundred names.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional, Iterable
 import math
-import statistics
-import time
 import random
-
+import statistics
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
 Vector = List[float]
 Matrix = List[List[float]]

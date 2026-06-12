@@ -26,8 +26,6 @@ Run
 pytest -q tests/test_faiss_indexer.py
 """
 
-import os
-import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -36,19 +34,23 @@ import pytest
 
 try:
     import faiss  # type: ignore
-except Exception as e:
+except Exception:
     faiss = None
 
 # Try to import your HybridIndexer
 try:
-    from analytics_engine.vector_ai.index_builder.hybrid_indexer import HybridIndexer # type: ignore
+    from analytics_engine.vector_ai.index_builder.hybrid_indexer import (
+        HybridIndexer,  # type: ignore
+    )
 except Exception:
     # fallback relative path if repo layout differs in local dev
     import sys
     sys.path.append(str(Path(__file__).resolve().parents[1]))
     try:
-        from analytics_engine.vector_ai.index_builder.hybrid_indexer import HybridIndexer # type: ignore
-    except Exception as e:
+        from analytics_engine.vector_ai.index_builder.hybrid_indexer import (
+            HybridIndexer,  # type: ignore
+        )
+    except Exception:
         HybridIndexer = None
 
 

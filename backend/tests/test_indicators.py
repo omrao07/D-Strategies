@@ -3,9 +3,19 @@
 import numpy as np
 import pandas as pd
 import pytest
+
 from backend.indicators.technical import (
-    sma, ema, rsi, macd, bollinger, atr, vwap, zscore,
-    kalman_filter, hurst_exponent, historical_vol,
+    atr,
+    bollinger,
+    ema,
+    historical_vol,
+    hurst_exponent,
+    kalman_filter,
+    macd,
+    rsi,
+    sma,
+    vwap,
+    zscore,
 )
 
 

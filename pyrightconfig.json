@@ -1,8 +1,8 @@
 {
-  "include": ["backend", "frontend"],
-  "exclude": ["**/node_modules", "**/__pycache__", "**/dist", "**/.venv", "**/venv"],
+  "include": ["backend"],
+  "exclude": ["**/node_modules", "**/__pycache__", "**/dist", "**/.venv", "**/venv", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   "typeCheckingMode": "basic",
-  "reportMissingImports": "warning",
+  "reportMissingImports": "none",
   "reportMissingModuleSource": "none",
 
   "reportOptionalMemberAccess": "none",

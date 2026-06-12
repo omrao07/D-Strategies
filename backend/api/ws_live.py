@@ -102,7 +102,7 @@ def _safe_json(s: str) -> Any:
 async def _fetch_engine_status(r: Any) -> Dict[str, Any]:
     signals_raw = await _hgetall(r, "strategy:signal")
     enabled_raw = await _hgetall(r, "strategy:enabled")
-    drawdown_raw = await _hgetall(r, "strategy:drawdown")
+    await _hgetall(r, "strategy:drawdown")
 
     n_active = sum(1 for v in enabled_raw.values() if v == "true")
     scores = [

@@ -48,13 +48,11 @@ Record schema (raw; normalizer will standardize):
 from __future__ import annotations
 
 import datetime as dt
-import math
 import random
 from typing import Any, Dict, List, Sequence
 
 # Optional real client (if present and configured)
 try:
-    import cdsapi  # type: ignore
     _HAVE_CDS = True
 except Exception:
     _HAVE_CDS = False

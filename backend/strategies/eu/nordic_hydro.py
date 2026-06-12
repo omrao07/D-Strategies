@@ -82,13 +82,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -440,7 +439,7 @@ def mc_paths(df_sys: pd.DataFrame, days: int, seed: Optional[int], scen: Dict[st
     mu_in, sd_in = float(np.nanmean(inflow)), float(np.nanstd(inflow))
     sd_in *= float(scen.get("mc.inflow_sd_mult", 1.0))
     gen = float(np.nanmean(recent.get("hydro_gwh", pd.Series([0]*len(recent)))))
-    dem = float(np.nanmean(recent.get("demand_gwh", pd.Series([0]*len(recent)))))
+    float(np.nanmean(recent.get("demand_gwh", pd.Series([0]*len(recent)))))
     exports = float(np.nanmean(recent.get("net_export_gwh", pd.Series([0]*len(recent)))))
     demand_mult = float(scen.get("demand.multiplier", 1.0))
     gen = max(0.0, gen)  # guardrail
@@ -464,7 +463,7 @@ def mc_paths(df_sys: pd.DataFrame, days: int, seed: Optional[int], scen: Dict[st
     T = days
     paths_pct = np.zeros((N, T))
     paths_price = np.zeros((N, T))
-    min_pct = float(scen.get("reservoir.min_pct", 2.0))
+    float(scen.get("reservoir.min_pct", 2.0))
     max_pct = float(scen.get("reservoir.max_pct", 98.0))
     for n in range(N):
         st = storage0

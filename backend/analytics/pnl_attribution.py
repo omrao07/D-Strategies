@@ -33,11 +33,9 @@ Minimal integration points in your loop:
 from __future__ import annotations
 
 import csv
-import json
 import os
-from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple, Any
-
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
 
 # ---------------------- Data models ----------------------
 
@@ -70,7 +68,6 @@ class LegPosition:
 
         # Else we are reducing or flipping direction:
         # Realize PnL on the portion that offsets existing position.
-        closing_qty = qty
         # If flip, part (or all) offsets old exposure.
         if (self.qty > 0 and qty < 0) or (self.qty < 0 and qty > 0):
             # Amount that offsets old qty (limited by existing exposure)

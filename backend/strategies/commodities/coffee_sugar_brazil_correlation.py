@@ -25,11 +25,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 FROST_SEASON_MONTHS = [6, 7, 8]  # Brazil winter frost risk
 
@@ -68,7 +70,7 @@ def run(cfg):
     for date, row in merged.iterrows():
         brl_z = row.get("brl_zscore", np.nan)
         arabica_z = row.get("arabica_zscore", np.nan)
-        sugar_z = row.get("sugar_zscore", np.nan)
+        row.get("sugar_zscore", np.nan)
         frost = row.get("is_frost_season", False)
 
         # BRL strong (high USDBRL z) → exports more competitive → bearish for prices

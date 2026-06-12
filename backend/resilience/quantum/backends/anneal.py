@@ -12,10 +12,9 @@ Designed for:
 This backend is deterministic if seed is fixed.
 """
 
-from typing import Callable, List, Tuple, Optional
 import math
 import random
-
+from typing import Callable, List, Optional, Tuple
 
 # ─────────────────────────────────────────────────────────────
 # Types

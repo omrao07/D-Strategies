@@ -37,14 +37,13 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import json
 import os
 import sys
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-import requests
 import feedparser
 import pandas as pd
+import requests
 
 try:
     import yfinance as yf

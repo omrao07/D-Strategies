@@ -3,7 +3,10 @@
 """
 buyback_yield_factor.py — Buyback yield + total shareholder yield factor
 """
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

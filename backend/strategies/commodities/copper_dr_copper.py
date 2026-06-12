@@ -24,11 +24,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 SECTOR_PREFERRED_RISING = ["XLB", "XLI", "XLE", "XLF"]   # Cyclicals outperform when copper rising
 SECTOR_PREFERRED_FALLING = ["XLU", "XLP", "XLV", "TLT"]  # Defensives outperform when copper falling
@@ -58,7 +60,7 @@ def run(cfg):
     merged["copper_yoy"] = merged[copper_col].pct_change(252)
     merged["copper_mom"] = merged[copper_col].pct_change(21)
 
-    copper_ret = merged[copper_col].pct_change().dropna()
+    merged[copper_col].pct_change().dropna()
 
     signal_records = []
     for date, row in merged.iterrows():

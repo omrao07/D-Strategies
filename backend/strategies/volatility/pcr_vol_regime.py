@@ -26,7 +26,10 @@ outdir/regime_stats.csv     pcr_regime, avg_fwd_5d_return, win_rate, n_obs
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

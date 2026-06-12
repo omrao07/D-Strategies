@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import List, Sequence, Optional
+from typing import List, Optional, Sequence
 
 try:
     import yfinance as yf  # pip install yfinance
@@ -10,10 +10,10 @@ except Exception as e:
     raise ImportError("yfinance is required for Yahoo news. pip install yfinance") from e
 
 from .news_base import (
-    NewsSource,
     NewsEvent,
-    hash_key,
+    NewsSource,
     clean_text,
+    hash_key,
     to_unix,
 )
 

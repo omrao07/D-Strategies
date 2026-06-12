@@ -24,12 +24,10 @@ world.step(tick={"symbol":"NIFTY","price":22200,"vol":0.35,"news_sentiment":-0.7
 
 from __future__ import annotations
 
-import math
-import os
 import random
 import time
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 # optional bus

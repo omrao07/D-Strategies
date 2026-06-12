@@ -24,10 +24,9 @@ from __future__ import annotations
 import json
 import os
 import random
-import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # -----------------------
 # Catalog (100 brand-new strategies: 25 per region)
@@ -308,7 +307,7 @@ def propose(
 # -----------------------
 
 def _main():
-    import argparse, sys
+    import argparse
     ap = argparse.ArgumentParser(description="Generate strategy proposals")
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("--seed", type=int, default=None)

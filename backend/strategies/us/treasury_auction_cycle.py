@@ -54,7 +54,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -66,7 +66,6 @@ except Exception:
 
 import statsmodels.api as sm
 from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 
@@ -292,7 +291,6 @@ def regress_tails(df: pd.DataFrame) -> pd.DataFrame:
     Cross-sectional OLS on *auction-day* tails by tenor:
     tail_bp ~ log(size) + bcov + indirect% + direct% + dealer% + month_end + reopen
     """
-    cols = ["tail_bp","size_usd","bcov","indirect_award_pct","direct_award_pct","dealer_award_pct","month_end","reopen","tenor","date"]
     use = df.copy()
     for c in ["indirect_award_pct","direct_award_pct","dealer_award_pct"]:
         if c not in use.columns: use[c] = np.nan
@@ -398,7 +396,7 @@ def main():
         # Size vs tail scatter (color = reopen)
         fig3 = plt.figure(figsize=(7,5)); ax3 = plt.gca()
         s = auctions.dropna(subset=["tail_bp","size_usd"])
-        sc = ax3.scatter(np.log(s["size_usd"]/1e9), s["tail_bp"], c=s["reopen"].astype(int), alpha=0.7)
+        ax3.scatter(np.log(s["size_usd"]/1e9), s["tail_bp"], c=s["reopen"].astype(int), alpha=0.7)
         ax3.set_xlabel("log(size, $bn)"); ax3.set_ylabel("tail (bp)")
         ax3.set_title("Tail vs size"); plt.tight_layout()
         fig3.savefig(os.path.join(cfg.outdir, "plots", "tail_vs_size.png"), dpi=140); plt.close(fig3)

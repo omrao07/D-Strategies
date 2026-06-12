@@ -36,9 +36,9 @@ Usage:
   python pull_margins.py --prefer profitability --window 4    # 4-period TTM if quarterly data
 """
 
-import os
 import argparse
-from typing import Optional, List, Tuple
+import os
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -143,7 +143,6 @@ def normalize_fundamentals_wide(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute_margins(df: pd.DataFrame) -> pd.DataFrame:
     d = df.copy()
-    eps = 1e-12
     rev = d["revenue_usd"].replace(0, np.nan)
 
     d["gross_margin"]   = d["gross_profit_usd"] / rev

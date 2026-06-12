@@ -3,11 +3,10 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple, DefaultDict
-from collections import defaultdict
+from typing import Any, Dict, Optional, Tuple
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
+from backend.engine.strategy_base import Strategy
 
 
 @dataclass

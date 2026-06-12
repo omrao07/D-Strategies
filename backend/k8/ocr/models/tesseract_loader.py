@@ -23,19 +23,19 @@ Note:
 """
 
 from __future__ import annotations
-import os
-import sys
-import io
-import re
-import json
-import time
-import glob
+
 import argparse
+import glob
+import json
+import os
+import re
+import sys
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
-import yaml
 import numpy as np
+import yaml
 
 # OpenCV
 try:

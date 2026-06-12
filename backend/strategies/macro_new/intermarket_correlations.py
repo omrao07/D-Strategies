@@ -22,12 +22,13 @@ outdir/backtest.csv             regime-adaptive portfolio P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
 from itertools import combinations
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 KEY_PAIRS = [
     ("SPY", "TLT", "stock_bond"),
@@ -54,7 +55,7 @@ def run(cfg):
     price_wide = prices.pivot(index="date", columns="ticker", values="price").sort_index()
     ret_wide = price_wide.pct_change().dropna()
 
-    available_pairs = [(t1, t2, label) for t1, t2, label in KEY_PAIRS
+    [(t1, t2, label) for t1, t2, label in KEY_PAIRS
                        if t1.lower() in ret_wide.columns or t1 in ret_wide.columns
                        and (t2.lower() in ret_wide.columns or t2 in ret_wide.columns)]
 
@@ -78,7 +79,7 @@ def run(cfg):
         s1, s2 = r[0], r[1]
         rolling_corr = s1.rolling(cfg.corr_window).corr(s2)
         corr_z = rolling_corr_zscore(s1, s2, cfg.corr_window)
-        corr_trend = rolling_corr.diff(20)
+        rolling_corr.diff(20)
 
         for date in rolling_corr.dropna().index:
             c = float(rolling_corr.loc[date])

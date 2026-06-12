@@ -38,7 +38,7 @@ import sys
 import time
 import traceback
 from dataclasses import asdict, is_dataclass
-from typing import Any, Dict, Iterable, List, Sequence, Tuple
+from typing import Any, Dict, List, Sequence, Tuple
 
 # Optional peak-RSS on Unix
 try:
@@ -49,22 +49,21 @@ except Exception:
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-
 # -------- Job registry (import lazily to keep import cost small) --------
 
 def _job_class_for(kind: str):
     kind = kind.lower()
     if kind == "backtest":
-        from simulation_farm.jobs.backtest_job import BacktestJob # type: ignore
+        from simulation_farm.jobs.backtest_job import BacktestJob  # type: ignore
         return BacktestJob
     if kind in ("mc", "monte_carlo", "montecarlo"):
-        from simulation_farm.jobs.monte_carlo_job import MonteCarloJob # type: ignore
+        from simulation_farm.jobs.monte_carlo_job import MonteCarloJob  # type: ignore
         return MonteCarloJob
     if kind == "replay":
-        from simulation_farm.jobs.replay_job import ReplayJob # type: ignore
+        from simulation_farm.jobs.replay_job import ReplayJob  # type: ignore
         return ReplayJob
     if kind in ("stress", "stress_test", "stresstest"):
-        from simulation_farm.jobs.stress_test_job import StressTestJob # type: ignore
+        from simulation_farm.jobs.stress_test_job import StressTestJob  # type: ignore
         return StressTestJob
     raise ValueError(f"Unknown job kind: {kind}")
 
@@ -232,26 +231,26 @@ def _parse_cli():
     # Build spec object for the selected job
     job_type = args.job
     if job_type == "backtest":
-        from simulation_farm.jobs.backtest_job import BacktestSpec # type: ignore
+        from simulation_farm.jobs.backtest_job import BacktestSpec  # type: ignore
         # map CLI-like keys to dataclass field names
         field_map = {
             "run-id": "run_id", "data": "data_path", "out-prefix": "output_prefix",
         }
         spec = BacktestSpec(**_remap_keys(spec_kwargs, field_map))
     elif job_type == "monte_carlo":
-        from simulation_farm.jobs.monte_carlo_job import MonteCarloSpec # type: ignore
+        from simulation_farm.jobs.monte_carlo_job import MonteCarloSpec  # type: ignore
         field_map = {
             "run-id": "run_id", "data": "data_path", "out-prefix": "output_prefix",
         }
         spec = MonteCarloSpec(**_remap_keys(spec_kwargs, field_map))
     elif job_type == "replay":
-        from simulation_farm.jobs.replay_job import ReplaySpec # type: ignore
+        from simulation_farm.jobs.replay_job import ReplaySpec  # type: ignore
         field_map = {
             "run-id": "run_id", "data": "data_path", "out-prefix": "output_prefix",
         }
         spec = ReplaySpec(**_remap_keys(spec_kwargs, field_map))
     else:
-        from simulation_farm.jobs.stress_test_job import StressTestSpec # type: ignore
+        from simulation_farm.jobs.stress_test_job import StressTestSpec  # type: ignore
         field_map = {
             "run-id": "run_id", "data": "data_path", "out-prefix": "output_prefix",
         }

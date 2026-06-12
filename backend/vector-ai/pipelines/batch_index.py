@@ -25,10 +25,16 @@ Examples
 """
 
 from __future__ import annotations
-import os, re, json, uuid, argparse
-from pathlib import Path
+
+import argparse
+import json
+import os
+import re
+import uuid
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
 
 # -------------------- Embedders --------------------
@@ -65,7 +71,7 @@ class OpenAIEmbedder(BaseEmbedder):
 class HFEmbedder(BaseEmbedder):
     def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2", batch_size: int = 256, device: Optional[str] = None):
         try:
-            from sentence_transformers import SentenceTransformer # type: ignore
+            from sentence_transformers import SentenceTransformer  # type: ignore
         except Exception as e:
             raise RuntimeError("pip install sentence-transformers") from e
         self.model = SentenceTransformer(model_name, device=device)
@@ -75,7 +81,6 @@ class HFEmbedder(BaseEmbedder):
         self.dim = self.model.get_sentence_embedding_dimension() # type: ignore
 
     def encode(self, texts: List[str]) -> List[List[float]]:
-        import numpy as np
         embs = self.model.encode(
             texts, batch_size=self.batch, convert_to_numpy=True,
             show_progress_bar=True, normalize_embeddings=True
@@ -157,8 +162,10 @@ def load_table(path: Path, text_col: str) -> pd.DataFrame:
 
 class FAISSSink:
     def __init__(self, faiss_path: Path, dim: int, metric: str = "ip"):
-        try: import faiss  # type: ignore
-        except Exception as e: raise RuntimeError("pip install faiss-cpu") from e
+        try:
+            import faiss  # type: ignore
+        except Exception as e:
+            raise RuntimeError("pip install faiss-cpu") from e
         self.faiss = faiss
         self.path = faiss_path
         self.dim = dim
@@ -177,8 +184,10 @@ class FAISSSink:
 
 class PineconeSink:
     def __init__(self, index_name: str, namespace: Optional[str] = None):
-        try: from pinecone import Pinecone
-        except Exception as e: raise RuntimeError("pip install pinecone-client") from e
+        try:
+            from pinecone import Pinecone
+        except Exception as e:
+            raise RuntimeError("pip install pinecone-client") from e
         api_key = os.getenv("PINECONE_API_KEY")
         if not api_key: raise RuntimeError("Set PINECONE_API_KEY")
         self.pc = Pinecone(api_key=api_key)

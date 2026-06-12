@@ -23,7 +23,10 @@ outdir/forward_returns.csv     ticker, ex_date, fwd_5d, fwd_20d (if returns prov
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -91,7 +94,7 @@ def run(cfg):
     if fwd_records:
         fdf = pd.DataFrame(fwd_records)
         fdf.to_csv(os.path.join(cfg.outdir, "forward_returns.csv"), index=False)
-        over = fdf[fdf["over_reaction"] == True]
+        over = fdf[fdf["over_reaction"]]
         avg_fwd5_overreact = float(over["fwd_5d"].mean()) if len(over) > 0 else None
     else:
         avg_fwd5_overreact = None

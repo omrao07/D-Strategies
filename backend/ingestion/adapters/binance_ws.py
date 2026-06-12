@@ -16,7 +16,7 @@ Requires:
 import asyncio
 import json
 import logging
-from typing import Callable, Dict, List, Optional
+from typing import Callable, List, Optional
 
 import websockets
 

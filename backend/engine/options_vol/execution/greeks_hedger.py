@@ -1,9 +1,11 @@
 # engines/options/hedging/greeks_hedger.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
 
 # ---------------------------------------------------------------------
 # Data models
@@ -97,8 +99,8 @@ def build_hedge(
         tolerances = {f: 1.0 for f in greek_fields}
 
     # Assemble matrices
-    n = len(instruments)
-    m = len(greek_fields)
+    len(instruments)
+    len(greek_fields)
 
     G = np.vstack([inst.greeks_vector(list(greek_fields)) for inst in instruments]).T  # (m x n)
     b = -portfolio.as_vector(list(greek_fields))  # target greek change

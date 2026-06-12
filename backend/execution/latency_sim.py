@@ -33,19 +33,18 @@ print(result["summary"])
 
 from __future__ import annotations
 
-import heapq
 import hashlib
+import heapq
 import json
 import math
-import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 # ---------------- Bus hook (optional) ----------------
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:
         head = {k: payload.get(k) for k in ("ts","type","id","stage","reason","lat_ms") if isinstance(payload, dict)}

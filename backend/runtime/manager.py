@@ -1,16 +1,15 @@
 # backend/engine/manager.py
 from __future__ import annotations
 
-import os
-import sys
-import time
 import json
-import signal
-import queue
 import logging
+import os
+import queue
+import signal
 import threading
+import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Callable, Dict, List, Optional
 
 # ---- logging ----
 log = logging.getLogger("manager")
@@ -23,12 +22,13 @@ if not log.handlers:
 # ---- bus helpers (your existing wrappers) ----
 from backend.bus.streams import (
     consume_stream,
-    publish_stream,
     hset,
+    publish_stream,
 )
 
 # ---- core components ----
-from backend.engine.strategy_base import Strategy, ExampleBuyTheDip
+from backend.engine.strategy_base import ExampleBuyTheDip, Strategy
+
 try:
     from backend.engine.risk_manager import RiskManager  # type: ignore
 except ImportError:
@@ -39,15 +39,26 @@ except ImportError:
             ok, reason = _rm.check_order(order)
             adj = order  # passthrough without adjustment
             return ok, reason, adj
-from backend.runtime.broker_base import BrokerBase, PaperBroker, Order, Side, OrderType, TIF  # type: ignore
+from backend.runtime.broker_base import (  # type: ignore
+    TIF,
+    BrokerBase,
+    Order,
+    OrderType,
+    PaperBroker,
+    Side,
+)
 
 # Optional strategies (import if present)
 try:
-    from backend.engine.strategies.market_maker import MarketMakerStrategy  # type: ignore # noqa: F401
+    from backend.engine.strategies.market_maker import (
+        MarketMakerStrategy,  # type: ignore # noqa: F401
+    )
 except Exception:
     MarketMakerStrategy = None  # type: ignore
 try:
-    from backend.engine.strategies.predictor_strategy import PredictorStrategy  # type: ignore # noqa: F401
+    from backend.engine.strategies.predictor_strategy import (
+        PredictorStrategy,  # type: ignore # noqa: F401
+    )
 except Exception:
     PredictorStrategy = None  # type: ignore
 

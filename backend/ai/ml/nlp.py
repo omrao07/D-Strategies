@@ -7,8 +7,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Dict, List, Literal, Tuple
-import numpy as np
+from typing import List, Literal, Tuple
 
 logger = logging.getLogger("ai.ml.nlp")
 

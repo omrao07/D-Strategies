@@ -35,17 +35,16 @@ python -m simulation_farm.utils.job_registry --job monte_carlo.risk_mc_us --runn
 from __future__ import annotations
 
 import json
-from dataclasses import is_dataclass, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import yaml  # pip install pyyaml
 
 # Job Specs & Jobs
-from simulation_farm.jobs.backtest_job import BacktestSpec, BacktestJob # type: ignore
-from simulation_farm.jobs.monte_carlo_job import MonteCarloSpec, MonteCarloJob # type: ignore
-from simulation_farm.jobs.replay_job import ReplaySpec, ReplayJob # type: ignore
-from simulation_farm.jobs.stress_test_job import StressTestSpec, StressTestJob # type: ignore
+from simulation_farm.jobs.backtest_job import BacktestJob, BacktestSpec  # type: ignore
+from simulation_farm.jobs.monte_carlo_job import MonteCarloJob, MonteCarloSpec  # type: ignore
+from simulation_farm.jobs.replay_job import ReplayJob, ReplaySpec  # type: ignore
+from simulation_farm.jobs.stress_test_job import StressTestJob, StressTestSpec  # type: ignore
 
 
 class JobRegistry:
@@ -116,15 +115,15 @@ class JobRegistry:
         rk = runner.lower()
         runner_kwargs = runner_kwargs or {}
         if rk == "local":
-            from simulation_farm.runners.local_runner import LocalRunner # type: ignore
+            from simulation_farm.runners.local_runner import LocalRunner  # type: ignore
             r = LocalRunner(**runner_kwargs)
             return r.run(job_type, spec)
         elif rk == "ray":
-            from simulation_farm.runners.ray_runner import RayRunner # type: ignore
+            from simulation_farm.runners.ray_runner import RayRunner  # type: ignore
             r = RayRunner(**runner_kwargs)
             return r.run(job_type, spec)
         elif rk in ("k8s", "kubernetes"):
-            from simulation_farm.runners.k8s_runner import K8sRunner # type: ignore
+            from simulation_farm.runners.k8s_runner import K8sRunner  # type: ignore
             env = runner_kwargs.pop("k8s_env", None)  # optional env for container
             kr = K8sRunner(**runner_kwargs)
             job_name = kr.submit(job_type, spec, env=env)

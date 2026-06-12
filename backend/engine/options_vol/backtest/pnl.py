@@ -1,9 +1,11 @@
 # engines/options/backtest/pnlk.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Literal
 
 # ---------------------------------------------------------------------
 # Config
@@ -35,7 +37,7 @@ def _bs_price(right: np.ndarray, S, K, r, q, vol, T):
     # right: +1 for call, -1 for put
     d1 = _bs_d1(S, K, r, q, vol, T)
     d2 = d1 - vol * np.sqrt(np.maximum(T, 1e-9))
-    cp = (right > 0).astype(float) * 2.0 - 1.0  # +1 for C, -1 for P
+    (right > 0).astype(float) * 2.0 - 1.0  # +1 for C, -1 for P
     disc_q = np.exp(-q * T); disc_r = np.exp(-r * T)
     call = disc_q * S * _norm_cdf(d1) - disc_r * K * _norm_cdf(d2)
     put  = disc_r * K * _norm_cdf(-d2) - disc_q * S * _norm_cdf(-d1)
@@ -152,7 +154,7 @@ def compute_options_pnl(
         return np.repeat(float(q_series.loc[at_date]), len(meta))
 
     # Underlying spot panel aligned
-    und_cols = list(S.columns)
+    list(S.columns)
     U = pd.DataFrame(index=idx, columns=positions.columns, dtype=float)
     for oid, und in meta["underlying"].items():
         if und not in S.columns:
@@ -222,7 +224,7 @@ def compute_options_pnl(
             traded_notional = np.abs(trd_t) * mult_arr * px_t
             fees = np.abs(trd_t) * float(cost.commission_per_contract)
             slip = traded_notional * (float(cost.slippage_bps) * 1e-4)
-            costs = fees + slip
+            fees + slip
 
             pnl_rows.append({
                 "date": t,

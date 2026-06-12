@@ -63,7 +63,7 @@ import os
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Callable
+from typing import Any, Callable, Dict, List, Optional
 
 # ---- Optional deps ----
 try:
@@ -78,7 +78,7 @@ except Exception:
 
 # bus (best-effort)
 try:
-    from backend.bus.streams import publish_stream, hset
+    from backend.bus.streams import hset, publish_stream
 except Exception:
     publish_stream = None  # type: ignore
     hset = None  # type: ignore

@@ -28,7 +28,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -73,7 +76,6 @@ def run(cfg):
     gsec_pivot = gsec.pivot_table(index="date", columns="tenor_yr", values="gsec_yield_pct").sort_index()
 
     spread_records = []
-    rating_curve_records = []
     portfolio_rets = []
 
     for rating in RATINGS:

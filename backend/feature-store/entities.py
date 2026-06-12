@@ -14,7 +14,7 @@ Entities defined
 Keep these join keys consistent in your Parquet/streaming payloads and FeatureViews.
 """
 
-from feast import Entity # type: ignore
+from feast import Entity  # type: ignore
 
 # ----------------------------- Core Entities -----------------------------
 

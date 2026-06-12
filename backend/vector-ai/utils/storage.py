@@ -30,10 +30,7 @@ from __future__ import annotations
 
 import io
 import json
-import os
 import pathlib
-import shutil
-import tempfile
 from typing import Any, List, Optional
 
 # Optional deps
@@ -44,14 +41,13 @@ except Exception:
     _HAS_BOTO3 = False
 
 try:
-    from google.cloud import storage as gcs # type: ignore
+    from google.cloud import storage as gcs  # type: ignore
     _HAS_GCS = True
 except Exception:
     _HAS_GCS = False
 
 try:
     import pandas as pd
-    import pyarrow.parquet as pq
     _HAS_PANDAS = True
 except Exception:
     _HAS_PANDAS = False

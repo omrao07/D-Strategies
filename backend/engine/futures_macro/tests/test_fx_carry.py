@@ -1,10 +1,11 @@
 # engines/fx/tests/test_fx_carry.py
 import numpy as np
 import pandas as pd
-
-from engines.fx.signals.fx_carry import ( # type: ignore
-    SignalConfig, BacktestConfig,
-    build_fx_carry_weights, backtest_fx_carry,
+from engines.fx.signals.fx_carry import (  # type: ignore
+    BacktestConfig,
+    SignalConfig,
+    backtest_fx_carry,
+    build_fx_carry_weights,
     weights_to_notional_orders,
 )
 

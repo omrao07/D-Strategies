@@ -2,12 +2,11 @@
 from __future__ import annotations
 
 import fnmatch
-import json
-import os
 import re
 import time
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
+
 
 # ---- tiny YAML loader (safe fallback) ----------------------------------
 def _load_yaml(path: str) -> Dict[str, Any]:
@@ -184,7 +183,7 @@ class RoutingRules:
                 have = set(ctx.lit_venues + ctx.dark_venues)
                 if not allow.intersection(have):
                     return (False, 0.0, notes)
-            bump(0.5, f"allow_venues∩have")
+            bump(0.5, "allow_venues∩have")
         if "deny_venues" in when:
             deny = set(_listify(when["deny_venues"]))
             if any(v in deny for v in (ctx.lit_venues + ctx.dark_venues)):

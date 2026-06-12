@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import math
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Literal, Any
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 Side = Literal["buy", "sell"]
 Asset = Literal["equity", "futures", "fx", "rates", "credit", "crypto", "option"]

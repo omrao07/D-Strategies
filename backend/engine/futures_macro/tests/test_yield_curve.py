@@ -1,12 +1,18 @@
 # engines/rates/tests/test_yield_curve.py
 import numpy as np
 import pandas as pd
-
-from engines.rates.signals.yield_curve import ( # type: ignore
-    CurveConfig, MapConfig, build_signal, interpolate_panel,
-    slope_series, curvature_series, pca_factors,
-    dv01_neutral_steepener, dv01_neutral_butterfly,
-    dv01_to_contracts, build_yield_curve_trades
+from engines.rates.signals.yield_curve import (  # type: ignore
+    CurveConfig,
+    MapConfig,
+    build_signal,
+    build_yield_curve_trades,
+    curvature_series,
+    dv01_neutral_butterfly,
+    dv01_neutral_steepener,
+    dv01_to_contracts,
+    interpolate_panel,
+    pca_factors,
+    slope_series,
 )
 
 # ----------------------------- helpers -----------------------------

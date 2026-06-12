@@ -87,13 +87,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ------------------------ Defaults & helpers ------------------------
 
@@ -367,7 +366,6 @@ def availability_daily(reactors: pd.DataFrame,
             if (pd.notna(com) and d < com) or (pd.notna(ret) and d > ret):
                 continue
             # Base availability = 1.0
-            base_av = 1.0
             # Outage/derate
             o_today = od[od["d"] == d]
             derate_outage = 0.0
@@ -550,7 +548,7 @@ def main():
                     if str(v).startswith("+") and str(v).endswith("d"):
                         extra = int(str(v)[1:-1])
                         mask = outages["reactor_id"].astype(str) == rid
-                        outages.loc[mask, "end_date"] = outages.loc[mask, "end_date"] + pd.to_datetime(f"1970-01-01") + pd.to_timedelta(extra, unit="D") - pd.to_datetime("1970-01-02")
+                        outages.loc[mask, "end_date"] = outages.loc[mask, "end_date"] + pd.to_datetime("1970-01-01") + pd.to_timedelta(extra, unit="D") - pd.to_datetime("1970-01-02")
                 except Exception:
                     pass
         # Status overrides already handled in availability

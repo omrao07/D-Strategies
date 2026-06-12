@@ -150,7 +150,7 @@ class EwmaMV:
         return self.mean, self.var
 
 def _ewma_key() -> str:
-    return f"carb:ewma:EUA_UKA"
+    return "carb:ewma:EUA_UKA"
 
 def _load_ewma(alpha: float) -> EwmaMV:
     raw = r.get(_ewma_key())

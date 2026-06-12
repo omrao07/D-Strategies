@@ -2,17 +2,21 @@
 from __future__ import annotations
 
 import json
-import os
 import time
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, date, timedelta
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from dataclasses import asdict, dataclass, field
+from datetime import date, datetime
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 # ---------------- Soft imports (stay runnable even if parts are missing) -----
 try:
-    from backend.macro.central_bank_ai import ( # type: ignore
-        PolicyState, EconEvent, decide_next_meeting, simulate_policy_path,
-        path_to_yield_curve, curve_vs_base_to_shock, decision_to_json
+    from backend.macro.central_bank_ai import (  # type: ignore
+        EconEvent,
+        PolicyState,
+        curve_vs_base_to_shock,
+        decide_next_meeting,
+        decision_to_json,
+        path_to_yield_curve,
+        simulate_policy_path,
     )
 except Exception:
     PolicyState = object; EconEvent = object
@@ -23,19 +27,24 @@ except Exception:
     def decision_to_json(x): return "{}"
 
 try:
-    from backend.intelligence.neurosym.contagion_graph import ContagionGraph, Bank, ShockParams # type: ignore
+    from backend.intelligence.neurosym.contagion_graph import (  # type: ignore
+        Bank,
+        ContagionGraph,
+        ShockParams,
+    )
 except Exception:
     ContagionGraph = object; Bank = object
     class ShockParams: ...
 
 try:
-    from backend.risk.governor import Governor, Policy as GovPolicy # type: ignore
+    from backend.risk.governor import Governor  # type: ignore
+    from backend.risk.governor import Policy as GovPolicy
 except Exception:
     Governor = None
     class GovPolicy: ...
 
 try:
-    from backend.risk.adversary import default_suite, GuardrailPolicy # type: ignore
+    from backend.risk.adversary import GuardrailPolicy, default_suite  # type: ignore
 except Exception:
     def default_suite(*a, **k): return None
     class GuardrailPolicy:

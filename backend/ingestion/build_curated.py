@@ -20,9 +20,9 @@ Usage:
   python build_curated.py --outdir data/adamodar/curated --all
 """
 
+import argparse
 import os
 import sys
-import argparse
 from datetime import date
 from typing import Callable, Dict, List, Optional
 
@@ -31,7 +31,8 @@ import pandas as pd
 
 # --- Optional project helpers (falls back if not available) ---
 try:
-    from io import ensure_dir as _ensure_dir, save_csv as _save_csv  # type: ignore # your io.py
+    from io import ensure_dir as _ensure_dir  # type: ignore # your io.py
+    from io import save_csv as _save_csv
 except Exception:  # pragma: no cover
     def _ensure_dir(path: str) -> None:
         os.makedirs(os.path.dirname(path), exist_ok=True)

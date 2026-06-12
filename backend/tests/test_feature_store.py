@@ -1,13 +1,12 @@
 # tests/test_feature_store.py
+import importlib
 import json
 import math
 import time
-import importlib
-from copy import deepcopy
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from datetime import datetime, timezone
+from typing import Any, Dict
 
-import pytest # type: ignore
+import pytest  # type: ignore
 
 """
 Supported public APIs (any one is fine)

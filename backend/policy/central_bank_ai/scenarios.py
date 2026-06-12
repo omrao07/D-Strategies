@@ -21,15 +21,13 @@ for snap in sim.run():
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from backend.sim.policy_sim import ( # type: ignore
+from backend.sim.policy_sim import (  # type: ignore
     PolicySimConfig,
     PolicySimulator,
     Shock,
-    RegimeSpec,
 )
 
 # ----------------------- Scenario Definitions ---------------------------

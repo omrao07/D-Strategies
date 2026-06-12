@@ -13,10 +13,7 @@ Run:
   pytest -q backend/policies/tests/test_policies.py
 """
 
-import math
-import time
-import types
-import pytest # type: ignore
+import pytest  # type: ignore
 
 # ---------------------------------------------------------------------
 # Imports (skip tests cleanly if a module is missing in your tree)

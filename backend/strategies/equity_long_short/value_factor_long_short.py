@@ -134,8 +134,8 @@ def build_portfolio_weights(df: pd.DataFrame, top_q: float, bot_q: float,
         scores = grp.dropna(subset=["composite_value_score"]).set_index("ticker")["composite_value_score"]
         if len(scores) < min_stocks * 2:
             continue
-        hi_thresh = scores.quantile(1 - bot_q)   # expensive (high score = cheap, so inverse)
-        lo_thresh = scores.quantile(top_q)        # cheap
+        scores.quantile(1 - bot_q)   # expensive (high score = cheap, so inverse)
+        scores.quantile(top_q)        # cheap
         # Long cheap: low composite score means expensive multiple → high ratio
         # Wait — composite_value_score high = cheap. So long high scorers:
         longs = scores[scores >= scores.quantile(1 - top_q)]

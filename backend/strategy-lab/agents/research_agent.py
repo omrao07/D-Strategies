@@ -37,12 +37,11 @@ All math done with stdlib for portability & testability.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Tuple, Optional
+import json
 import math
 import statistics
-import json
-
+from dataclasses import dataclass, field
+from typing import Callable, Dict, List, Optional, Tuple
 
 Row = Dict[str, float]  # one day of OHLCV (expects at least "ts" and "close")
 
@@ -218,7 +217,7 @@ class ResearchAgent:
             ranks = _rank([(s, fv[s]) for s in inter])
             # Forward returns already aligned to next period relative to factor signal at t.
             # Since both are same t-index here, fwd_returns[t] should be "return from t to t+1".
-            rvec = [rv[s] for s in inter]
+            [rv[s] for s in inter]
             rrank = _rank([(s, rv[s]) for s in inter])
             x = [ranks[s] for s in inter]
             y = [rrank[s] for s in inter]

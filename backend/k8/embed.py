@@ -26,18 +26,18 @@ Env:
 """
 
 from __future__ import annotations
+
+import argparse
+import glob
+import json
+import math
 import os
 import re
-import io
 import sys
-import json
-import glob
 import time
-import math
-import argparse
 import warnings
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -55,8 +55,7 @@ except Exception:
     pass
 
 try:
-    from transformers import AutoTokenizer, AutoModel  # type: ignore
-    import torch  # type: ignore
+    from transformers import AutoModel, AutoTokenizer  # type: ignore
     _has_tf = True
 except Exception:
     pass
@@ -68,7 +67,6 @@ except Exception:
     pass
 
 try:
-    import faiss  # type: ignore
     _has_faiss = True
 except Exception:
     pass
@@ -247,7 +245,7 @@ class OpenAIEmbedder(BaseEmbedder):
                     timeout=self.cfg.openai_timeout,
                 )
                 return resp
-            except Exception as e:
+            except Exception:
                 wait = min(2 ** attempt, 30)
                 if attempt == self.cfg.openai_max_retries - 1:
                     raise
@@ -274,7 +272,6 @@ class TFIDFEmbedder(BaseEmbedder):
 
     def fit(self, corpus: List[str]) -> None:
         """Build vocabulary and IDF from corpus."""
-        from collections import Counter
         df: Dict[str, int] = {}
         for doc in corpus:
             for tok in set(self._tokenize(doc)):
@@ -471,7 +468,6 @@ def chunk_file(path: str,
                overlap: int,
                rows_per_chunk: int) -> List[Dict[str, Any]]:
     text = read_text(path)
-    kw = {}
     if kind_hint == "table":
         # chunk_any will route by ext, but for CSV we can pass rows_per_chunk via manual call
         # quick hack: embed rows_per_chunk into text split AFTER chunk_any returns too-large chunks

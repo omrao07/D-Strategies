@@ -1,8 +1,10 @@
 # engines/equity_ls/backtest/pnl.py
 from __future__ import annotations
-import pandas as pd
-import numpy as np
+
 from typing import Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 """
 Equity L/S PnL attribution
@@ -176,7 +178,7 @@ def factor_attribution(
     dates = per_ticker_price_pnl.index
     factors = factor_rets.columns
     # Notional at t-1 as weights
-    notional_lag = prices.shift(1)  # multiply by pos elsewhere; we only need alignment
+    prices.shift(1)  # multiply by pos elsewhere; we only need alignment
 
     out = pd.DataFrame(0.0, index=dates, columns=factors)
 

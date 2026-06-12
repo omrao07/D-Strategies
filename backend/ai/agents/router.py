@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Literal, Any, Tuple, Callable
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
 try:
     # Prefer your concrete interface if present
-    from backend.api.broker_interface import BrokerInterface, Order, Fill # type: ignore
+    from backend.api.broker_interface import BrokerInterface, Order  # type: ignore
 except Exception:
     # Minimal shims so this file stays importable
     from dataclasses import dataclass

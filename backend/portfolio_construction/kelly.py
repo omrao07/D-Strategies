@@ -4,9 +4,9 @@ Kelly criterion and vol-parity position sizing.
 """
 from __future__ import annotations
 
+from typing import Dict
+
 import numpy as np
-import pandas as pd
-from typing import Dict, Optional
 
 
 def kelly_position_size(

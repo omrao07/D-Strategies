@@ -23,13 +23,15 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, silhouette_samples
+from sklearn.metrics import silhouette_samples, silhouette_score
 from sklearn.preprocessing import StandardScaler
-
 
 N_CLUSTERS = 4
 ROLLING_FIT_WINDOW = 252
@@ -160,7 +162,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Clustering | Best k: {best_k} | Silhouette: {f'{summary['best_silhouette']:.3f}' if summary['best_silhouette'] else 'N/A'} | Current: {summary['current_regime']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Clustering | Best k: {best_k} | Silhouette: {format(summary['best_silhouette'], '.3f') if summary['best_silhouette'] else 'N/A'} | Current: {summary['current_regime']} | Sharpe: {format(sharpe, '.2f') if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

@@ -1,7 +1,10 @@
 # backend/strategies/diversified/shipping_rate_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
@@ -210,7 +213,7 @@ class ShippingRateArbitrage(Strategy):
         route = str(meta.get("route", "ROUTE"))
         start_ms = int(meta.get("start_ms", 0) or 0)
         end_ms   = int(meta.get("end_ms", 0) or 0)
-        T = _tenor_years(start_ms, end_ms)
+        _tenor_years(start_ms, end_ms)
 
         # Fair value: spot nowcast minus daily adj costs (simple; your router can publish a richer fair)
         adj_per_day = _carry_adj(route)  # $/day

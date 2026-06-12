@@ -1,10 +1,17 @@
 # backend/telemetry/session_recorder.py
 from __future__ import annotations
 
-import os, sys, json, time, asyncio, signal, shutil, platform, subprocess
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, List, Optional, Tuple, Iterable
+import asyncio
+import json
+import os
+import platform
+import signal
+import subprocess
+import sys
+import time
 from contextlib import contextmanager
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 # -------- Optional deps (graceful) -------------------------------------------
 HAVE_REDIS = True
@@ -156,7 +163,7 @@ class SessionRecorder:
             try:
                 sha = subprocess.check_output(["git","rev-parse","HEAD"], stderr=subprocess.DEVNULL).decode().strip()
                 branch = subprocess.check_output(["git","rev-parse","--abbrev-ref","HEAD"], stderr=subprocess.DEVNULL).decode().strip()
-                man["git"] = {"commit": sha, "branch": branch, "dirty": bool(subprocess.call(["git","diff","--quiet"])) == False}
+                man["git"] = {"commit": sha, "branch": branch, "dirty": not bool(subprocess.call(["git","diff","--quiet"]))}
             except Exception:
                 man["git"] = None
         return man

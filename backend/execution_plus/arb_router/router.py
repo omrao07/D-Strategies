@@ -32,16 +32,24 @@ Usage:
 from __future__ import annotations
 
 import os
-import math
-import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from backend.execution_plus.adapters import AdapterBase, Order, OrderType, Side, Quote # type: ignore
-from backend.execution_plus.cost_model import DefaultCostModel, CostBreakdown, get_default_model # type: ignore
-from backend.execution_plus.arb_router.discovery import Discovery, DiscoveryResult
-from backend.execution_plus.registry import HUB # type: ignore
+from backend.execution_plus.adapters import (  # type: ignore
+    AdapterBase,
+    Order,
+    OrderType,
+    Quote,
+    Side,
+)
+from backend.execution_plus.cost_model import (  # type: ignore
+    CostBreakdown,
+    DefaultCostModel,
+    get_default_model,
+)
+from backend.execution_plus.registry import HUB  # type: ignore
 
+from backend.execution_plus.arb_router.discovery import Discovery, DiscoveryResult
 
 # ----------------------------- models ---------------------------------
 
@@ -169,7 +177,7 @@ class ArbRouter:
         """
         Build a route plan by scoring venues and optionally splitting across best‑K.
         """
-        snap = self._ensure_snapshot()
+        self._ensure_snapshot()
         symbol = order.symbol
         side = order.side
         qty = float(order.qty)
@@ -186,7 +194,6 @@ class ArbRouter:
 
         # 2) Allocate qty across top‑K by a simple capacity proxy (inverse spread)
         remaining = qty
-        legs: List[RouteLeg] = []
         selected = scores[: max(1, self.topk)]
 
         # capacity weights ~ 1/spread (tighter spreads → more capacity).
@@ -353,7 +360,7 @@ class ArbRouter:
 
 if __name__ == "__main__":
     # Tiny self‑test with built‑in mock adapters
-    from backend.execution_plus.adapters import OrderType, Side # type: ignore
+    from backend.execution_plus.adapters import OrderType, Side  # type: ignore
 
     router = ArbRouter()  # will fall back to HUB mock adapters if venues.yaml missing
     order = Order(symbol="BTCUSDT", side=Side.BUY, qty=0.25, type=OrderType.MARKET)

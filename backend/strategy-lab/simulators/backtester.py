@@ -44,13 +44,14 @@ import math
 import os
 import statistics
 import time
-from dataclasses import dataclass, field
-from typing import Dict, Iterator, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
 try:
     # Local imports in repo structure
+    from agents.execution_agent import ExecutionAgent, Fill  # type: ignore
+
     from simulators.envs.data_loader import DataSet
-    from agents.execution_agent import ExecutionAgent, Fill # type: ignore
 except Exception:  # pragma: no cover
     DataSet = object  # type: ignore
     ExecutionAgent = object  # type: ignore
@@ -287,12 +288,11 @@ class Backtester:
 
 if __name__ == "__main__":
     # Minimal end-to-end smoke test with synthetic data
-    from simulators.envs.data_loader import MarketDataLoader, LoadSpec
-    from agents.execution_agent import ExecutionAgent, Side, OrderType
-    from agents.strategy_agent import StrategyAgent, StrategyBase, RebalanceConfig
-
     # Build a tiny synthetic dataset (two symbols, ~200 bars)
     import random
+
+    from agents.execution_agent import ExecutionAgent
+    from agents.strategy_agent import RebalanceConfig, StrategyAgent, StrategyBase
     random.seed(7)
 
     def synth(n: int, start: float):

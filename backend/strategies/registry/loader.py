@@ -3,16 +3,15 @@ from __future__ import annotations
 
 import csv
 import json
-import os
 import re
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 # ---- Optional import from types.py (your Pydantic or dataclasses). Fallback if missing.
 try:
-    from .types import StrategyRow, StrategyConfig  # type: ignore
+    from .types import StrategyConfig, StrategyRow  # type: ignore
 except Exception:  # lightweight fallback types
     @dataclass
     class StrategyRow:

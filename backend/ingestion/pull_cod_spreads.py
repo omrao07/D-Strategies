@@ -10,9 +10,9 @@ Supports:
 """
 
 import os
-import pandas as pd
 from datetime import date
-from typing import Optional
+
+import pandas as pd
 
 OUT_PATH = "data/adamodar/curated/cds_spreads.csv"
 

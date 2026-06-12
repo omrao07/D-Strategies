@@ -24,11 +24,13 @@ outdir/backtest.csv           cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 TAIWAN_DEPENDENT = ["nvda", "amd", "qcom", "aapl", "marvell", "mediatek", "tsm"]
 DOMESTIC_FABS = ["intc", "smc", "gfs", "umc"]

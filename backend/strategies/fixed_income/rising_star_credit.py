@@ -23,10 +23,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 
 def compute_upgrade_score(row: pd.Series) -> float:
@@ -117,7 +119,6 @@ def run(cfg):
     # Pre-upgrade return analysis (if upgrade history available)
     upgrade_ret_records = []
     if upgrade_history is not None:
-        hy_rets = {"BB+": 0.0005, "BB": 0.0004, "BB-": 0.0003}  # proxy daily returns
         for _, upg in upgrade_history.iterrows():
             issuer = upg.get("issuer", "")
             dg_date = upg["date"]

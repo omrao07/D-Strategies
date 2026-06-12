@@ -1,12 +1,11 @@
 # tests/test_ledger.py
+import importlib
 import json
 import math
-import importlib
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
 
-import pytest # type: ignore
+import pytest  # type: ignore
 
 """
 Supported public API shapes (any one is fine):

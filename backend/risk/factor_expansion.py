@@ -54,7 +54,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -332,7 +332,10 @@ def information_coefficient(
     method: str = "spearman",
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Return (IC_t per factor per date, summary)."""
-    from scipy.stats import spearmanr, pearsonr  # lightweight; if unavailable, fallback to numpy corr
+    from scipy.stats import (  # lightweight; if unavailable, fallback to numpy corr
+        pearsonr,
+        spearmanr,
+    )
 
     ics = []
     for date, X in X_panel.groupby(level=0, sort=True):
@@ -554,7 +557,7 @@ def main():
         UV = UV.reindex(columns=assets)
 
     # Build (Date, Asset) index union and align
-    idx = panel_raw.index.get_level_values(0)
+    panel_raw.index.get_level_values(0)
     if not R.index.equals(R.index):
         pass
     # Create panel returns (future)

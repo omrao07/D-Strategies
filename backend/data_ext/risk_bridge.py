@@ -13,11 +13,9 @@ Design goals:
 
 from __future__ import annotations
 
-import math
-from typing import Dict, List, Any, Iterable
-from statistics import mean, stdev
 from datetime import datetime, timezone
-
+from statistics import mean, stdev
+from typing import Any, Dict, Iterable, List
 
 # ============================
 # Types

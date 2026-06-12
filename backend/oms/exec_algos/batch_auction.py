@@ -1,14 +1,12 @@
 # backend/engine/strategies/batch_auction.py
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
-
+from backend.engine.strategy_base import Strategy
 
 # -------------------- Config --------------------
 

@@ -22,9 +22,12 @@ Streams (env):
   regime.state    : {"ts_ms","regime","score","features":{...},"notes": "..."}
 """
 
-import os, json, time, math
-from dataclasses import dataclass, asdict, field
-from typing import Dict, Optional, Tuple, List
+import json
+import math
+import os
+import time
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Tuple
 
 # -------- deps (graceful) ----------------------------------------------------
 try:
@@ -146,10 +149,10 @@ class RegimeMapper:
         tr_str = T.tr_strong - (H.tr_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
         tr_wk  = T.tr_weak   + (H.tr_buf if prev_reg in ("RANGE_BOUND","RECOVERY") else 0.0)
         corr_hi = T.corr_high + (H.corr_buf if prev_reg in ("CRISIS","LIQUIDITY_CRUNCH") else 0.0)
-        corr_lo = T.corr_low  - (H.corr_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
+        T.corr_low  - (H.corr_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
         liq_lo  = T.liq_low   + (H.liq_buf if prev_reg in ("CRISIS","LIQUIDITY_CRUNCH") else 0.0)
         liq_hi  = T.liq_high  - (H.liq_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
-        cred_ok = T.cred_ok   - (H.cred_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
+        T.cred_ok   - (H.cred_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
         cred_str= T.cred_stress + (H.cred_buf if prev_reg in ("CRISIS","LIQUIDITY_CRUNCH") else 0.0)
 
         notes = []
@@ -377,7 +380,6 @@ def _seq(a: Optional[List[float]], i: int) -> Optional[float]:
 # -------- CLI / demo ---------------------------------------------------------
 def _demo():
     rng = np.random.default_rng(7)
-    T = 800
     # simulate regimes by stitching different parameter blocks
     rv = np.concatenate([
         0.10 + 0.02 * rng.standard_normal(200),
@@ -413,7 +415,8 @@ def _demo():
     print("demo rows:", len(rows), "last:", rows[-1]["regime"], rows[-1]["score"])
 
 if __name__ == "__main__":
-    import argparse, asyncio
+    import argparse
+    import asyncio
     ap = argparse.ArgumentParser("regime_map")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--worker", action="store_true")

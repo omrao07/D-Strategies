@@ -1,13 +1,12 @@
 # backend/pipelines.py
 from __future__ import annotations
 
-import json
 import logging
 import os
 import time
 import traceback
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 # ---- logging -------------------------------------------------------------
 log = logging.getLogger("pipelines")
@@ -20,7 +19,7 @@ if not log.handlers:
 # ---- bus / stores (your existing modules) --------------------------------
 # These imports are optional; keep them inside functions if your tree differs.
 try:
-    from backend.bus.streams import publish_stream, consume_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception:
     publish_stream = lambda *a, **k: None   # type: ignore
     consume_stream = lambda *a, **k: []     # type: ignore
@@ -126,7 +125,7 @@ def task_fetch_yahoo(limit: int = 50):
 
 def task_fetch_moneycontrol(limit: int = 50):
     def _fn(ctx: Context):
-        from backend.ingestion.news.news_moneycontrol import MoneycontrolNews # type: ignore
+        from backend.ingestion.news.news_moneycontrol import MoneycontrolNews  # type: ignore
         items = MoneycontrolNews().fetch(limit=limit)
         prev = ctx.get("news_items", [])
         ctx.set("news_items", (prev + items)) # type: ignore
@@ -150,7 +149,7 @@ def task_dedupe_news(key: str = "headline"):
 
 def task_sentiment():
     def _fn(ctx: Context):
-        from backend.analytics.sentiment_ai import SentimentModel # type: ignore
+        from backend.analytics.sentiment_ai import SentimentModel  # type: ignore
         sm = ctx.get("sent_model")
         if sm is None:
             sm = SentimentModel.load_or_default()
@@ -198,7 +197,7 @@ def task_capture_acks_and_fills(db_path: str = "runtime/order_store.db"):
     Consume 'orders.acks' and 'fills' streams and persist to SQLite OrderStore.
     """
     def _fn(ctx: Context):
-        from backend.execution.order_store import OrderStore, AckIn, FillIn # type: ignore
+        from backend.execution.order_store import AckIn, FillIn, OrderStore  # type: ignore
         store = ctx.get("order_store")
         if store is None:
             store = OrderStore(db_path=db_path)
@@ -239,8 +238,8 @@ def task_capture_acks_and_fills(db_path: str = "runtime/order_store.db"):
 def task_train_price_predictor(symbol: str, csv_path: str, out_path: str,
                                alpha: float = 1.0):
     def _fn(ctx: Context):
-        from backend.cli.train_price_predictor import load_csv # type: ignore
-        from backend.alpha.predictors.price_predictor import RidgePricePredictor # type: ignore
+        from backend.alpha.predictors.price_predictor import RidgePricePredictor  # type: ignore
+        from backend.cli.train_price_predictor import load_csv  # type: ignore
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         df = load_csv(csv_path)
         model = RidgePricePredictor(alpha=alpha)

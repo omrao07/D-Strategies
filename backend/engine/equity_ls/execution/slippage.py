@@ -1,8 +1,10 @@
 # engines/equity_ls/execution/slippage.py
 from __future__ import annotations
+
+from typing import Dict, Literal, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, Literal
 
 ModelName = Literal["flat_bps", "sqrt_impact", "amihud", "spread_vol"]
 

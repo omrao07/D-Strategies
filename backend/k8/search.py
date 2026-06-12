@@ -20,20 +20,21 @@ Options:
 """
 
 from __future__ import annotations
+
+import argparse
+import json
+import math
 import os
 import re
 import sys
-import json
-import math
-import argparse
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from chunker import _count_tokens  # optional, only for display
 
 # local imports
 from embed import EmbeddingConfig, create_embedder
-from chunker import _count_tokens  # optional, only for display
 
 # optional dependency
 _HAS_FAISS = True
@@ -276,9 +277,9 @@ def run(queries: List[str],
             cand = meta_filter(cand, source_pat, kind, meta_key, meta_value)
             # need to update scores/idcs to match filtered cand
             # easiest: rebuild from mapping
-            new_scores, new_idxs = [], []
+            _new_scores, _new_idxs = [], []
             for r in cand.itertuples():
-                pos = np.where(cand.index.values == r.Index)[0]
+                np.where(cand.index.values == r.Index)[0]
                 # but cand reindexed; fallback to original ids
                 pass  # We will align by id below
             # align by id

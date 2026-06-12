@@ -24,11 +24,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 GST_GROWTH_STRONG = 15.0    # YoY % growth — strong fiscal
 GST_GROWTH_WEAK = 5.0

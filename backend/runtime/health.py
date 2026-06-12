@@ -1,12 +1,12 @@
 # backend/engine/health.py
 from __future__ import annotations
 
-import os
-import time
-import socket
 import logging
-from dataclasses import dataclass, asdict
-from typing import Dict, Optional, Any
+import os
+import socket
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional
 
 import redis
 
@@ -93,9 +93,9 @@ def run_checks(broker: Optional[BrokerBase] = None) -> HealthReport:
 # ------------------- Optional HTTP server -------------------
 
 try:
+    import uvicorn
     from fastapi import FastAPI
     from fastapi.responses import JSONResponse
-    import uvicorn
 
     app = FastAPI()
 

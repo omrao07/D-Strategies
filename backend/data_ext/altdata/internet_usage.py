@@ -1,5 +1,6 @@
 # backend/altdata/internet_usage.py
 from __future__ import annotations
+
 """
 Internet Usage Index (Alt-Data)
 --------------------------------
@@ -28,9 +29,13 @@ Optional live pull (if pytrends installed):
   tf = TrendsFetcher(); tf.fetch(["internet outage","whatsapp"], geo="US", timeframe="today 3-m")
 """
 
-import csv, json, math, os, time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+import csv
+import json
+import math
+import os
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # ---------- Optional deps (graceful fallbacks) ----------
 try:

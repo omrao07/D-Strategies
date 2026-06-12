@@ -52,7 +52,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -63,7 +63,6 @@ except Exception:
     plt = None
 
 from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 
@@ -120,7 +119,7 @@ def norm_modality(s: str) -> str:
 def load_products(path: str, asof: Optional[pd.Timestamp]) -> pd.DataFrame:
     df = pd.read_csv(path)
     # standardize columns
-    cols = {c.lower().strip(): c for c in df.columns}
+    {c.lower().strip(): c for c in df.columns}
     df.columns = [c.lower().strip() for c in df.columns]
 
     # required minimum

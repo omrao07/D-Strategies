@@ -6,7 +6,7 @@ import math
 import os
 import time
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, List, Optional, Tuple
 
 try:
     import redis as _redis_mod

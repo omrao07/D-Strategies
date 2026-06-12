@@ -34,13 +34,12 @@ python -m backend.risk.governor --probe
 
 from __future__ import annotations
 
-import os
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
 try:
-    from backend.bus.streams import publish_stream, hset
+    from backend.bus.streams import hset, publish_stream
 except Exception:
     publish_stream = None
     hset = None
@@ -79,7 +78,7 @@ class Governor:
         if self._kill:
             return False, f"kill_switch:{self._kill_reason}"
 
-        eq   = float(metrics.get("equity", 1e6))
+        float(metrics.get("equity", 1e6))
         dd   = float(metrics.get("drawdown", 0.0))
         lev  = float(metrics.get("leverage", 1.0))
         adv  = float(metrics.get("adv", 1e7))

@@ -1,9 +1,12 @@
 # backend/strategies/diversified/climate_to_commodity.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, List, Optional, Tuple
 
 try:
     import redis as _redis_mod
@@ -235,7 +238,7 @@ class ClimateToCommodity(Strategy):
                     self._close_out(tag, st, s)
 
         # entries
-        fee = _fees_bps("EXCH") * 1e-4
+        _fees_bps("EXCH") * 1e-4
         n_open = len(open_tags)
         # sort by |z| desc
         for s, z in sorted(zmap.items(), key=lambda kv: abs(kv[1]), reverse=True):

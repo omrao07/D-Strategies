@@ -1,16 +1,16 @@
 # bus/python/utils/tracing.py
 from __future__ import annotations
 
-import time
 import functools
-from contextlib import contextmanager, nullcontext
-from typing import Any, Dict, Optional, Callable, Awaitable, Tuple
+import time
+from contextlib import contextmanager
+from typing import Any, Awaitable, Callable, Dict, Optional, Tuple
 
 # ---------------- Optional OpenTelemetry ----------------
 try:
-    from opentelemetry import trace, context, propagation # type: ignore
+    from opentelemetry import context, propagation, trace  # type: ignore
+    from opentelemetry.propagate import extract, inject
     from opentelemetry.trace import SpanKind, Status, StatusCode
-    from opentelemetry.propagate import inject, extract
     _OTEL = True
 except Exception:  # OpenTelemetry not available -> no-op fallbacks
     trace = None

@@ -1,15 +1,14 @@
 # tests/test_var_risk_premium.py
 import numpy as np
 import pandas as pd
-
-from engines.options.signals.var_risk_premium import ( # type: ignore
-    VRPConfig,
+from engines.options.signals.var_risk_premium import (  # type: ignore
     BacktestConfig,
-    realized_variance,
-    implied_variance_from_vix,
+    VRPConfig,
+    backtest_vrp,
     build_vrp_series,
     build_vrp_signal,
-    backtest_vrp,
+    implied_variance_from_vix,
+    realized_variance,
 )
 
 # ---------------------------------------------------------------------
@@ -27,7 +26,7 @@ def make_equity_path(idx, seed=0):
     return px
 
 def make_vix_from_rv(rv: pd.Series, seed=1):
-    rng = np.random.default_rng(seed)
+    np.random.default_rng(seed)
     vix = np.sqrt(rv.clip(1e-6)) * 100.0 + 3.0 + 2.0*np.sin(np.linspace(0, 6, len(rv)))
     vix = pd.Series(vix, index=rv.index, name="VIX").clip(8, 80)
     return vix

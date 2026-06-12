@@ -5,8 +5,8 @@ import json
 import math
 import os
 import time
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Dict, Optional, Tuple
 
 try:
     import redis as _redis_mod

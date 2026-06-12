@@ -42,13 +42,13 @@ Normalized output (published):
 
 from __future__ import annotations
 
+import logging
 import os
 import time
-import logging
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from backend.config.feature_flags import is_enabled
 from backend.bus import streams
+from backend.config.feature_flags import is_enabled
 
 try:
     import yaml  # type: ignore
@@ -56,13 +56,12 @@ except Exception:
     yaml = None
 
 # Source loaders
-from .sources import reddit as src_reddit # type: ignore
-from .sources import x as src_x
-from .sources import tiktok as src_tiktok # type: ignore
-from .sources import discord as src_discord
-
 # Scoring
 from .sentiment_model import SentimentModel
+from .sources import discord as src_discord
+from .sources import reddit as src_reddit  # type: ignore
+from .sources import tiktok as src_tiktok  # type: ignore
+from .sources import x as src_x
 
 log = logging.getLogger(__name__)
 if not log.handlers:

@@ -20,7 +20,10 @@ outdir/flow_signals.csv     date, etf, shares_change, change_pct, signal, fwd_5d
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

@@ -21,11 +21,13 @@ outdir/backtest.csv         out-of-sample cumulative P&L with best params
 outdir/summary.json
 """
 
-import argparse, json, os
-import numpy as np
-import pandas as pd
+import argparse
+import json
+import os
 import random
 
+import numpy as np
+import pandas as pd
 
 PARAM_BOUNDS = {
     "mom_short": (5, 30),

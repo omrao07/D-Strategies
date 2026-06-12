@@ -1,15 +1,15 @@
 # engines/futures_macro/execution/order_router.py
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Iterable, Protocol, Literal
+
+import logging
 import math
 import time
 import uuid
-import logging
+from dataclasses import dataclass, field
+from typing import Dict, Iterable, List, Literal, Optional, Protocol
 
 import pandas as pd
-
-from engines.futures_macro.backtest.pnl import ContractSpec # type: ignore
+from engines.futures_macro.backtest.pnl import ContractSpec  # type: ignore
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

@@ -21,11 +21,11 @@ Ties into your existing adapters.py:
 
 from __future__ import annotations
 
+import importlib
 import os
 import threading
-import importlib
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional
 
 # Optional YAML (used only if present)
 try:
@@ -35,10 +35,14 @@ except Exception:
     _HAVE_YAML = False
 
 # Pull in your adapter types
-from .adapters import ( # type: ignore
+from .adapters import (  # type: ignore
     AdapterBase,
-    AdapterRegistry as BuiltinAdapterRegistry,
     VenueConfig,
+)
+from .adapters import (
+    AdapterRegistry as BuiltinAdapterRegistry,
+)
+from .adapters import (
     load_from_path as load_adapter_from_path,
 )
 

@@ -23,7 +23,7 @@ import hashlib
 import json
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -36,7 +36,7 @@ except Exception:
 
 # -------- bus hook --------
 try:
-    from backend.bus.streams import publish_stream, consume_stream # type: ignore
+    from backend.bus.streams import consume_stream, publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload):
         print(f"[stub publish_stream] {stream} <- {json.dumps(payload)[:220]}")

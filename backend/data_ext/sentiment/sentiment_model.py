@@ -24,8 +24,8 @@ SentimentModel(...).score_batch(texts) -> List[...]
 
 from __future__ import annotations
 
-import os
 import hashlib
+import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 

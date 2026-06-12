@@ -18,7 +18,10 @@ outdir/portfolio.csv          L/S returns if --returns provided
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

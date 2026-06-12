@@ -7,8 +7,7 @@ Covers:
 - Stress scenarios (steepener, flattener)
 """
 
-import pytest # type: ignore
-from backend.risk.rate_limits import RateLimits, RateShock # type: ignore
+from backend.risk.rate_limits import RateLimits, RateShock  # type: ignore
 
 
 def test_parallel_shock_clamp():

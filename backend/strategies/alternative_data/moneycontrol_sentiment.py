@@ -31,7 +31,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -119,7 +122,7 @@ def run(cfg):
                 lambda z: 1 if z > ENTRY_Z else (-1 if z < -ENTRY_Z else 0)
             )
 
-            fwd_1d = ret.shift(-1)
+            ret.shift(-1)
             strat_ret = (pos.reindex(ret.index).ffill() * ret).dropna()
             if len(strat_ret) >= 20:
                 all_port.append(strat_ret.rename(ticker_upper))

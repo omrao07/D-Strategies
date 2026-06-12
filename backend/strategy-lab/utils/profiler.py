@@ -22,9 +22,8 @@ import pstats
 import threading
 import time
 import tracemalloc
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterator, Optional
-
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, Optional
 
 # ----------------------------- tiny JSONL logger ------------------------------
 

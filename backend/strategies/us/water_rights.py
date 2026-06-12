@@ -58,7 +58,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -69,7 +69,6 @@ except Exception:
     plt = None
 
 from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 
@@ -320,7 +319,7 @@ def portfolio_npv(paths: Dict[Tuple[str,str], np.ndarray],
     For each Monte Carlo path, allocate annually & compute present value; return per-right stats
     and summary by path.
     """
-    rng = np.random.default_rng(42)  # deterministic for repeatability
+    np.random.default_rng(42)  # deterministic for repeatability
     years = list(range(paths[list(paths.keys())[0]].shape[0])) if paths else []
     per_right_accrual = {}  # (right_id) -> [pv across paths]
     path_summary = []
@@ -516,7 +515,7 @@ def main():
         # Build a quick one-path allocation for illustration
         if base_paths:
             # take first path, first year
-            any_br = next(iter(base_paths))
+            next(iter(base_paths))
             one_year_flows = {br: float(base_paths[br][0,0]) for br in base_paths}
             alloc_one, _ = allocate_value(one_year_flows, rights, demand, prices)
         else:

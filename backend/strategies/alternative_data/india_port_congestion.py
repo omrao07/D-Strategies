@@ -32,7 +32,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -119,7 +122,7 @@ def run(cfg):
         lambda g: np.average(g["z_score"].fillna(0), weights=g["weight"])
     ).rename("composite_z")
 
-    composite_ma = composite.rolling(MA_WINDOW).mean()
+    composite.rolling(MA_WINDOW).mean()
 
     # Stock correlation with congestion index
     corr_records = []

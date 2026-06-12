@@ -19,7 +19,10 @@ outdir/divestiture_analysis.csv    proceeds_pct_mktcap, signal, forward returns
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

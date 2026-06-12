@@ -2,15 +2,17 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, asdict, field
-from datetime import date, timedelta
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from dataclasses import asdict, dataclass, field
+from datetime import date
+from typing import Any, Dict, List, Optional
 
 # ---- Soft imports from your project (fallback stubs keep this importable) ----
 try:
-    from backend.treasury.bank_adapters import ( # type: ignore
-        BankAdapterBase, MockBankAdapter, BankAccount, Balance, Transaction,
-        to_dicts,
+    from backend.treasury.bank_adapters import (  # type: ignore
+        Balance,
+        BankAccount,
+        BankAdapterBase,
+        MockBankAdapter,
     )
 except Exception:
     # minimal fallbacks
@@ -26,7 +28,13 @@ except Exception:
         def list_transactions(self, account_id: str, *, since: Optional[str]=None, until: Optional[str]=None, limit:int=200)->List[Dict[str,Any]]: return []
 
 try:
-    from backend.treasury.soverign_adapter import YieldCurve, CurvePoint, BondSpec, SovereignAdapter, price_from_curve # type: ignore
+    from backend.treasury.soverign_adapter import (  # type: ignore
+        BondSpec,
+        CurvePoint,
+        SovereignAdapter,
+        YieldCurve,
+        price_from_curve,
+    )
 except Exception:
     @dataclass
     class CurvePoint: tenor_yrs: float; yld: float
@@ -66,7 +74,7 @@ except Exception:
 
 # Optional shock types (parallel/steepen etc.)
 try:
-    from backend.risk.policy_sim import RateShock, FXShock # type: ignore
+    from backend.risk.policy_sim import FXShock, RateShock  # type: ignore
 except Exception:
     @dataclass
     class RateShock:
@@ -380,7 +388,7 @@ if __name__ == "__main__":
 
     # Mock bank with INR cash
     try:
-        from backend.treasury.bank_adapters import MockBankAdapter # type: ignore
+        from backend.treasury.bank_adapters import MockBankAdapter  # type: ignore
         bank = MockBankAdapter(currency="INR", start_cash=25_00_000.0)  # ₹2.5m
     except Exception:
         class _B(BankAdapterBase): # type: ignore

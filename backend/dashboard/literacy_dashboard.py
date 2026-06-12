@@ -12,11 +12,13 @@ Deps:
 """
 
 from __future__ import annotations
-import os, time
-import requests, pandas as pd, numpy as np
-import dash # type: ignore
-from dash import Dash, dcc, html, dash_table # type: ignore
-from dash.dependencies import Input, Output # type: ignore
+
+import os
+
+import dash  # type: ignore
+import requests
+from dash import Dash, dcc, html  # type: ignore
+from dash.dependencies import Input, Output  # type: ignore
 
 API_URL = os.getenv("DATA_API_URL", "http://localhost:8000").rstrip("/")
 API_KEY = os.getenv("DATA_API_KEY", "").strip()

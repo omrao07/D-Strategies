@@ -1,11 +1,12 @@
 # engines/stat_arb/execution/order_router.py
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Iterable, Tuple, Protocol, Literal
+
+import logging
+import math
 import time
 import uuid
-import math
-import logging
+from dataclasses import dataclass, field
+from typing import Dict, Iterable, List, Literal, Optional, Protocol, Tuple
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

@@ -40,7 +40,6 @@ except Exception:
 
 from dateutil import parser as dtp
 
-
 # ----------------------------- Config -----------------------------
 
 @dataclass
@@ -134,7 +133,7 @@ def backtest_blend(prices: pd.DataFrame, weights: dict, freq: str = "m") -> pd.S
     wealth.iloc[0] = 1.0
     cur_w = w.copy()
 
-    last_rebal = periods[0] if len(periods) else idx[0]
+    periods[0] if len(periods) else idx[0]
     for i in range(1, len(idx)):
         d = idx[i]
         # periodic rebalance on boundaries
@@ -143,7 +142,6 @@ def backtest_blend(prices: pd.DataFrame, weights: dict, freq: str = "m") -> pd.S
         r = (rets.iloc[i] * cur_w).sum(skipna=True)
         wealth.iloc[i] = wealth.iloc[i - 1] * (1.0 + (0 if np.isnan(r) else r))
         # drift weights
-        port_val = 1.0
         asset_vals = (1.0 + rets.iloc[i]).fillna(1.0) * cur_w
         cur_w = (asset_vals / asset_vals.sum()).fillna(0.0)
     return wealth.pct_change().dropna()

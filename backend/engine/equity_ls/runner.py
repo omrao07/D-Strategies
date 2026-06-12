@@ -1,17 +1,23 @@
 # engines/equity_ls/runner.py
 from __future__ import annotations
+
+import logging
+from typing import Dict, Literal, Optional
+
 import numpy as np
 import pandas as pd
-import logging
-from typing import Dict, Optional, Literal
-
-from engines.equity_ls.signals import momentum, value, quality, sector_rotation # type: ignore
-from engines.equity_ls.execution.allocator import allocate_from_scores, generate_orders # type: ignore
-from engines.equity_ls.execution.slippage import apply_to_orders # type: ignore
-from engines.equity_ls.execution.order_router import ( # type: ignore
-    Order, default_router, ExecutionReport
+from engines.equity_ls.backtest.pnl import run_equity_ls_pnl  # type: ignore
+from engines.equity_ls.execution.allocator import (  # type: ignore
+    allocate_from_scores,
+    generate_orders,
 )
-from engines.equity_ls.backtest.pnl import run_equity_ls_pnl # type: ignore
+from engines.equity_ls.execution.order_router import (  # type: ignore
+    ExecutionReport,
+    Order,
+    default_router,
+)
+from engines.equity_ls.execution.slippage import apply_to_orders  # type: ignore
+from engines.equity_ls.signals import momentum, quality, sector_rotation, value  # type: ignore
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

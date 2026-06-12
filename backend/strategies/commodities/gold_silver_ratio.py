@@ -20,11 +20,12 @@ outdir/backtest.csv             cumulative P&L (long silver, short gold or vice 
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 GSR_THRESHOLDS = {"extreme_high": 90, "high": 75, "historical_mean": 65, "low": 55, "extreme_low": 45}
 
@@ -110,7 +111,7 @@ def run(cfg):
     # Backtest: trade the ratio
     SIG_POS = {"long_silver_short_gold": (1, -1), "long_gold_short_silver": (-1, 1),
                "light_long_silver": (0.5, -0.5), "light_long_gold": (-0.5, 0.5), "neutral": (0, 0)}
-    gold_pos = metals["gsr_regime"].apply(lambda r: SIG_POS.get(classify_gsr_regime(metals.loc[metals.index == r.name, "gsr"].iloc[0] if isinstance(r, pd.Series) else r), (0, 0))[0] if not isinstance(r, float) else SIG_POS.get("neutral", (0, 0))[0])
+    metals["gsr_regime"].apply(lambda r: SIG_POS.get(classify_gsr_regime(metals.loc[metals.index == r.name, "gsr"].iloc[0] if isinstance(r, pd.Series) else r), (0, 0))[0] if not isinstance(r, float) else SIG_POS.get("neutral", (0, 0))[0])
     # Simpler approach:
     sig_series = sig_df.set_index("date")["signal"].reindex(metals.index).ffill()
     pos_gold = sig_series.map({s: v[0] for s, v in SIG_POS.items()}).fillna(0)

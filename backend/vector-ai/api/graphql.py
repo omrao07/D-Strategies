@@ -28,18 +28,19 @@ http://localhost:8000/graphql
 """
 
 from __future__ import annotations
-import os
+
 import json
+import os
 from pathlib import Path
 from typing import List, Optional
 
-import strawberry # type: ignore
-from strawberry.asgi import GraphQL # type: ignore
 import pandas as pd
+import strawberry  # type: ignore
+from strawberry.asgi import GraphQL  # type: ignore
 
 # optional: FAISS + Pinecone
 try:
-    import faiss # type: ignore
+    import faiss  # type: ignore
 except ImportError:
     faiss = None
 
@@ -57,7 +58,6 @@ class VectorIndex:
     def search(self, query_vec, top_k: int = 10) -> List[dict]:
         if not self.index:
             raise RuntimeError("FAISS index not loaded")
-        import numpy as np
         q = query_vec.reshape(1, -1).astype("float32")
         scores, ids = self.index.search(q, top_k)
         out = []
@@ -89,7 +89,7 @@ class KnowledgeGraph:
         self.driver = None
         if uri:
             try:
-                from neo4j import GraphDatabase # type: ignore
+                from neo4j import GraphDatabase  # type: ignore
                 self.driver = GraphDatabase.driver(uri, auth=(user, password))
             except Exception as e:
                 print(f"[WARN] Neo4j unavailable: {e}")

@@ -1,13 +1,17 @@
 # backend/ingestion/replayer.py
 from __future__ import annotations
 
-import argparse, json, os, time
+import argparse
+import json
+import os
+import time
 from pathlib import Path
 from typing import Iterator, Optional, Tuple
 
 import pyarrow as pa
 import pyarrow.dataset as ds
 import redis
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Replay Parquet recordings to a Redis Stream")

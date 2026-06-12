@@ -31,7 +31,7 @@ from typing import Dict, Optional
 
 import redis
 
-from backend.bus.streams import consume_stream, publish_pubsub, CHAN_ORDERS
+from backend.bus.streams import CHAN_ORDERS, consume_stream, publish_pubsub
 
 log = logging.getLogger(__name__)
 

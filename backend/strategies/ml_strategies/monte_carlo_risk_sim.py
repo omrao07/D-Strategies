@@ -23,11 +23,12 @@ outdir/path_scenarios.csv   sample paths (P5/P50/P95 percentiles)
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 N_SIMS = 10000
 HORIZON_DAYS = 252

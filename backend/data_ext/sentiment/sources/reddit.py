@@ -37,10 +37,10 @@ normalize/publish to STREAM_ALT_SIGNALS.
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 import re
 import time
-import datetime as dt
 from typing import Any, Dict, List, Optional
 
 # Optional real backend: PRAW
@@ -108,7 +108,7 @@ def _fetch_reddit_real(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     )
 
     out: List[Dict[str, Any]] = []
-    now_iso = _iso_now()
+    _iso_now()
 
     for sub in subs:
         try:

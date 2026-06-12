@@ -19,9 +19,7 @@ Assumes:
 
 from __future__ import annotations
 
-import os
 import time
-import json
 from typing import Any, Dict, List, Optional
 
 try:
@@ -30,8 +28,8 @@ except Exception:
     publish_stream = None
 
 try:
-    import backend.oms.order_store as order_store # type: ignore
-    import backend.oms.broker_interface as broker_interface # type: ignore
+    import backend.oms.broker_interface as broker_interface  # type: ignore
+    import backend.oms.order_store as order_store  # type: ignore
 except Exception:
     order_store = None
     broker_interface = None
@@ -205,7 +203,7 @@ class Reconciler:
     def run(self):
         self._running=True
         while self._running:
-            rep=self.reconcile_once()
+            self.reconcile_once()
             time.sleep(self.poll_s)
 
     def stop(self):

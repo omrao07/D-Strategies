@@ -1,8 +1,9 @@
 # engines/structured_credit/clo_tranches.py
 from __future__ import annotations
-import math
+
 from dataclasses import dataclass
-from typing import List, Dict, Tuple, Optional, Callable
+from typing import Callable, Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
 
@@ -96,7 +97,7 @@ class CLOEngine:
         self.timeline = pd.date_range("2000-01-31", periods=self.months, freq="M")
 
     def run(self, seed: Optional[int] = 7) -> Dict[str, pd.DataFrame]:
-        rng = np.random.default_rng(seed)
+        np.random.default_rng(seed)
 
         # Collateral state
         coll_bal = self.pool.collateral_notional

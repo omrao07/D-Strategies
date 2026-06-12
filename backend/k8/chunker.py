@@ -21,11 +21,12 @@ Typical usage:
 """
 
 from __future__ import annotations
-import re
+
 import csv
+import hashlib
 import io
 import os
-import hashlib
+import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 

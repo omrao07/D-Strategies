@@ -28,7 +28,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -67,7 +70,6 @@ def run(cfg):
 
     iv_profile_records = []
     backtest_pnls = []
-    results_window_records = []
 
     for _, event in earnings.iterrows():
         ticker = str(event["ticker"]).upper()

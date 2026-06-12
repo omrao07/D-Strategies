@@ -31,15 +31,14 @@ Usage
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import sys
-import json
 import time
-import hashlib
-import typing as T
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 

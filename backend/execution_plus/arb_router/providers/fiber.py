@@ -43,7 +43,7 @@ from __future__ import annotations
 
 import datetime as dt
 import random
-from typing import Any, Dict, List, Sequence, Optional
+from typing import Any, Dict, List, Sequence
 
 
 def _iso_now() -> str:

@@ -22,20 +22,18 @@ Example:
 """
 
 from __future__ import annotations
+
+import argparse
+import glob
+import json
 import os
 import sys
-import re
-import io
-import json
 import time
-import glob
-import math
-import argparse
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
-import yaml
 import numpy as np
+import yaml
 
 # OpenCV (prefer headless for servers)
 try:
@@ -425,7 +423,7 @@ class PaddleOCRLoader:
         Output filenames append _pNNN to page stems.
         """
         imgs = self._rasterize_pdf(pdf_path)
-        base = os.path.splitext(os.path.basename(pdf_path))[0]
+        os.path.splitext(os.path.basename(pdf_path))[0]
         out_payloads = []
         for pi, img in enumerate(imgs):
             t0 = time.time()

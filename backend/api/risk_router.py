@@ -38,7 +38,10 @@ def _r():
 
 
 def _load_engine():
-    from backend.risk.institutional_risk_engine import InstitutionalRiskEngine, RiskConfig, get_risk_config_from_redis
+    from backend.risk.institutional_risk_engine import (
+        InstitutionalRiskEngine,
+        get_risk_config_from_redis,
+    )
     r = _r()
     config = get_risk_config_from_redis(r)
     return InstitutionalRiskEngine(config=config, redis_client=r), r
@@ -81,8 +84,9 @@ class PositionSizerRequest(BaseModel):
 def get_risk_config():
     """Return current institutional risk engine configuration."""
     try:
-        from backend.risk.institutional_risk_engine import RiskConfig, get_risk_config_from_redis
         import dataclasses
+
+        from backend.risk.institutional_risk_engine import get_risk_config_from_redis
         config = get_risk_config_from_redis(_r())
         return dataclasses.asdict(config)
     except Exception as exc:
@@ -193,6 +197,7 @@ def portfolio_var(confidence: float = 0.99, horizon_days: int = 1):
     """
     try:
         import numpy as np
+
         from backend.risk.institutional_risk_engine import VaREngine
 
         r = _r()
@@ -228,6 +233,7 @@ def run_stress_test(req: StressTestRequest):
     try:
         import numpy as np
         import pandas as pd
+
         from backend.risk.institutional_risk_engine import StressTestEngine
 
         r = _r()
@@ -281,6 +287,7 @@ def compute_position_sizes(req: PositionSizerRequest):
     """
     try:
         import numpy as np
+
         from backend.risk.institutional_risk_engine import PositionSizer
 
         sizer = PositionSizer()
@@ -352,6 +359,7 @@ def portfolio_risk_metrics():
     """Compute all portfolio risk metrics from Redis return history."""
     try:
         import numpy as np
+
         from backend.risk.institutional_risk_engine import PortfolioRiskEngine
 
         r = _r()

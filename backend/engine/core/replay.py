@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import List
 
 from backend.engine.core.engine import Engine
-from backend.engine.core.types import Event, EngineResult
+from backend.engine.core.types import EngineResult, Event
 
 
 class Replayer:

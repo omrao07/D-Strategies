@@ -23,6 +23,7 @@
 #   REDIS_URL=redis://localhost:6379/0 python backend/data/adapters/lse_ws.py --mode mock
 
 from __future__ import annotations
+
 import argparse
 import asyncio
 import contextlib
@@ -35,7 +36,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
 
 # Optional Redis support (will be skipped if not installed)
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")

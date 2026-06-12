@@ -58,7 +58,7 @@ except Exception:
 
 # ── Swarm ──
 try:
-    from .concrete.swarm_manager import SwarmManager, SwarmRequest  # type: ignore
+    from .concrete.swarm_manager import SwarmManager  # type: ignore
     _HAS_SWARM = True
 except Exception:
     _HAS_SWARM = False
@@ -66,12 +66,16 @@ except Exception:
 
 # ── Concrete agents ──
 try:
-    from .concrete.analyst_agent    import AnalystAgent, AnalystRequest     # type: ignore
-    from .concrete.greeks_agent     import GreeksAgent, GreeksRequest       # type: ignore
-    from .concrete.monte_carlo_agent import MonteCarloAgent, SimRequest, AssetSpec, OptionPayoff  # type: ignore
-    from .concrete.portfolio_agent  import PortfolioAgent, PortfolioRequest, HoldingSpec  # type: ignore
-    from .concrete.insight_agent    import InsightAgent                     # type: ignore
-    from .concrete.rl_execution_agent import RLExecutionAgent               # type: ignore
+    from .concrete.analyst_agent import AnalystAgent, AnalystRequest  # type: ignore
+    from .concrete.greeks_agent import GreeksAgent  # type: ignore
+    from .concrete.insight_agent import InsightAgent  # type: ignore
+    from .concrete.monte_carlo_agent import (  # type: ignore
+        MonteCarloAgent,
+    )
+    from .concrete.portfolio_agent import (  # type: ignore
+        PortfolioAgent,
+    )
+    from .concrete.rl_execution_agent import RLExecutionAgent  # type: ignore
     _HAS_AGENTS = True
 except Exception:
     _HAS_AGENTS = False

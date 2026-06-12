@@ -1,9 +1,9 @@
 # engines/cap_struct/cds_basis/runner.py
 from __future__ import annotations
+
 import numpy as np
 import pandas as pd
-
-from engines.cap_struct import cds_basis # type: ignore
+from engines.cap_struct import cds_basis  # type: ignore
 
 
 # ---------------------------------------------------------------------

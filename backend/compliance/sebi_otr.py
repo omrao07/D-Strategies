@@ -61,9 +61,9 @@ import csv
 import json
 import os
 import time
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Tuple, List
 from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 # Optional YAML
 try:
@@ -73,7 +73,7 @@ except Exception:
 
 # Optional bus (graceful if missing)
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception:
     consume_stream = publish_stream = hset = None  # type: ignore
 
@@ -322,8 +322,9 @@ class OtrMonitor:
         if not db_url:
             return
         try:
-            import psycopg2  # type: ignore
             import json as _json
+
+            import psycopg2  # type: ignore
             conn = psycopg2.connect(db_url, connect_timeout=5)
             with conn:
                 with conn.cursor() as cur:

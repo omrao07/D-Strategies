@@ -11,20 +11,23 @@ from __future__ import annotations
 import json
 import logging
 import threading
-import yaml
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import redis
+import yaml
 
-# Local modules
-from backend.config.settings import REGISTER_CONFIG, FEEDS_DIR, REDIS_HOST, REDIS_PORT, LOG_LEVEL
 from backend.bus.streams import (
     consume_stream,
     publish_pubsub,
-    hset,
+)
+from backend.bus.streams import (
     set as kv_set,
 )
+
+# Local modules
+from backend.config.settings import FEEDS_DIR, LOG_LEVEL, REDIS_HOST, REDIS_PORT, REGISTER_CONFIG
 
 # Optional: strategy router hook (we keep running if it doesn't exist)
 try:

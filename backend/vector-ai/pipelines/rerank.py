@@ -42,15 +42,15 @@ Notes
 """
 
 from __future__ import annotations
-import os
-import json
+
 import argparse
+import json
+import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Iterable, Tuple
+from typing import Any, Dict, Iterable, List, Optional
 
 import numpy as np
 from tqdm import tqdm
-
 
 # ============================================================
 # Utilities

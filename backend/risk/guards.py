@@ -16,8 +16,9 @@ g.check_drawdown([100_000, 101_000, 97_000, 103_000])
 """
 
 from __future__ import annotations
+
 import math
-from typing import Dict, Any, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
 

@@ -1,9 +1,11 @@
 # engines/stat_arb/signals/dispersion.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Literal
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Literal
 
 TRADING_DAYS = 252
 
@@ -182,7 +184,7 @@ def build_weights(
     })
 
     # Latest snapshot weights
-    snap_date = sig.index[-1]
+    sig.index[-1]
     w_mem_snap = w_mem.copy()
     w_idx_snap = pd.Series({idx_symbol: float(w_idx)})
 

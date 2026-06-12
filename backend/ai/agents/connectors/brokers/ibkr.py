@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import os
+import threading
 import time
 import uuid
-import threading
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # ============================================================
 # Configuration (env)
@@ -22,7 +22,7 @@ IBKR_PAPER = os.getenv("IBKR_PAPER", "true").lower() in ("1","true","yes","y")
 # Optional dependency: ib_insync
 # ============================================================
 try:
-    from ib_insync import IB, Stock, Forex, Contract, MarketOrder, LimitOrder, util  # type: ignore
+    from ib_insync import IB, Forex, LimitOrder, MarketOrder, Stock, util  # type: ignore
     _HAS_IB = True
 except Exception:
     _HAS_IB = False

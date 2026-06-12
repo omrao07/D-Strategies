@@ -66,8 +66,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict
-from datetime import datetime
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -83,9 +82,7 @@ try:
 except Exception:
     pdr = None
 
-from dateutil import parser as dtp
 from dateutil.relativedelta import relativedelta
-
 
 # ----------------------------- Config -----------------------------
 
@@ -106,7 +103,7 @@ class Config:
 # ----------------------------- IO helpers -----------------------------
 
 def ensure_outdir(base: str) -> str:
-    out = os.path.join(base, f"fed_funds_vs_swaps_artifacts")
+    out = os.path.join(base, "fed_funds_vs_swaps_artifacts")
     os.makedirs(os.path.join(out, "plots"), exist_ok=True)
     return out
 

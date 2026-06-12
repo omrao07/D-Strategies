@@ -15,10 +15,9 @@ Expected adapter APIs (any one is fine):
 """
 
 import os
-import json
 import time
-import types
-import pytest # type: ignore
+
+import pytest  # type: ignore
 
 yaml = pytest.importorskip("yaml", reason="pyyaml not installed")
 la   = pytest.importorskip("backend.adapters.latency_adapter", reason="latency_adapter module not found")
@@ -117,7 +116,7 @@ def test_path_override_for_zerodha_nse(cfg, sim, no_sleep, rng_control):
     """
     # Force jitter 0
     rng_control.uniform_seq = [0.0]
-    base = cfg["defaults"]["order_send"]
+    cfg["defaults"]["order_send"]
     # Validate config contains the path override we expect
     expect = None
     for path in cfg.get("paths", []):

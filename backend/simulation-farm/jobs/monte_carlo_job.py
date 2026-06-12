@@ -24,16 +24,17 @@ python -m simulation_farm.jobs.monte_carlo_job \
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import math
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import math
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-
-from simulation_farm.artifacts.reports.report_generator import ReportGenerator, ReportInputs  # type: ignore
-
+from simulation_farm.artifacts.reports.report_generator import (  # type: ignore
+    ReportGenerator,
+    ReportInputs,
+)
 
 # ----------------------------- Spec -----------------------------
 

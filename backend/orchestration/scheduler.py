@@ -47,11 +47,13 @@ sched.start(loop_fn=loop_run)
 """
 
 from __future__ import annotations
+
 import threading
 import time
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from typing import Callable, Dict, Optional, Set, Tuple
-from datetime import datetime, time as dtime, timedelta
+
 try:
     # Python 3.9+
     from zoneinfo import ZoneInfo

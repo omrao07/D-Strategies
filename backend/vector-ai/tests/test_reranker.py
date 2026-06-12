@@ -15,19 +15,16 @@ Run:
 
 from __future__ import annotations
 
-import math
 import numpy as np
 import pytest
-
 from search.reranker import (
+    BM25LiteReranker,
     Candidate,
     CosineReranker,
-    BM25LiteReranker,
     CrossEncoderReranker,
     diversify_mmr,
     fuse_scores,
 )
-
 
 # ----------------------------- Test Utilities -----------------------------
 

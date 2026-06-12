@@ -1,5 +1,6 @@
 # backend/compliance/compliance_narrative.py
 from __future__ import annotations
+
 """
 Compliance Narrative Generator
 ------------------------------
@@ -34,8 +35,12 @@ CLI:
 
 Schema tips are in the docstrings below.
 """
-import json, hashlib, os, time, re
-from dataclasses import dataclass, asdict
+import hashlib
+import json
+import os
+import re
+import time
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 # Optional bus
@@ -401,7 +406,7 @@ _JINJA_TMPL = r"""
 def _fallback_render(p: Dict[str, Any]) -> str:
     # Simple deterministic markdown without jinja2
     lines = []
-    lines.append(f"# Compliance Narrative")
+    lines.append("# Compliance Narrative")
     lines.append("")
     lines.append(f"**Session:** `{p['meta']['session_hash']}`")
     lines.append(f"**Generated:** {p['meta']['ts_ms']} (ms since epoch)")

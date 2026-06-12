@@ -5,7 +5,8 @@ Uses analytical solution for minimum variance and max-Sharpe portfolios.
 """
 from __future__ import annotations
 
-from typing import Optional, Tuple
+from typing import Tuple
+
 import numpy as np
 
 

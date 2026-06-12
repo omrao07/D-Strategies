@@ -3,7 +3,10 @@
 """
 dividend_yield_factor.py — High dividend yield factor — defensive income factor
 """
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

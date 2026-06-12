@@ -72,9 +72,8 @@ Streams (if Redis present)
 from __future__ import annotations
 
 import json
-import math
 import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 # ---- Optional deps / glue ----
@@ -90,13 +89,19 @@ except Exception:
 
 # Engines you already have
 try:
-    from backend.macro.soverign import SovereignEngine, SovereignState, load_from_yaml as load_sovereign # type: ignore
+    from backend.macro.soverign import SovereignEngine, SovereignState  # type: ignore
+    from backend.macro.soverign import load_from_yaml as load_sovereign
 except Exception:
     SovereignEngine = None  # type: ignore
     load_sovereign = None   # type: ignore
 
 try:
-    from backend.risk.bank_stress import BankStressEngine, BankState, ShockSpec, load_from_yaml as load_bank, _parse_scenario # type: ignore
+    from backend.risk.bank_stress import (  # type: ignore
+        BankStressEngine,
+        ShockSpec,
+        _parse_scenario,
+    )
+    from backend.risk.bank_stress import load_from_yaml as load_bank
 except Exception:
     BankStressEngine = None  # type: ignore
     load_bank = None         # type: ignore
@@ -104,7 +109,8 @@ except Exception:
     def _parse_scenario(s: str): return None  # type: ignore
 
 try:
-    from backend.risk.liquidity_spiral import LiquiditySpiral, Bucket, SpiralConfig, Shock as LShock
+    from backend.risk.liquidity_spiral import Bucket, LiquiditySpiral, SpiralConfig
+    from backend.risk.liquidity_spiral import Shock as LShock
 except Exception:
     LiquiditySpiral = None  # type: ignore
     Bucket = None           # type: ignore

@@ -79,8 +79,8 @@ import argparse
 import json
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
 from datetime import datetime
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd

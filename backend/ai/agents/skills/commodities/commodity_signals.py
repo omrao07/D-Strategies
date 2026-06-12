@@ -17,17 +17,17 @@ Skill functions:
 """
 from __future__ import annotations
 
-import math
 from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 
 # ── CommodityAIAgent ──
 try:
     from backend.ai.agents.concrete.commodity_ai_agent import (
-        CommodityAIAgent, CommodityRequest, CommodityBrief,
-        TradeIdea, quick_brief, build_commodity_agent, _dominant_direction,
+        CommodityAIAgent,
+        CommodityBrief,
+        _dominant_direction,
+        build_commodity_agent,
     )
     _HAS_AGENT = True
 except Exception:
@@ -45,7 +45,7 @@ except Exception:
 # ── Strategy analytics ──
 try:
     from backend.strategies.commodities.carbon_credits_eua import (
-        fuel_switching_signal, implied_carbon_price_from_switching
+        fuel_switching_signal,
     )
     _HAS_EUA = True
 except Exception:
@@ -58,23 +58,26 @@ except Exception:
     _HAS_EV = False
 
 try:
+    from backend.strategies.commodities.copper_gold_ratio_economy import compute_cuau
     from backend.strategies.commodities.copper_gold_ratio_economy import (
-        compute_cuau, macro_regime as _macro_regime
+        macro_regime as _macro_regime,
     )
     _HAS_CU = True
 except Exception:
     _HAS_CU = False
 
 try:
-    from backend.commodities.cot_positioning import COTEngine, COTRecord, generate_synthetic_cot
+    from backend.commodities.cot_positioning import COTEngine, generate_synthetic_cot
     _HAS_COT = True
 except Exception:
     _HAS_COT = False
 
 try:
     from backend.commodities.curve_analytics import (
-        ForwardCurve, CurvePoint, carry_signal, classify_structure,
-        roll_yield, build_curve,
+        CurvePoint,
+        carry_signal,
+        classify_structure,
+        roll_yield,
     )
     _HAS_CURVE = True
 except Exception:
@@ -238,8 +241,9 @@ def get_carry_signal(
         points = [CurvePoint(days_to_expiry=p["days_to_expiry"], price=p["price"],
                              label=p.get("label", f"M{i+1}"))
                   for i, p in enumerate(forward_curve_points)]
-        from backend.commodities.curve_analytics import ForwardCurve as FC
         import datetime
+
+        from backend.commodities.curve_analytics import ForwardCurve as FC
         curve = FC(commodity=commodity, date=str(datetime.date.today()),
                    points=points, currency="USD", unit="BBL")
         ry = roll_yield(curve, near_days=30, far_days=60, holding_days=30)

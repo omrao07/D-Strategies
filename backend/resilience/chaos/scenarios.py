@@ -33,8 +33,7 @@ try:
 except Exception:
     _HAVE_YAML = False
 
-from .policy_sim import PolicySimConfig, PolicySimulator, Shock # type: ignore
-
+from .policy_sim import PolicySimConfig, PolicySimulator, Shock  # type: ignore
 
 # --------------------------- data models --------------------------------
 
@@ -280,7 +279,7 @@ def _split_index(token: str) -> Tuple[str, Optional[int]]:
 # --------------------------- tiny demo ----------------------------------
 
 if __name__ == "__main__":
-    from .policy_sim import PolicySimConfig # type: ignore
+    from .policy_sim import PolicySimConfig  # type: ignore
     runner = ScenarioRunner(PolicySimConfig(seed=11, dt_days=1.0, horizon_days=120))
     sc = presets.stagflation(horizon_days=90)
     snaps = runner.run(sc)

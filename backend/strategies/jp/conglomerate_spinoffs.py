@@ -108,13 +108,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- utilities -----------------------------
 
@@ -433,7 +432,6 @@ def sotp_unlock(ACT: pd.DataFrame, SEG: pd.DataFrame, MULT: pd.DataFrame) -> pd.
         p = r["parent_ticker"]
         # pull net debt
         nd = float(ACT[ACT["parent_ticker"]==p]["net_debt_parent"].dropna().iloc[0]) if "net_debt_parent" in ACT.columns and (ACT["parent_ticker"]==p).any() and ACT["net_debt_parent"].notna().any() else np.nan
-        mcp = np.nan  # will be filled in main if price & shares exist
         obs_rows.append({"parent_ticker": p, "implied_ev": r["implied_ev"], "observed_ev": np.nan, "net_debt_parent": nd, "metric": r["metric"]})
     OUT = pd.DataFrame(obs_rows)
     return OUT

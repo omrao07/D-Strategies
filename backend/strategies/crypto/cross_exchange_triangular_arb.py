@@ -19,11 +19,13 @@ outdir/triangular_arb.csv       date, exchange, path, profit_pct
 outdir/summary.json
 """
 
-import argparse, json, os
-from itertools import combinations, permutations
+import argparse
+import json
+import os
+from itertools import permutations
+
 import numpy as np
 import pandas as pd
-
 
 FEE_RATE = 0.001  # 0.1% per leg (taker fee)
 SLIPPAGE = 0.0005  # 0.05% per leg

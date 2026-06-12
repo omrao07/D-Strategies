@@ -30,7 +30,7 @@ Signals:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -38,8 +38,10 @@ import pandas as pd
 
 try:
     from backend.commodities.base import (
-        CommodityStrategy, CommoditySignal, CommoditySector,
-        SignalDirection, SignalSource, CommodityRiskParams, ContractSpec,
+        CommoditySector,
+        CommodityStrategy,
+        SignalDirection,
+        SignalSource,
     )
     from backend.commodities.curve_analytics import crush_spread
 except Exception:
@@ -158,14 +160,14 @@ class CornSoybeanCrush(CommodityStrategy):  # type: ignore
         csr = corn_soy_ratio(corn / 100, soy / 100)
 
         # Rolling z-scores (require history)
-        gpm_z = csr_z = 0.0
+        gpm_z = 0.0
         if "gpm" in prices.columns and len(prices) >= 60:
             g = prices["gpm"]
             gpm_z = float((gpm - g.rolling(self.cfg.z_lookback, min_periods=60).mean().iloc[-1]) /
                           max(g.rolling(self.cfg.z_lookback, min_periods=60).std().iloc[-1], 0.01))
         if "csr" in prices.columns and len(prices) >= 60:
             c = prices["csr"]
-            csr_z = float((csr - c.rolling(self.cfg.z_lookback, min_periods=60).mean().iloc[-1]) /
+            float((csr - c.rolling(self.cfg.z_lookback, min_periods=60).mean().iloc[-1]) /
                           max(c.rolling(self.cfg.z_lookback, min_periods=60).std().iloc[-1], 0.01))
 
         # Satellite NDVI
@@ -176,7 +178,7 @@ class CornSoybeanCrush(CommodityStrategy):  # type: ignore
         import datetime
         month = datetime.date.today().month
         soy_phase  = seasonal_planting_factor(month, "soybeans")
-        corn_phase = seasonal_planting_factor(month, "corn")
+        seasonal_planting_factor(month, "corn")
 
         # ── Signal 1: Crush spread (GPM) ──
         if gpm_z > self.cfg.gpm_z_buy_threshold:

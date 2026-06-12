@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import math
 import time
-from dataclasses import dataclass, field
 from collections import deque
-from typing import Deque, Dict, Optional, Tuple, List, Literal
+from dataclasses import dataclass, field
+from typing import Deque, Dict, List, Literal, Optional, Tuple
 
 Side = Literal["buy", "sell"]
 

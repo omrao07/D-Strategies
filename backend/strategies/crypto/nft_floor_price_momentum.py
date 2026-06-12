@@ -23,10 +23,12 @@ outdir/backtest.csv             cumulative P&L in ETH terms
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 
 def compute_nft_score(sub: pd.DataFrame) -> pd.DataFrame:

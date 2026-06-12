@@ -7,8 +7,14 @@ from __future__ import annotations
 
 try:
     from sqlalchemy import (
-        BigInteger, Boolean, Column, Date, DateTime, Double,
-        Float, Index, Integer, String, Text, func,
+        Boolean,
+        Column,
+        Date,
+        DateTime,
+        Double,
+        Integer,
+        Text,
+        func,
     )
     from sqlalchemy.dialects.postgresql import JSONB
     from sqlalchemy.orm import DeclarativeBase

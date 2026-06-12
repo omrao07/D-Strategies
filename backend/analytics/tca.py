@@ -40,12 +40,10 @@ tca.close_order(order_id)
 from __future__ import annotations
 
 import csv
-import json
 import math
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Any, Iterable
-
+from dataclasses import dataclass, field
+from typing import Any, Dict, Iterable, List, Optional
 
 # ------------- Data models -------------
 

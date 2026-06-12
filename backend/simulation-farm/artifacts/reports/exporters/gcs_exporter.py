@@ -23,16 +23,13 @@ exp.upload_dir("artifacts/reports/run123")  # preserves relative paths under pre
 
 from __future__ import annotations
 
-import base64
 import gzip
 import io
-import json
 import mimetypes
 import os
 import pathlib
-import time
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Optional
 
 # Optional dependency: google-cloud-storage
 try:

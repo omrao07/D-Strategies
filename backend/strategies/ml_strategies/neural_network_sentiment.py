@@ -23,10 +23,12 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-
 
 HIDDEN_SIZE = 32
 FORWARD_DAYS = 5
@@ -210,7 +212,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"NN Sentiment | Val Acc: {f'{summary['avg_final_val_accuracy']:.3f}' if summary['avg_final_val_accuracy'] else 'N/A'} | Buy: {summary['n_buy']} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"NN Sentiment | Val Acc: {format(summary['avg_final_val_accuracy'], '.3f') if summary['avg_final_val_accuracy'] else 'N/A'} | Buy: {summary['n_buy']} | Sharpe: {format(sharpe, '.2f') if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

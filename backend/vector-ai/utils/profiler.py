@@ -43,11 +43,9 @@ import csv
 import functools
 import io
 import json
-import os
 import sys
 import time
-import typing as _t
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 
 # ---------- Optional imports (soft dependencies) ----------
 try:
@@ -196,7 +194,8 @@ def profile_it(name: str | None = None, capture_return: bool = False, with_cprof
         def sync_wrapped(*args, **kwargs):
             profiler_io = None
             if with_cprofile:
-                import cProfile, pstats
+                import cProfile
+                import pstats
                 profiler = cProfile.Profile()
                 profiler.enable()
 
@@ -216,7 +215,8 @@ def profile_it(name: str | None = None, capture_return: bool = False, with_cprof
         async def async_wrapped(*args, **kwargs):
             profiler_io = None
             if with_cprofile:
-                import cProfile, pstats
+                import cProfile
+                import pstats
                 profiler = cProfile.Profile()
                 profiler.enable()
 
@@ -272,7 +272,6 @@ class Profiler(contextlib.AbstractContextManager):
         Sampling profiler using sys.setprofile (per-call hooks).
         Captures function hit counts during the context.
         """
-        import threading
         import collections
         counts = collections.Counter()
 
@@ -378,7 +377,7 @@ class Profiler(contextlib.AbstractContextManager):
         if self.autoprint:
             print(out)
 
-    def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: contextlib.TracebackType | None) -> _ExitT_co: # type: ignore
+    def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: contextlib.TracebackType | None) -> bool | None:
         raise NotImplementedError
 
 
@@ -390,7 +389,8 @@ def profile_block(name: str):
 
 def cprofile_block(sort_by: str = "tottime", lines: int = 30):
     """Context that prints cProfile stats on exit."""
-    import cProfile, pstats
+    import cProfile
+    import pstats
     class _C:
         def __enter__(self):
             self.pr = cProfile.Profile(); self.pr.enable(); return self

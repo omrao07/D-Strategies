@@ -58,7 +58,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Dict
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -69,7 +69,6 @@ except Exception:
     plt = None
 
 from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 
@@ -242,7 +241,7 @@ def apply_scenarios(df: pd.DataFrame, sc: pd.DataFrame, elasticity: float, disc_
     for _, r in sc.iterrows():
         mask = (d["platform"] == r["platform"]) & (d["date"] == r["date"])
         if not mask.any():  # allow nearest-forward if exact quarter missing
-            nearest = d[(d["platform"]==r["platform"])].iloc[(d[(d["platform"]==r["platform"])]['date'] - r["date"]).abs().argmin()].name
+            d[(d["platform"]==r["platform"])].iloc[(d[(d["platform"]==r["platform"])]['date'] - r["date"]).abs().argmin()].name
             mask = False
             # Use exact only to avoid accidental mass updates
             continue

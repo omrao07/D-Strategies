@@ -31,13 +31,12 @@ print(stats.files, stats.rows)
 
 from __future__ import annotations
 
-import io
-import os
-import uuid
-import json
-import time
 import hashlib
+import io
+import json
+import os
 import typing as T
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
@@ -289,7 +288,6 @@ class ParquetWriter:
             return [df]
         chunks: list[pd.DataFrame] = []
         start = 0
-        approx = 0
         # probe a small sample to estimate per-row bytes
         probe_n = min(len(df), 5000)
         probe_tbl = pa.Table.from_pandas(df.head(probe_n), preserve_index=False)

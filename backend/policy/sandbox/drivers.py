@@ -27,8 +27,6 @@ import argparse
 import json
 import os
 import sys
-import time
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 # Optional YAML
@@ -49,8 +47,13 @@ def _ensure(cond: bool, msg: str):
 
 # Signals stack
 try:
-    from backend.io_utils.signals_adapter import SignalsAdapter, SourceSpec, TransformSpec, MixerHook # type: ignore
-except Exception as e:
+    from backend.io_utils.signals_adapter import (  # type: ignore
+        MixerHook,
+        SignalsAdapter,
+        SourceSpec,
+        TransformSpec,
+    )
+except Exception:
     SignalsAdapter = None  # type: ignore
     SourceSpec = None      # type: ignore
     TransformSpec = None   # type: ignore
@@ -58,27 +61,30 @@ except Exception as e:
 
 # Mixer config (optional)
 try:
-    from backend.common.mixer import MixerConfig # type: ignore
+    from backend.common.mixer import MixerConfig  # type: ignore
 except Exception:
     class MixerConfig:  # type: ignore
         def __init__(self, **kw): pass
 
 # Pipelines / Manager / Scheduler
 try:
-    from backend.runtime.pipelines import build_signals_pipeline, build_manager_step_pipeline # type: ignore
+    from backend.runtime.pipelines import (  # type: ignore
+        build_manager_step_pipeline,
+        build_signals_pipeline,
+    )
 except Exception:
     build_signals_pipeline = None   # type: ignore
     build_manager_step_pipeline = None  # type: ignore
 
 try:
-    from backend.runtime.manager import Manager, StaticPrices, StaticSignals # type: ignore
+    from backend.runtime.manager import Manager, StaticPrices, StaticSignals  # type: ignore
 except Exception:
     Manager = None         # type: ignore
     StaticPrices = None    # type: ignore
     StaticSignals = None   # type: ignore
 
 try:
-    from backend.runtime.schedule import Scheduler, Job, scheduled # type: ignore
+    from backend.runtime.schedule import Job, Scheduler, scheduled  # type: ignore
 except Exception:
     Scheduler = None  # type: ignore
     Job = None        # type: ignore
@@ -88,14 +94,18 @@ except Exception:
 
 # Simulators
 try:
-    from backend.sim.policy_sim import PolicySimConfig, PolicySimulator # type: ignore
+    from backend.sim.policy_sim import PolicySimConfig, PolicySimulator  # type: ignore
 except Exception:
     PolicySimConfig = None  # type: ignore
     PolicySimulator = None  # type: ignore
 
 try:
     # you have two scenarios.py options; prefer the richer one if present
-    from backend.sim.scenarios import ScenarioRunner, presets, ScenarioSpec  # type: ignore # richer version
+    from backend.sim.scenarios import (  # type: ignore # richer version
+        ScenarioRunner,
+        ScenarioSpec,
+        presets,
+    )
     _SCEN_KIND = "runner"
 except Exception:
     ScenarioRunner = None  # type: ignore

@@ -1,9 +1,9 @@
 # backend/utils/rate_linits.py
 from __future__ import annotations
 
-import time
 import threading
-from collections import deque, defaultdict
+import time
+from collections import defaultdict, deque
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Callable, Deque, Dict, Optional

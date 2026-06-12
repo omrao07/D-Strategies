@@ -4,8 +4,8 @@ from __future__ import annotations
 import csv
 import json
 import math
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 # Optional pandas for neat DataFrame exports
 try:

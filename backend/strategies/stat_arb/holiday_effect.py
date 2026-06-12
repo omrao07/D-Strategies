@@ -19,11 +19,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 US_HOLIDAYS = [
     "2019-01-01","2019-01-21","2019-02-18","2019-04-19","2019-05-27","2019-07-04",

@@ -24,13 +24,12 @@ from backend.valuation.schemas import (
     CompanyId,
     Currency,
     DCFInputsSchema,
+    DCFResultSchema,
     Fundamentals,
-    Frequency,
     MarketSnapshot,
     TerminalMethod,
-    ValuationPackage,
-    DCFResultSchema,
     ValuationMethod,
+    ValuationPackage,
 )
 
 # ---------------------------------------------------------------------------

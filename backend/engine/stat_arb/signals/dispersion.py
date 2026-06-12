@@ -1,9 +1,11 @@
 # engines/stat_arb/signals/dispersion.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Iterable, List, Literal, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional, Iterable, Literal
 
 BetaMethod = Literal["rolling_ols", "expanding_ols", "static_ols"]
 
@@ -35,8 +37,8 @@ def dispersion_metrics(
     # Average-correlation proxy (Lopez de Prado style approximation)
     # var(mean) ≈ avg_corr * avg_var / N + (1-avg_corr) * avg_var / N ?  Use simple proxy:
     # avg pairwise corr ≈ var(mean) / (avg_var / N)
-    avg_var = rets.var(axis=1)
-    var_mean = rets.mean(axis=1).var()
+    rets.var(axis=1)
+    rets.mean(axis=1).var()
     # More stable rolling proxy:
     avg_var_rb = rets.rolling(lookback).var().mean(axis=1)
     var_mean_rb = rets.mean(axis=1).rolling(lookback).var()
@@ -102,7 +104,7 @@ def group_residual_zscores(
             continue
         gvec = group_ret[g].iloc[rb].values.reshape(-1, 1)
         gx = np.hstack([gvec, np.ones_like(gvec)])  # add intercept
-        denom = float((gx.T @ gx)[0, 0])
+        float((gx.T @ gx)[0, 0])
         for t in names:
             y = r[t].iloc[rb].values.reshape(-1, 1)
             # OLS beta on group + intercept
@@ -245,7 +247,7 @@ def units_from_pairs(
       - diag DataFrame: per pair diagnostics (z, spread, beta, risk_scale)
     """
     px = prices.sort_index()
-    rets = px.pct_change()
+    px.pct_change()
 
     units_by_pair: Dict[str, float] = {}
     betas_by_pair: Dict[str, float] = {}
@@ -255,7 +257,7 @@ def units_from_pairs(
     if not pairs:
         return units_by_pair, betas_by_pair, legs_by_pair, pd.DataFrame()
 
-    t = px.index[-1]  # snapshot at the last date
+    px.index[-1]  # snapshot at the last date
 
     for p in pairs:
         if p.y not in px.columns or p.x not in px.columns:

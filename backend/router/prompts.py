@@ -19,7 +19,8 @@ response = llm.generate(text)
 """
 
 from __future__ import annotations
-from typing import Dict, Any
+
+from typing import Any, Dict
 
 # ----------------------------------------------------------------------
 # Static templates

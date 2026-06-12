@@ -43,21 +43,19 @@ sweep:
 """
 
 import argparse
-import dataclasses
 import importlib
 import json
 import math
 import os
 import random
-import shutil
 import sys
 import time
 import traceback
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from itertools import product
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Iterable
+from typing import Any, Dict, List, Optional
 
 # -------- Optional deps (all graceful) ---------------------------------------
 try:
@@ -300,7 +298,8 @@ class ExperimentRunner:
         Run a system command (use with care in your environment).
         params.cmd = "python scripts/do_thing.py --opt 1"
         """
-        import subprocess, shlex
+        import shlex
+        import subprocess
         cmd = params.get("cmd")
         if not cmd:
             return {"kind": "shell", "error": "cmd missing"}

@@ -82,13 +82,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -411,13 +410,12 @@ def event_study(prx_idx: pd.DataFrame, events: pd.DataFrame,
                     if "govt_stake_pct" in shp.columns:
                         gov_delta = float(after["govt_stake_pct"].iloc[0] - before["govt_stake_pct"].iloc[0])
             # fundamentals (closest prior)
-            pb = roe = dy = np.nan
             if not funda.empty:
                 fu = funda[(funda["symbol"]==sym) & (funda["date"]<=d0)].tail(1)
                 if not fu.empty:
-                    pb = float(fu["pb"].iloc[0]) if "pb" in fu.columns and pd.notna(fu["pb"].iloc[0]) else np.nan
-                    roe = float(fu["roe"].iloc[0]) if "roe" in fu.columns and pd.notna(fu["roe"].iloc[0]) else np.nan
-                    dy = float(fu["dividend_yield"].iloc[0]) if "dividend_yield" in fu.columns and pd.notna(fu["dividend_yield"].iloc[0]) else np.nan
+                    float(fu["pb"].iloc[0]) if "pb" in fu.columns and pd.notna(fu["pb"].iloc[0]) else np.nan
+                    float(fu["roe"].iloc[0]) if "roe" in fu.columns and pd.notna(fu["roe"].iloc[0]) else np.nan
+                    float(fu["dividend_yield"].iloc[0]) if "dividend_yield" in fu.columns and pd.notna(fu["dividend_yield"].iloc[0]) else np.nan
             # pack
             out_rows.append({
                 "event_id": ev["event_id"], "date": d0, "symbol": sym, "type": ev.get("type","OFS"),

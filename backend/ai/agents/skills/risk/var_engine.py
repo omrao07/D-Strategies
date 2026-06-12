@@ -524,7 +524,7 @@ def to_currency(var_frac: float, notional: float) -> float:
 # =============================================================================
 
 if __name__ == "__main__":  # pragma: no cover
-    import random, time
+    import random
     random.seed(42)
 
     # Synthetic daily returns with a few fat-tail hits

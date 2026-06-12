@@ -4,7 +4,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List
 
-from backend.risk.policy_sim import PolicyShock, RateShock, EquityShock, FXShock, VolShock # type: ignore
+from backend.risk.policy_sim import (  # type: ignore
+    EquityShock,
+    FXShock,
+    PolicyShock,
+    RateShock,
+    VolShock,
+)
 
 
 # ----------------------------- Registry -----------------------------

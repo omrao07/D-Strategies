@@ -32,7 +32,10 @@ outdir/backtest.csv                 cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -73,7 +76,7 @@ def run(cfg):
     if cfg.gsec10_file and os.path.exists(cfg.gsec10_file):
         gsec10 = pd.read_csv(cfg.gsec10_file, parse_dates=["date"]).set_index("date").sort_index()
         gsec10.columns = [c.lower().strip() for c in gsec10.columns]
-        gsec10_col = gsec10.columns[0]
+        gsec10.columns[0]
 
     event_records = []
     trade_pnls = []
@@ -91,7 +94,6 @@ def run(cfg):
         # Asset reactions
         nifty_react = {}
         usdinr_react = {}
-        gsec_react = {}
 
         for window in FORWARD_WINDOWS:
             post_date = release_date + pd.Timedelta(days=window)

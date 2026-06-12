@@ -32,14 +32,14 @@ ok, transformed, report = chain.apply(proposal_or_decision, context)
 
 from __future__ import annotations
 
-import time
 import math
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Sequence, Tuple
 
 # Import your primitives
 try:
-    from agents.base import MarketContext, Proposal, OrderPlan, notional_usd, clamp # type: ignore
+    from agents.base import MarketContext, OrderPlan, Proposal, clamp, notional_usd  # type: ignore
 except Exception:
     # Minimal shims for type hints if imported standalone
     MarketContext = Any  # type: ignore

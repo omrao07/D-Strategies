@@ -23,12 +23,10 @@ from __future__ import annotations
 
 import logging
 import time
-import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 
 log = logging.getLogger(__name__)
@@ -241,7 +239,7 @@ class ParallelRunner:
     def _discover_strategies(self) -> Dict[str, Any]:
         """Return dict of strategy_name → class."""
         try:
-            from backend.engine.registry import auto_register_strategies, HUB
+            from backend.engine.registry import HUB, auto_register_strategies
             auto_register_strategies()
             return dict(HUB.strategies._store)
         except Exception as exc:
@@ -267,6 +265,7 @@ class ParallelRunner:
         Returns DataFrame with one row per parameter combination, sorted by Sharpe.
         """
         from itertools import product
+
         from backend.backtester.backtest_engine import BacktestEngine
         from backend.backtester.data_feeds import SyntheticFeed
 

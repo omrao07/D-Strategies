@@ -17,12 +17,16 @@ python audit.py runfile --history runs/bt_xxx/history_XXXXXXXX.parquet --out run
 """
 
 from __future__ import annotations
-import os, re, json, math, uuid, time, importlib, logging
+
+import importlib
+import json
+import logging
+import math
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-import numpy as np
 import pandas as pd
 
 try:
@@ -33,7 +37,8 @@ except Exception:
 
 # Optional orchestrator import (graceful fallback)
 try:
-    from orchestrator import Orchestrator, load_yaml_or_json as _orc_load#type:ignore
+    from orchestrator import Orchestrator  #type:ignore
+    from orchestrator import load_yaml_or_json as _orc_load
 except Exception:
     Orchestrator = None
     _orc_load = None

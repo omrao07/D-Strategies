@@ -2,9 +2,8 @@
 from __future__ import annotations
 
 import json
-import math
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # ----------------------- Soft deps / hooks -----------------------------------
@@ -155,7 +154,6 @@ class PnLXray:
             pos.avg_price = ((pos.avg_price * abs(pos.qty)) + (px * abs(signed))) / max(1e-9, (abs(pos.qty) + abs(signed)))
         elif pos.qty * signed < 0 and abs(signed) > abs(pos.qty):
             # flipped side: new avg at residual
-            residual = new_qty
             pos.avg_price = px  # start new lot at trade price
         pos.qty = new_qty
 

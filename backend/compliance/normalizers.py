@@ -41,8 +41,7 @@ import json
 import re
 import sys
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 # Optional bus (graceful if missing)
 try:
@@ -96,7 +95,7 @@ def _to_ms(ts: Any) -> Optional[int]:
         if _ISO_RE.match(s):
             # minimal ISO parser: use time.strptime for Z; offset not fully applied here.
             # In production, prefer dateutil.parser; we keep stdlib-only.
-            from datetime import datetime, timezone
+            from datetime import datetime
             try:
                 dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
                 return int(dt.timestamp() * 1000)
@@ -414,7 +413,7 @@ def _probe():
     print(json.dumps(samples, indent=2, default=str))
 
 def main():
-    import argparse, time as _t
+    import argparse
     ap = argparse.ArgumentParser(description="Unified message normalizer")
     ap.add_argument("--run", action="store_true", help="Run raw.* -> normalized bridge on the bus")
     ap.add_argument("--probe", action="store_true", help="Print example normalized payloads")

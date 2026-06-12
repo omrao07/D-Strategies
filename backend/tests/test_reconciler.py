@@ -24,8 +24,8 @@ We duck-type defensively and only assert the essentials.
 """
 
 import copy
-import math
-import pytest # type: ignore
+
+import pytest  # type: ignore
 
 rec_mod = pytest.importorskip("backend.oms.reconciler", reason="backend.oms.reconciler not found")
 
@@ -194,7 +194,7 @@ def test_fx_conversion_if_provided(base_fx):
     recon = _mk_reconciler(base_ccy="USD")
     rep = recon.reconcile(orders, fills, positions, cash, fx=base_fx) # type: ignore
 
-    m = rep.get("metrics", {})
+    rep.get("metrics", {})
     # Look for a base notional field; otherwise compute via cash_base
     cash_base = rep.get("cash_base")
     if isinstance(cash_base, (int, float)):

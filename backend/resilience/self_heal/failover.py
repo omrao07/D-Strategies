@@ -11,10 +11,9 @@ Generic failover controller for:
 No external dependencies.
 """
 
-from typing import Callable, Dict, List, Optional
-import time
 import threading
-
+import time
+from typing import Callable, Dict, List, Optional
 
 # ─────────────────────────────────────────────────────────────
 # Errors

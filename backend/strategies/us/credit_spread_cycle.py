@@ -49,7 +49,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,6 @@ try:
 except Exception:
     HAVE_HP = False
 
-from dateutil.relativedelta import relativedelta
 
 
 # ---------------------------- Config ----------------------------
@@ -211,7 +210,7 @@ def signals_from_metrics(m: pd.DataFrame, series_name: str) -> pd.DataFrame:
 
 
 def rolling_correlations(wide: pd.DataFrame, window: int) -> pd.DataFrame:
-    cols = wide.columns.tolist()
+    wide.columns.tolist()
     rows = []
     for i in range(len(wide)):
         if i < window: continue

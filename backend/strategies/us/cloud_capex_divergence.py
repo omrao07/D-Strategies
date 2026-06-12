@@ -38,9 +38,8 @@
 
 import argparse
 import os
-import math
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import Tuple
 
 import numpy as np
 import pandas as pd

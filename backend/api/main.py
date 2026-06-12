@@ -1,7 +1,8 @@
+import logging
 import os
+import sys
 import time
 import uuid
-import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -11,8 +12,6 @@ from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, field_validator
-
-import sys
 
 ROOT = Path(__file__).resolve().parents[1]  # backend/
 if str(ROOT) not in sys.path:
@@ -75,6 +74,7 @@ async def lifespan(app: FastAPI):
     # Start compliance surveillance in a background asyncio task
     try:
         import asyncio
+
         from backend.compliance.surveillance import Surveillance
         _surv = Surveillance()
 
@@ -91,7 +91,8 @@ async def lifespan(app: FastAPI):
 
     # Start India market status poller — writes india:status hash every 60s
     try:
-        import asyncio, json as _json, os as _os
+        import asyncio
+        import os as _os
         async def _india_status_loop():
             while True:
                 try:
@@ -102,7 +103,8 @@ async def lifespan(app: FastAPI):
                         decode_responses=True,
                     )
                     from backend.india import (
-                        IndiaMarketCalendar, get_india_vix,
+                        IndiaMarketCalendar,
+                        get_india_vix,
                     )
                     vix = get_india_vix(_r) or 0.0
                     is_open = IndiaMarketCalendar.is_market_open()
@@ -414,6 +416,7 @@ def run_vec_backtest(req: VecBacktestRequest, _auth: None = Depends(_require_key
     try:
         import numpy as np
         import pandas as pd
+
         from backend.backtester.vectorized_backtester import run_backtest
     except ImportError as exc:
         raise HTTPException(503, f"Vectorized backtester unavailable: {exc}")
@@ -457,7 +460,10 @@ def _not_implemented(name: str):
 def _redis_hgetall_list(key: str) -> List[Dict]:
     """Read a Redis hash and return its values as a list of parsed JSON dicts."""
     try:
-        import redis as _redis_mod, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis_mod
         _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
         raw = _r.hgetall(key)
         return [_json.loads(v) for v in raw.values() if v]
@@ -468,7 +474,10 @@ def _redis_hgetall_list(key: str) -> List[Dict]:
 def _redis_stream_last(stream: str, count: int = 50, filter_metric: Optional[str] = None) -> List[Dict]:
     """Read last `count` entries from a Redis stream, optionally filtering by metric field."""
     try:
-        import redis as _redis_mod, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis_mod
         _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
         entries = _r.xrevrange(stream, count=count)
         out = []
@@ -491,7 +500,10 @@ def _redis_stream_last(stream: str, count: int = 50, filter_metric: Optional[str
 @app.get("/api/altdata/card_spend")
 def get_altdata_card_spend():
     try:
-        import redis as _redis_mod, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis_mod
         _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
         # Try hash key first, then fall back to stream filter
         raw = _r.hgetall("altdata:card_spend")
@@ -507,7 +519,10 @@ def get_altdata_card_spend():
 @app.get("/api/altdata/satellite_lights")
 def get_altdata_satellite_lights():
     try:
-        import redis as _redis_mod, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis_mod
         _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
         raw = _r.hgetall("altdata:satellite_lights")
         if raw:
@@ -522,7 +537,10 @@ def get_altdata_satellite_lights():
 @app.get("/api/altdata/shipping_traffic")
 def get_altdata_shipping_traffic():
     try:
-        import redis as _redis_mod, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis_mod
         _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
         raw = _r.hgetall("altdata:shipping")
         if raw:
@@ -537,7 +555,10 @@ def get_altdata_shipping_traffic():
 @app.get("/api/altdata/geo_spatial")
 def get_altdata_geo_spatial():
     try:
-        import redis as _redis_mod, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis_mod
         _r = _redis_mod.Redis(host=_os.getenv("REDIS_HOST", "localhost"), port=int(_os.getenv("REDIS_PORT", "6379")), decode_responses=True)
         raw = _r.hgetall("altdata:geo")
         if raw:
@@ -552,7 +573,10 @@ def get_altdata_geo_spatial():
 @app.get("/api/analyst/screener")
 def get_analyst_screener(q: str = ""):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("analyst:screener:results", 0, 49)
         return {"results": [_json.loads(x) for x in items if x]}
@@ -562,7 +586,10 @@ def get_analyst_screener(q: str = ""):
 @app.get("/api/analyst/news")
 def get_analyst_news(limit: int = 20):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("news:feed", -limit, -1)
         return {"items": [_json.loads(x) for x in reversed(items) if x]}
@@ -572,7 +599,10 @@ def get_analyst_news(limit: int = 20):
 @app.get("/api/analyst/notes")
 def get_analyst_notes():
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("analyst:notes", 0, -1)
         return {"notes": [_json.loads(x) for x in items if x]}
@@ -582,7 +612,11 @@ def get_analyst_notes():
 @app.post("/api/analyst/notes")
 def post_analyst_note(payload: Dict[str, Any]):
     try:
-        import redis as _redis, os as _os, json as _json, time as _time
+        import json as _json
+        import os as _os
+        import time as _time
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         note = {**payload, "id": str(int(_time.time() * 1000)), "ts": _time.time()}
         r.rpush("analyst:notes", _json.dumps(note))
@@ -593,7 +627,10 @@ def post_analyst_note(payload: Dict[str, Any]):
 @app.get("/api/analyst/tasks")
 def get_analyst_tasks():
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("analyst:tasks", 0, -1)
         return {"tasks": [_json.loads(x) for x in items if x]}
@@ -603,7 +640,11 @@ def get_analyst_tasks():
 @app.post("/api/analyst/tasks")
 def post_analyst_task(payload: Dict[str, Any]):
     try:
-        import redis as _redis, os as _os, json as _json, time as _time
+        import json as _json
+        import os as _os
+        import time as _time
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         task = {**payload, "id": str(int(_time.time() * 1000)), "done": False, "ts": _time.time()}
         r.rpush("analyst:tasks", _json.dumps(task))
@@ -614,7 +655,10 @@ def post_analyst_task(payload: Dict[str, Any]):
 @app.post("/api/analyst/tasks/{task_id}/toggle")
 def toggle_analyst_task(task_id: str):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("analyst:tasks", 0, -1)
         updated = []
@@ -633,7 +677,10 @@ def toggle_analyst_task(task_id: str):
 @app.get("/api/analyst/sentiment")
 def get_analyst_sentiment():
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         raw = r.get("sentiment:latest")
         return _json.loads(raw) if raw else {"score": 0.0, "label": "neutral", "ts": None}
@@ -652,8 +699,10 @@ def analyst_query(q: str = "", _auth: None = Depends(_require_key)):
 @app.get("/api/fno/futures")
 def get_fno_futures():
     try:
-        from backend.india.nse_option_chain import put_call_ratio
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("fno:futures:latest", 0, 49)
         return {"futures": [_json.loads(x) for x in items if x]}
@@ -663,7 +712,10 @@ def get_fno_futures():
 @app.get("/api/fno/options")
 def get_fno_options(symbol: str = "NIFTY"):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         raw = r.get(f"fno:options:{symbol}")
         return _json.loads(raw) if raw else {"calls": [], "puts": [], "symbol": symbol}
@@ -674,7 +726,10 @@ def get_fno_options(symbol: str = "NIFTY"):
 @app.get("/api/research/notes")
 def get_research_notes():
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("research:notes", 0, -1)
         return {"notes": [_json.loads(x) for x in items if x]}
@@ -684,7 +739,10 @@ def get_research_notes():
 @app.get("/api/research/chart")
 def get_research_chart(symbol: str = "", tf: str = "1d", limit: int = 90):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange(f"bars:{symbol}:{tf}", -limit, -1)
         return {"bars": [_json.loads(x) for x in items if x], "symbol": symbol, "tf": tf}
@@ -703,7 +761,10 @@ def research_query(q: str = "", _auth: None = Depends(_require_key)):
 @app.get("/api/risk/kpis")
 def get_risk_kpis(_auth: None = Depends(_require_key)):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(
             host=_os.getenv("REDIS_HOST", "localhost"),
             port=int(_os.getenv("REDIS_PORT", "6379")),
@@ -721,7 +782,7 @@ def get_risk_kpis(_auth: None = Depends(_require_key)):
 def get_risk_monte_carlo(_auth: None = Depends(_require_key)):
     try:
         from backend.risk.institutional_risk_engine import StressTestEngine
-        eng = StressTestEngine.__new__(StressTestEngine)
+        StressTestEngine.__new__(StressTestEngine)
         return {"scenarios": []}
     except Exception as exc:
         logger.warning("monte carlo error: %s", exc)
@@ -730,7 +791,9 @@ def get_risk_monte_carlo(_auth: None = Depends(_require_key)):
 @app.get("/api/risk/scenarios")
 def get_risk_scenarios(_auth: None = Depends(_require_key)):
     try:
-        import redis as _redis, os as _os
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(
             host=_os.getenv("REDIS_HOST", "localhost"),
             port=int(_os.getenv("REDIS_PORT", "6379")),
@@ -746,7 +809,10 @@ def get_risk_scenarios(_auth: None = Depends(_require_key)):
 @app.get("/api/risk/timeseries")
 def get_risk_timeseries(metric: str = "pnl", days: int = 30, _auth: None = Depends(_require_key)):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(
             host=_os.getenv("REDIS_HOST", "localhost"),
             port=int(_os.getenv("REDIS_PORT", "6379")),
@@ -825,7 +891,10 @@ def stop_strategies(payload: Dict[str, Any], _auth: None = Depends(_require_key)
 @app.post("/api/strategies/presets/save")
 def save_preset(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         name = str(payload.get("name", "default"))
         r.hset("strategy:presets", name, _json.dumps(payload))
@@ -836,7 +905,10 @@ def save_preset(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
 @app.post("/api/strategies/presets/apply")
 def apply_preset(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         name = str(payload.get("name", "default"))
         raw = r.hget("strategy:presets", name)
@@ -854,17 +926,23 @@ def apply_preset(payload: Dict[str, Any], _auth: None = Depends(_require_key)):
 @app.get("/api/terminal/candles")
 def get_terminal_candles(symbol: str = "NIFTY", tf: str = "1m", limit: int = 300):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange(f"bars:{symbol}:{tf}", -limit, -1)
         return {"candles": [_json.loads(x) for x in items if x]}
-    except Exception as exc:
+    except Exception:
         return {"candles": []}
 
 @app.get("/api/terminal/book")
 def get_terminal_book(symbol: str = "NIFTY"):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         raw = r.get(f"orderbook:{symbol}")
         return _json.loads(raw) if raw else {"bids": [], "asks": []}
@@ -874,7 +952,10 @@ def get_terminal_book(symbol: str = "NIFTY"):
 @app.get("/api/terminal/trades")
 def get_terminal_trades(limit: int = 100):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("fills:recent", -limit, -1)
         return {"trades": [_json.loads(x) for x in items if x]}
@@ -884,7 +965,10 @@ def get_terminal_trades(limit: int = 100):
 @app.get("/api/terminal/alerts")
 def get_terminal_alerts(limit: int = 50):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         items = r.lrange("alerts:recent", -limit, -1)
         return {"alerts": [_json.loads(x) for x in reversed(items) if x]}
@@ -938,8 +1022,11 @@ def ledger_verify(last_n: int = 1000, _auth: None = Depends(_require_key)):
 @app.get("/api/regime")
 def get_regime(_auth: None = Depends(_require_key)):
     try:
+        import os as _os
+
+        import redis as _redis
+
         from backend.engine.regime_risk import regime_multiplier
-        import redis as _redis, os as _os
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         raw = r.get("regime:current")
         mult = regime_multiplier(r)
@@ -963,7 +1050,10 @@ def set_regime_endpoint(payload: Dict[str, Any], _auth: None = Depends(_require_
 @app.get("/api/commodities/{sym}")
 def get_commodity(sym: str):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         raw = r.get(f"commodity:{sym.upper()}")
         return _json.loads(raw) if raw else {"symbol": sym, "price": None, "available": False}
@@ -974,7 +1064,10 @@ def get_commodity(sym: str):
 @app.get("/api/trades/{trade_id}")
 def get_trade(trade_id: str):
     try:
-        import redis as _redis, os as _os, json as _json
+        import json as _json
+        import os as _os
+
+        import redis as _redis
         r = _redis.Redis(host=_os.getenv("REDIS_HOST","localhost"), port=int(_os.getenv("REDIS_PORT","6379")), decode_responses=True)
         raw = r.hget("fills:by_id", trade_id)
         if not raw:

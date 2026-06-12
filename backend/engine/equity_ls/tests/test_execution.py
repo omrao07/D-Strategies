@@ -1,18 +1,14 @@
 # engines/equity_ls/tests/test_execution.py
 import pandas as pd
-import numpy as np
-
-import pytest # type: ignore
-
-from engines.equity_ls.execution.allocator import ( # type: ignore
+from engines.equity_ls.execution.allocator import (  # type: ignore
     allocate_from_scores,
     generate_orders,
 )
-from engines.equity_ls.execution.order_router import ( # type: ignore
-    Order, default_router, PaperBroker
+from engines.equity_ls.execution.order_router import (  # type: ignore
+    Order,
+    default_router,
 )
-from engines.equity_ls.execution.slippage import apply_to_orders # type: ignore
-
+from engines.equity_ls.execution.slippage import apply_to_orders  # type: ignore
 
 # ------------------------ Helpers ------------------------
 

@@ -3,8 +3,10 @@
 """
 activist_investor_tracking.py — Activist campaigns → target stock CAR analysis
 """
-import argparse, json, os
-import numpy as np
+import argparse
+import json
+import os
+
 import pandas as pd
 
 

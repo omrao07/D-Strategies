@@ -1,9 +1,12 @@
 # backend/strategies/diversified/short_interest_alpha.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
 try:
     import redis as _redis_mod
@@ -198,7 +201,7 @@ class ShortInterestAlpha(Strategy):
             if bz and _hours_since(int(bz.get("updated_ms", _now_ms()))) > STALE_HR_BUZZ:
                 bz = {}
             p3d = float(bz.get("price_mom_3d", 0.0))
-            p1d = float(bz.get("price_mom_1d", 0.0))
+            float(bz.get("price_mom_1d", 0.0))
             volrel = float(bz.get("vol_rel_5d", 1.0))
             sburst = float(bz.get("social_burst_z", 0.0))
             ivrel = float(bz.get("iv_30_rel", 1.0))

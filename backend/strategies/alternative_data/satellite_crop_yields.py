@@ -176,7 +176,7 @@ def backtest(signals: pd.DataFrame, futures: pd.DataFrame, best_lags: dict) -> p
     records = []
     for crop, sig_grp in signals.groupby("crop"):
         fut_grp = futures[futures["commodity"] == crop].copy().sort_values("date")
-        lag = best_lags.get(crop, 0)
+        best_lags.get(crop, 0)
         sig_shifted = sig_grp[["date", "signal"]].copy()
         sig_shifted["date_target"] = sig_grp["date"].values
 

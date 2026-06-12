@@ -13,9 +13,9 @@ from __future__ import annotations
 import json
 import math
 import statistics
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 try:
     import pandas as pd  # type: ignore

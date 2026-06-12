@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-from pathlib import Path
-import sys
-import json
 import argparse
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Tuple, Optional, Any
+import json
 import warnings
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 warnings.filterwarnings("ignore")
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
 except Exception as e:
     raise SystemExit(f"Required packages missing: {e}")
 
@@ -207,7 +206,6 @@ def walk_forward(
     """
     results: List[pd.DataFrame] = []
     params_used: List[Dict[str, Any]] = []
-    idx = df.index
     start = train_window
     while start + test_window <= len(df):
         train = df.iloc[start - train_window:start]

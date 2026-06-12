@@ -15,9 +15,8 @@ Designed for:
 Safe to import anywhere. No threads, no async, no side effects.
 """
 
-from typing import Callable, Dict, Optional
 import time
-
+from typing import Callable, Dict, Optional
 
 # ─────────────────────────────────────────────────────────────
 # Types

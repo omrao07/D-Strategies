@@ -145,7 +145,7 @@ def _fx(pair: str) -> float:
     px = _hget_last(pair)
     return float(px or 1.0)
 
-def _units(sym: string) -> float:  # type: ignore[name-defined]
+def _units(sym: str) -> float:
     return CONTRACT_UNITS.get(_prefix(sym), 1.0)
 
 def _usd_price(sym: str) -> Optional[float]:

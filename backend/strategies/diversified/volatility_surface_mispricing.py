@@ -1,6 +1,9 @@
-import os, time
-import numpy as np
+import os
+import time
 from typing import Dict
+
+import numpy as np
+
 from backend.engine.strategy_base import Strategy
 
 """

@@ -1,10 +1,13 @@
 # backend/analytics/attribution.py
 from __future__ import annotations
 
-import os, json, time, math, datetime as dt
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple, Iterable, DefaultDict
+import datetime as dt
+import json
+import os
+import time
 from collections import defaultdict
+from dataclasses import asdict, dataclass
+from typing import Any, DefaultDict, Dict, Iterable, List, Optional, Tuple
 
 # -------- Optional Redis -----------------------------------------------------
 USE_REDIS = True
@@ -151,7 +154,7 @@ class AttributionEngine:
             new_cost = _wa(pos_qty, pos_cost, qty, px)
         else:
             # closing (fully or partially) → realize PnL on closed portion
-            closing_qty = -qty if abs(qty) < abs(pos_qty) and ((pos_qty>0 and qty<0) or (pos_qty<0 and qty>0)) else pos_qty
+            -qty if abs(qty) < abs(pos_qty) and ((pos_qty>0 and qty<0) or (pos_qty<0 and qty>0)) else pos_qty
             closed = min(abs(qty), abs(pos_qty))
             sign = 1.0 if pos_qty > 0 else -1.0
             realized = (px - pos_cost) * (closed * sign)  # sign aligns P&L with position

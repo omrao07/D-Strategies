@@ -32,19 +32,15 @@ Notes
 
 from __future__ import annotations
 
-import os
-import sys
 import json
-import time
-import uuid
-import math
-import shutil
-import signal
 import logging
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple
-
+import math
+import signal
+import sys
+import uuid
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 # -----------------------------------------------------------------------------
 # Optional deps
@@ -498,7 +494,11 @@ def main():
     elif args.cmd == "scenario":
         # delegate to scenario.py if available
         try:
-            from scenario import ScenarioEngine, load_spec, demo_portfolio, MarketData  # type: ignore
+            from scenario import (  # type: ignore
+                ScenarioEngine,
+                demo_portfolio,
+                load_spec,
+            )
         except Exception:
             print("scenario.py not available in PYTHONPATH.", file=sys.stderr)
             sys.exit(2)

@@ -1,9 +1,8 @@
 # tests/test_knowledge_graph.py
-import json
 import importlib
-from copy import deepcopy
-from typing import Any, Dict, List, Tuple, Optional
-import pytest # type: ignore
+import json
+
+import pytest  # type: ignore
 
 """
 What this validates
@@ -215,7 +214,7 @@ def test_export_import_roundtrip(api):
         pytest.skip("No export/import API")
     blob = api.call("export_json")
     assert isinstance(blob, (str, dict, list))
-    s = json.dumps(blob, default=str)
+    json.dumps(blob, default=str)
     api.call("clear") if api.has("clear") else None
     api.call("import_json", json_blob=blob)
     # Ensure some structure exists after import

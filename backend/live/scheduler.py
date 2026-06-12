@@ -6,12 +6,12 @@ Each job is a callable registered with a schedule slot.
 from __future__ import annotations
 
 import logging
-import os
 import threading
 import time
-from dataclasses import dataclass, field
-from datetime import datetime, time as dtime
-from typing import Callable, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from datetime import time as dtime
+from typing import Callable, List, Optional
 
 logger = logging.getLogger("live.scheduler")
 
@@ -20,7 +20,6 @@ IST_OFFSET_SECONDS = 19800
 
 
 def _now_ist() -> datetime:
-    import calendar
     ts = time.time() + IST_OFFSET_SECONDS
     return datetime.utcfromtimestamp(ts)
 

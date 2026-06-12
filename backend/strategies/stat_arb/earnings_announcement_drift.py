@@ -46,14 +46,13 @@
 import argparse
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 # ----------------------------- Config -----------------------------
 
@@ -250,7 +249,7 @@ def backtest(
     for date in all_dates:
         # Open new positions
         new_pos = [p for p in pos_records if p["entry_date"] <= date <= p["exit_date"]]
-        active = [p for p in new_pos if p not in open_positions]
+        [p for p in new_pos if p not in open_positions]
         open_positions = new_pos[:max_positions]  # cap positions
 
         daily_pnl = 0.0
@@ -361,7 +360,7 @@ def main():
     with open(os.path.join(outdir, "run_params.json"), "w") as f:
         json.dump(asdict(cfg), f, indent=2, default=str)
 
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Events processed: {len(events_df)}")
     if "t_stat" in agg:
         print(f"Mean trade ret ({cfg.hold_days}d): {agg[f'mean_trade_ret_{cfg.hold_days}d']:.4f}")

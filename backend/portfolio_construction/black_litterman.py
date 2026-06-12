@@ -5,7 +5,8 @@ No external optimizer required — pure numpy.
 """
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
+from typing import Optional, Tuple
+
 import numpy as np
 
 

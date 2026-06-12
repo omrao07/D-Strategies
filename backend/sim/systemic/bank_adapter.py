@@ -9,13 +9,13 @@ import os
 import threading
 import time
 import uuid
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 # Optional helpers from your codebase (kept optional to avoid hard deps)
 try:
-    from backend.utils.rate_linits import RateGate, SlidingWindowLimiter, WindowRule # type: ignore
+    from backend.utils.rate_linits import RateGate, SlidingWindowLimiter, WindowRule  # type: ignore
 except Exception:
     class RateGate:
         def __init__(self, rps: float): pass
@@ -27,7 +27,7 @@ except Exception:
         def __init__(self, *_a, **_k): pass
 
 try:
-    from backend.utils.secrets import secrets # type: ignore
+    from backend.utils.secrets import secrets  # type: ignore
 except Exception:
     class _DummySecrets:
         def get(self, k: str, default: Optional[str] = None, required: bool = False):
@@ -385,7 +385,9 @@ class PayoutRailsAdapter(BankAdapterBase):
     def _http_get(self, path: str, params: Optional[Dict] = None) -> Dict[str, Any]:
         """HTTP GET against payout rail API. Override/extend with your SDK."""
         try:
-            import urllib.request, urllib.parse, base64 as _b64
+            import base64 as _b64
+            import urllib.parse
+            import urllib.request
             url = self._base_url.rstrip("/") + "/" + path.lstrip("/")
             if params:
                 url += "?" + urllib.parse.urlencode(params)
@@ -400,7 +402,10 @@ class PayoutRailsAdapter(BankAdapterBase):
     def _http_post(self, path: str, body: Dict[str, Any]) -> Dict[str, Any]:
         """HTTP POST against payout rail API. Override/extend with your SDK."""
         try:
-            import urllib.request, urllib.parse, base64 as _b64, json as _j
+            import base64 as _b64
+            import json as _j
+            import urllib.parse
+            import urllib.request
             url = self._base_url.rstrip("/") + "/" + path.lstrip("/")
             cred = _b64.b64encode(f"{self._api_key}:{self._api_secret}".encode()).decode()
             data = _j.dumps(body).encode()

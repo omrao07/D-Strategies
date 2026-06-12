@@ -14,7 +14,21 @@ import time
 from collections import OrderedDict, deque
 from contextlib import contextmanager
 from dataclasses import asdict, is_dataclass
-from typing import Any, Callable, Deque, Dict, Iterable, Iterator, List, Mapping, MutableMapping, Optional, Sequence, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Deque,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 # ============================================================
 # Logging (simple, safe default)
@@ -106,7 +120,7 @@ def retry(*, tries: int = 3, backoff_ms: int = 200, jitter_ms: int = 100,
             while True:
                 try:
                     return fn(*args, **kwargs)
-                except exceptions as e: # type: ignore
+                except exceptions: # type: ignore
                     attempt += 1
                     if attempt > tries:
                         raise

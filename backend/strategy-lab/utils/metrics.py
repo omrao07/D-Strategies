@@ -15,10 +15,10 @@ Stdlib-only (uses math, statistics).
 """
 
 from __future__ import annotations
+
 import math
 import statistics
-from typing import List, Tuple, Dict, Optional
-
+from typing import Dict, List, Optional, Tuple
 
 # ---------------------- core return calcs ----------------------
 

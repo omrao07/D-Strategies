@@ -17,7 +17,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import numpy as np
 
@@ -54,7 +54,6 @@ def run() -> Dict[str, Any]:
 
     # ── 1. Walk-forward re-validation ────────────────────────────────────────
     try:
-        from backend.backtester.anti_overfit_engine import AntiOverfitEngine, walk_forward_split
         import pandas as pd
 
         strategy_names = r.hkeys("strategy:rankings") if r else []
@@ -153,8 +152,9 @@ def run() -> Dict[str, Any]:
 
     # ── 5. Strategy clustering (PCA) ─────────────────────────────────────────
     try:
-        from backend.backtester.factor_model import StrategyClusterer
         import pandas as pd
+
+        from backend.backtester.factor_model import StrategyClusterer
 
         strategy_names = r.hkeys("strategy:rankings") if r else []
         equity_curves = {}
@@ -187,8 +187,9 @@ def run() -> Dict[str, Any]:
 
     # ── 7. Telegram ───────────────────────────────────────────────────────────
     try:
-        from backend.live_engine.telegram_alerts import TelegramAlerter
         import datetime
+
+        from backend.live_engine.telegram_alerts import TelegramAlerter
         # Fetch rolling portfolio metrics
         raw_rets = r.lrange("portfolio:daily_returns", -252, -1) if r else []
         if len(raw_rets) >= 30:
@@ -231,7 +232,8 @@ def _max_dd(equity: np.ndarray) -> float:
 
 
 def _generate_weekly_report(results: dict, r) -> None:
-    import os, datetime
+    import datetime
+    import os
     os.makedirs(_REPORTS_DIR, exist_ok=True)
     date_str = datetime.date.today().isoformat()
     path = os.path.join(_REPORTS_DIR, f"weekly_{date_str}.html")

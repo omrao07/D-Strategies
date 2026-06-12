@@ -41,7 +41,7 @@ try:
 except Exception:  # noqa: BLE001
     feedparser = None  # type: ignore[assignment]
 
-from .parser import normalize_article, clean_text
+from .parser import clean_text, normalize_article
 
 # ---------------------------- utils ---------------------------------
 
@@ -234,12 +234,6 @@ def _parse_xml_feed(xml_bytes: bytes) -> tuple[list[dict], str]:
     root = ET.fromstring(xml_bytes)
 
     # Namespaces we might encounter
-    ns = {
-        "atom": "http://www.w3.org/2005/Atom",
-        "rss": "http://purl.org/rss/1.0/",
-        "content": "http://purl.org/rss/1.0/modules/content/",
-        "dc": "http://purl.org/dc/elements/1.1/",
-    }
 
     entries: list[dict] = []
     feed_title = ""

@@ -63,7 +63,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, Dict, List, Tuple
+from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -79,8 +79,6 @@ except Exception:
     plt = None
 
 import statsmodels.api as sm
-from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 

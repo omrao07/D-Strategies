@@ -1,5 +1,6 @@
 # backend/compliance/compliance_recorder.py
 from __future__ import annotations
+
 """
 Compliance Recorder — append-only, hash-chained audit ledger
 ------------------------------------------------------------
@@ -26,9 +27,15 @@ CLI:
   python -m backend.compliance.compliance_recorder verify --session 2025-08-30-ny-open
 """
 
-import os, io, json, time, hashlib, base64, pathlib, uuid
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional, List, Tuple
+import hashlib
+import io
+import json
+import os
+import pathlib
+import time
+import uuid
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 # -------- Optional PII redactor ----------
 try:
@@ -260,7 +267,7 @@ class ComplianceRecorder:
     @staticmethod
     def verify(session_id: str, *, root_dir: str = DEFAULT_ROOT) -> Tuple[bool, str]:
         base = pathlib.Path(root_dir)
-        ym = time.strftime("%Y-%m")  # best-effort locate; also scan other months if needed
+        time.strftime("%Y-%m")  # best-effort locate; also scan other months if needed
         candidates = list((base / "ledger").glob(f"*/{session_id}.jsonl"))
         if not candidates:
             return False, "ledger file not found"

@@ -1,9 +1,12 @@
 # backend/strategies/diversified/analyst_revision_momentum.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, List, Optional
 
 try:
     import redis as _redis_mod
@@ -194,7 +197,7 @@ class AnalystRevisionMomentum(Strategy):
 
         # current total names
         n_open = len(open_names)
-        fee_bps = _fees_bps("EXCH") * 1e-4
+        _fees_bps("EXCH") * 1e-4
 
         for s, z, age, sec in cands:
             if n_open >= MAX_NAMES: break

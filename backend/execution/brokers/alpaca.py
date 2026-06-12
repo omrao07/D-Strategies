@@ -12,11 +12,10 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 import alpaca_trade_api as alpaca
-
 
 # ============================
 # Types

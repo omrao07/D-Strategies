@@ -24,7 +24,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -57,9 +60,9 @@ def run(cfg):
 
     # Category-level TVL (aggregate)
     if "category" in tvl.columns:
-        cat_tvl = tvl.groupby(["date", "category"])["tvl_usd"].sum().reset_index()
+        tvl.groupby(["date", "category"])["tvl_usd"].sum().reset_index()
     else:
-        cat_tvl = pd.DataFrame()
+        pd.DataFrame()
 
     tvl_records = []
     corr_records = []

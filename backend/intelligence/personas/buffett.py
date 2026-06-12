@@ -30,11 +30,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from .base import ( # type: ignore
-    AgentBase, MarketContext, Proposal, OrderPlan, Constraints,
-    soft_score_from_edge, clamp
+from .base import (  # type: ignore
+    AgentBase,
+    MarketContext,
+    OrderPlan,
+    Proposal,
+    clamp,
+    soft_score_from_edge,
 )
-
 
 # ------------------- configuration -------------------
 

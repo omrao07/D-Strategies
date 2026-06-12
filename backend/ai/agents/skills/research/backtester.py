@@ -2,16 +2,25 @@
 from __future__ import annotations
 
 import heapq
-import math
 import random
-from dataclasses import dataclass, field, asdict
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Literal
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Literal, Optional, Tuple
 
 # ===== Try to use your shared schemas; else provide minimal shims =====
 try:
-    from backend.common.schemas import ( # type: ignore
-        Candle, TradeTick, Quote, OrderIntent, ParentOrder, ChildOrder, Fill,
-        ExecutionReport, Position, PortfolioSnapshot, LedgerEvent, VenueWeight
+    from backend.common.schemas import (  # type: ignore
+        Candle,
+        ChildOrder,
+        ExecutionReport,
+        Fill,
+        LedgerEvent,
+        OrderIntent,
+        ParentOrder,
+        PortfolioSnapshot,
+        Position,
+        Quote,
+        TradeTick,
+        VenueWeight,
     )
 except Exception:  # minimal local shims so this file stays drop-in
     @dataclass
@@ -501,7 +510,8 @@ class BuyTheDip:
 
 def run_demo() -> None:
     # Build synthetic candles for a quick sanity test
-    import time as _time, random as _rand
+    import random as _rand
+    import time as _time
     now = int(_time.time()*1000)
     px = 100.0
     candles: List[Candle] = []

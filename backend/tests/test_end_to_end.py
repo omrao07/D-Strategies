@@ -14,12 +14,13 @@ Run: pytest -q tests/test_end_to_end.py
 
 import json
 import math
-import sys
-import time
-import threading
 import queue
+import sys
+import threading
+import time
 import types
-import pytest # type: ignore
+
+import pytest  # type: ignore
 
 # --- Try to import your modules; skip cleanly if unavailable ------------------
 sb = pytest.importorskip("backend.engine.strategy_base", reason="strategy_base not found")

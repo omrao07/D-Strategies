@@ -1,9 +1,11 @@
 # engines/options/signals/var_risk_premium.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Literal, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Literal
 
 TRADING_DAYS = 252
 

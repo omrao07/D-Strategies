@@ -1,15 +1,13 @@
 # backend/engine/strategies/gamma_exposure_gex.py
 from __future__ import annotations
 
-import os
-import json
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, Optional, List, Tuple, DefaultDict
 from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
+from backend.engine.strategy_base import Strategy
 
 
 # ---------- Config ----------
@@ -63,8 +61,9 @@ class GammaExposureGEX(Strategy):
         self._redis = None
         if cfg.use_redis_gex:
             try:
-                import redis as _redis_mod
                 import os
+
+                import redis as _redis_mod
                 self._redis = _redis_mod.Redis(
                     host=os.getenv("REDIS_HOST", "localhost"),
                     port=int(os.getenv("REDIS_PORT", "6379")),

@@ -17,8 +17,8 @@ import typing as T
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-import requests
 import pandas as pd
+import requests
 
 # Optional Parquet
 try:

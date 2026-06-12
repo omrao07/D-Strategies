@@ -31,7 +31,7 @@ import random
 import time
 from typing import Dict, List, Optional
 
-from backend.bus.streams import publish_pubsub, CHAN_ORDERS
+from backend.bus.streams import CHAN_ORDERS, publish_pubsub
 
 log = logging.getLogger(__name__)
 

@@ -1,11 +1,10 @@
 # backend/tests/test_india.py
 """Tests for backend/india/ modules."""
 import datetime
-import pytest
 
-from backend.india.market_calendar import IndiaMarketCalendar
-from backend.india.fo_lots import get_lot_size, FO_LOT_SIZES
 from backend.india.circuit_breakers import CircuitBreakerChecker
+from backend.india.fo_lots import get_lot_size
+from backend.india.market_calendar import IndiaMarketCalendar
 
 
 def test_trading_day_weekday():

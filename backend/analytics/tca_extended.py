@@ -35,13 +35,11 @@ Usage:
 
 from __future__ import annotations
 
-import os
-import time
 import json
-import math
+import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 try:
     import numpy as np  # type: ignore
@@ -50,7 +48,7 @@ except Exception:
 
 # Bus helpers (graceful if absent)
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception:
     consume_stream = publish_stream = hset = None  # type: ignore
 
@@ -238,7 +236,7 @@ class TCAExtended:
         # compute venue VWAPs
         for v, acc in p.venues.items():
             # recompute vwap from individual fills for this venue
-            pr, qt = [], []
+            _pr, _qt = [], []
             for j, venue in enumerate([m for m in p.venues.keys()]):  # placeholder (if you track per-fill venue)
                 pass  # keeping minimal; we aggregate above via notional/fills
             acc["vwap"] = (acc["notional"] / max(1e-12, acc["fills"])) if acc["fills"] else 0.0
@@ -322,7 +320,9 @@ class TCAExtended:
 
         # optional: train the RL SOR bandit
         try:
-            from backend.ai import rl_execution_agent as RL  # type: ignore # local import to avoid hard dep
+            from backend.ai import (
+                rl_execution_agent as RL,  # type: ignore # local import to avoid hard dep
+            )
             RL.learn_from_tca({
                 "symbol": p.symbol,
                 "route": p.route,

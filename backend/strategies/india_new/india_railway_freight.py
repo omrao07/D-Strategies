@@ -24,11 +24,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 INDUSTRIAL_TICKERS = ["sail", "tatasteel", "jswsteel", "ultracemco", "acc", "shreecem", "ambujacement"]
 FREIGHT_GROWTH_STRONG = 8.0   # YoY % — strong industrial activity
@@ -90,7 +92,7 @@ def run(cfg):
         z = row.get("freight_zscore", np.nan)
 
         # Commodity-level sub-signals
-        cement_strong = "cement_mt" in freight.columns and not np.isnan(row.get("cement_mt", np.nan)) and \
+        "cement_mt" in freight.columns and not np.isnan(row.get("cement_mt", np.nan)) and \
                         not np.isnan(freight["cement_mt"].pct_change(12).loc[date] if date in freight.index else np.nan)
 
         if not np.isnan(yoy) and yoy > FREIGHT_GROWTH_STRONG and not np.isnan(accel) and accel > 0:

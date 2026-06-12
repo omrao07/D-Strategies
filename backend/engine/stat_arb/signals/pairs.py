@@ -1,10 +1,12 @@
 # engines/stat_arb/signals/pairs.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import List, Literal, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple, Optional, Literal, List
-from dataclasses import dataclass
-import statsmodels.api as sm # type: ignore
+import statsmodels.api as sm  # type: ignore
 
 BetaMethod = Literal["rolling_ols", "expanding_ols", "static_ols"]
 

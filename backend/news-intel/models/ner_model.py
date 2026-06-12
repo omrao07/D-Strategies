@@ -19,11 +19,11 @@ Integration
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple
 import importlib
 import re
 import unicodedata
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # --------------------------- Data model ---------------------------
 

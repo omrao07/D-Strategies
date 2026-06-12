@@ -1,9 +1,12 @@
 # backend/ops/chaos.py
 from __future__ import annotations
 
-import os, sys, time, json, math, random, threading
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional, Callable, Tuple, List
+import json
+import os
+import random
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional, Tuple
 
 # ---------- optional Redis (graceful fallback) ----------
 HAVE_REDIS = True

@@ -2,12 +2,10 @@
 from __future__ import annotations
 
 import os
+import signal
 import sys
 import time
-import json
-import signal
-import redis
-from typing import Dict, Any
+from typing import Any, Dict
 
 from backend.bus.streams import hset, publish_stream
 
@@ -20,6 +18,7 @@ KILL_KEY   = os.getenv("KILL_SWITCH_KEY", "policy:kill_switch")
 ALERTS_KEY = os.getenv("ALERTS_STREAM", "alerts")
 
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 

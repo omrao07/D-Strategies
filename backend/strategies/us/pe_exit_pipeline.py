@@ -47,7 +47,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -58,7 +58,6 @@ except Exception:
     plt = None
 
 from dateutil import parser as dtp
-
 
 # ----------------------------- Config -----------------------------
 

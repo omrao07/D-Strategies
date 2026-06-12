@@ -1,8 +1,10 @@
 # engines/equity_ls/execution/allocator.py
 from __future__ import annotations
+
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, Tuple
 
 TRADING_DAYS = 252
 

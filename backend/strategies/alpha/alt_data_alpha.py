@@ -1,7 +1,9 @@
 # strategies/alpha/alt_data_alpha.py
 from datetime import datetime
+
 import numpy as np
 import pandas as pd
+
 
 class AltDataAlpha:
     """
@@ -42,7 +44,7 @@ class AltDataAlpha:
         features = [c for c in df.columns if c != target_col]
 
         # Normalize features
-        z = (df[features] - df[features].mean()) / df[features].std(ddof=0)
+        (df[features] - df[features].mean()) / df[features].std(ddof=0)
 
         # Rolling correlation weights
         corrs = {}

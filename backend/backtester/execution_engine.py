@@ -10,18 +10,21 @@ Order lifecycle  : PENDING → OPEN → PARTIAL | FILLED | CANCELLED | EXPIRED
 from __future__ import annotations
 
 import math
-import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
 from backend.backtester.events import (
-    FillEvent, FillType, MarketEvent, OrderEvent, OrderSide, OrderStatus, OrderType,
+    FillEvent,
+    FillType,
+    MarketEvent,
+    OrderEvent,
+    OrderSide,
+    OrderStatus,
 )
 from backend.backtester.order_types import FillResult, OrderHandlerRegistry
-
 
 # ── Slippage models ───────────────────────────────────────────────────────────
 

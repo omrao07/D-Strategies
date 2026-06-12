@@ -16,7 +16,6 @@ from __future__ import annotations
 import os
 import sys
 import time
-import math
 import typing as T
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -26,13 +25,13 @@ import requests
 
 # Optional dependencies
 try:
-    import yfinance as yf           # preferred
+    import yfinance as yf  # preferred
     HAVE_YF = True
 except Exception:
     HAVE_YF = False
 
 try:
-    import pyarrow as pa            # for parquet output
+    import pyarrow as pa  # for parquet output
     import pyarrow.parquet as pq
     HAVE_PARQUET = True
 except Exception:

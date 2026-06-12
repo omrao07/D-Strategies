@@ -1,15 +1,14 @@
 # engines/options/var_risk_premium/runner.py
 from __future__ import annotations
-import pandas as pd
-import numpy as np
 
-from engines.options.signals.var_risk_premium import ( # type: ignore
-    VRPConfig,
+import numpy as np
+import pandas as pd
+from engines.options.signals.var_risk_premium import (  # type: ignore
     BacktestConfig,
+    VRPConfig,
     backtest_vrp,
     build_vrp_signal,
     realized_variance,
-    implied_variance_from_vix,
 )
 
 # ---------------------------------------------------------------------

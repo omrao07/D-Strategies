@@ -8,10 +8,9 @@ Measures push/pop latency and throughput for synthetic messages.
 
 import mmap
 import os
-import struct
-import sys
-import time
 import statistics
+import struct
+import time
 
 # Parameters
 N_MSGS = 100_000
@@ -64,7 +63,7 @@ def run_bench():
         # pop
         pos = HDR_SIZE + (tail % CAPACITY) * MSG_SIZE
         mm.seek(pos)
-        data = mm.read(MSG_SIZE)
+        mm.read(MSG_SIZE)
         tail = (tail + 1) % CAPACITY
 
         t1 = time.perf_counter_ns()

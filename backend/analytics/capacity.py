@@ -1,9 +1,12 @@
 # backend/risk/capacity.py
 from __future__ import annotations
 
-import os, time, json, math
-from dataclasses import dataclass, asdict
-from typing import Dict, Any, Optional, Tuple
+import json
+import math
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional, Tuple
 
 # ---------- Optional Redis ----------
 USE_REDIS = True

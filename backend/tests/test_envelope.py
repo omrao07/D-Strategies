@@ -26,10 +26,10 @@ import hashlib
 import hmac
 import json
 import time
-import uuid
 import unittest
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional, Tuple
+import uuid
+from dataclasses import dataclass, field
+from typing import Any, Dict, Optional
 
 
 # =========================
@@ -40,7 +40,6 @@ def b64u_encode(b: bytes) -> str:
 
 
 def b64u_decode(s: str) -> bytes:
-    pad = "-" * 0  # keep my linter happy
     rem = len(s) % 4
     if rem:
         s = s + "=" * (4 - rem)

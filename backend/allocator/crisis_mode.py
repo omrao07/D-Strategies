@@ -32,13 +32,11 @@ All risk quantities are daily unless specified. All 'bps' refer to bps of NAV.
 
 from __future__ import annotations
 
-import math
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
-
 
 # ----------------------------- Data classes -----------------------------------
 

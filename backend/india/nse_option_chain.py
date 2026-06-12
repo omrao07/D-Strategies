@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
+
 import redis
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -61,7 +62,7 @@ def gamma_exposure(chain: Dict, spot: float) -> float:
     """Approximate net dealer gamma exposure (simplified)."""
     gex = 0.0
     for strike_str, data in chain.items():
-        strike = float(strike_str)
+        float(strike_str)
         ce = data.get("CE", {})
         pe = data.get("PE", {})
         ce_gamma = ce.get("gamma", 0) * ce.get("openInterest", 0)

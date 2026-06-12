@@ -35,12 +35,11 @@ If Redis/event bus exists, you can publish the summary to `ai.insight`.
 
 from __future__ import annotations
 
+import json
 import math
 import os
-import json
 import time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     import numpy as np  # type: ignore
@@ -226,9 +225,9 @@ def to_markdown(report: Dict[str, Any], buckets: Optional[Dict[str, Dict[str, fl
             lines.append("- " + " · ".join(parts))
 
     if top:
-        lines.append(f"- **Top contributors:** " + ", ".join(f"`{n}` ({money(v)})" for n,v in top))
+        lines.append("- **Top contributors:** " + ", ".join(f"`{n}` ({money(v)})" for n,v in top))
     if bleeders:
-        lines.append(f"- **Top bleeders:** " + ", ".join(f"`{n}` ({money(v)})" for n,v in bleeders))
+        lines.append("- **Top bleeders:** " + ", ".join(f"`{n}` ({money(v)})" for n,v in bleeders))
     if conc:
         lines.append(f"- Concentration: Herfindahl {conc.get('herfindahl',0):.3f}, Top-{len(top)} share {pct(conc.get('top_k_share',0),1)}")
 
@@ -313,7 +312,7 @@ def publish_insight(report: Dict[str, Any], stream: str = "ai.insight") -> None:
     top = report.get("top_contributors", [])[:3]
     bleeders = report.get("top_bleeders", [])[:2]
     summary = "Alpha DNA — " + ", ".join(f"{n}:{money(v)}" for n,v in top) \
-              + (f"; bleeders: " + ", ".join(f"{n}:{money(v)}" for n,v in bleeders) if bleeders else "")
+              + ("; bleeders: " + ", ".join(f"{n}:{money(v)}" for n,v in bleeders) if bleeders else "")
     publish_stream(stream, {
         "ts_ms": report.get("asof", _utc_ms()),
         "kind": "alpha_dna",
@@ -343,7 +342,8 @@ def main():
     Quick demo:
       python -m backend.analytics.alpha_dna --out runtime/alpha_dna.json
     """
-    import argparse, random
+    import argparse
+    import random
     ap = argparse.ArgumentParser(description="Alpha DNA report builder")
     ap.add_argument("--out", type=str, default="runtime/alpha_dna.json")
     args = ap.parse_args()

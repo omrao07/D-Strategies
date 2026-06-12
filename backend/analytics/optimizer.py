@@ -30,7 +30,7 @@ All inputs:
 """
 
 import math
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
@@ -54,7 +54,7 @@ except Exception:
 # Optional SciPy for clustering (HRP)
 HAVE_SCIPY = True
 try:
-    from scipy.cluster.hierarchy import linkage, dendrogram
+    from scipy.cluster.hierarchy import dendrogram, linkage
     from scipy.spatial.distance import squareform
 except Exception:
     HAVE_SCIPY = False

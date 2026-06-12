@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import math
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import numpy as np
@@ -36,9 +36,14 @@ except Exception:
 
 try:
     from backend.models.mc import (  # type: ignore
-        GBM, MertonJD, HestonLite, Paths,
-        gaussian, portfolio_pnl, var_es, drawdown,
-        control_variate, bs_call_price, bs_put_price,
+        GBM,
+        HestonLite,
+        MertonJD,
+        bs_call_price,
+        control_variate,
+        drawdown,
+        portfolio_pnl,
+        var_es,
     )
     _HAS_MC = True
 except Exception:
@@ -260,7 +265,7 @@ class MonteCarloAgent(BaseAgent):  # type: ignore
             px = paths.X[:,:,i]   # (n_paths, n_steps+1)
             ST = px[:,-1]
             pct_ret = (ST - spec.s0) / max(spec.s0, 1e-9)
-            log_ret = np.log(np.maximum(px[:,1:], 1e-9) / np.maximum(px[:,:-1], 1e-9)).sum(axis=1)
+            np.log(np.maximum(px[:,1:], 1e-9) / np.maximum(px[:,:-1], 1e-9)).sum(axis=1)
 
             term_stats = self._dist_stats(ST)
             ret_stats  = self._dist_stats(pct_ret)
@@ -430,7 +435,7 @@ class MonteCarloAgent(BaseAgent):  # type: ignore
     @staticmethod
     def _dist_stats(x: np.ndarray) -> DistStats:
         x = np.asarray(x, dtype=float)
-        n = len(x)
+        len(x)
         mu = float(x.mean()); sig = float(x.std())
         if sig > 1e-12:
             skew = float(((x - mu)**3).mean() / sig**3)

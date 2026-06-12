@@ -22,11 +22,12 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 MONSOON_MONTHS = [6, 7, 8, 9]  # June-September
 ONSET_MONTH = 6

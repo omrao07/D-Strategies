@@ -22,13 +22,13 @@ from datetime import date, datetime
 from typing import Any, Callable, Dict, List, Optional
 
 from backend.live_engine.config import (
-    REDIS_HOST,
-    REDIS_PORT,
-    REDIS_PASSWORD,
-    ZERODHA_ACCESS_TOKEN,
-    ZERODHA_API_KEY,
     FOB_API_URL,
     NSE_CIRCUIT_BREAKER_URL,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_PORT,
+    ZERODHA_ACCESS_TOKEN,
+    ZERODHA_API_KEY,
 )
 
 log = logging.getLogger(__name__)
@@ -300,6 +300,7 @@ class MarketDataService:
         log.warning("SYNTHETIC DATA: returning synthetic OHLCV for %s (no real data available)", symbol)
 
         import hashlib
+
         import numpy as np
 
         seed_int = int(hashlib.md5(symbol.encode()).hexdigest()[:8], 16) % 10_000

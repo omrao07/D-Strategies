@@ -14,9 +14,10 @@
 #     "reasons": list[str],      # optional: why decisions were taken
 #   }
 # ------------------------------------------------------------
-import math
 import importlib
-import pytest # type: ignore
+import math
+
+import pytest  # type: ignore
 
 dg = importlib.import_module("backend.risk.dynamic_governor")
 

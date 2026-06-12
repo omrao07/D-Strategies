@@ -5,13 +5,13 @@ import json
 import os
 import threading
 import time
-from dataclasses import dataclass, asdict, field
-from queue import PriorityQueue, Queue, Empty
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from dataclasses import asdict, dataclass, field
+from queue import Empty, PriorityQueue, Queue
+from typing import Any, Callable, Dict, List, Optional, Union
 
 # -------- Optional local helpers (safe fallbacks) --------
 try:
-    from .base_agent import BaseAgent, AgentResult # type: ignore
+    from .base_agent import AgentResult, BaseAgent  # type: ignore
 except Exception:
     class BaseAgent:  # tiny shim
         name = "base"
@@ -24,7 +24,7 @@ except Exception:
         payload: Any = None; error: Optional[str] = None; trace: Optional[str] = None; meta: Dict[str, Any] = field(default_factory=dict)
 
 try:
-    from .toolbelt import now_ms, with_timeout, RateLimiter, TTLCache, to_json # type: ignore
+    from .toolbelt import RateLimiter, TTLCache, now_ms, to_json, with_timeout  # type: ignore
 except Exception:
     def now_ms(): return int(time.time()*1000)
     def with_timeout(fn, timeout_ms, *a, **k):

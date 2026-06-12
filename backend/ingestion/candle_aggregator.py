@@ -1,9 +1,12 @@
 # backend/marketdata/candle_aggregator.py
 from __future__ import annotations
 
-import os, json, time, math, threading
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, Optional, Tuple, List
+import json
+import os
+import threading
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 # -------- optional Redis (graceful fallback) ---------------------------------
 HAVE_REDIS = True
@@ -329,7 +332,7 @@ def run_stream(intervals: List[str]):
                 tick = fields
             try:
                 agg.on_tick(tick)
-            except Exception as e:
+            except Exception:
                 # optional: push to an error stream or log
                 pass
         agg.roll()

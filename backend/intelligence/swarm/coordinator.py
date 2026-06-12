@@ -27,22 +27,27 @@ You can call `Coordinator.step(context)` from a scheduler.
 
 from __future__ import annotations
 
-import math
-import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Iterable
+from typing import Dict, Iterable, List, Optional
 
 # Agents & shared primitives
-from agents.base import AgentBase, MarketContext, Proposal, RiskReport, OrderPlan, Constraints, clamp # type: ignore
-from agents.crypto import CryptoAgent # type: ignore
-from agents.equities import EquitiesAgent # type: ignore
-from agents.fx import FXAgent # type: ignore
-from agents.commodities import CommoditiesAgent # type: ignore
+from agents.base import (  # type: ignore
+    AgentBase,
+    Constraints,
+    MarketContext,
+    Proposal,
+    RiskReport,
+    clamp,
+)
+from agents.commodities import CommoditiesAgent  # type: ignore
+from agents.crypto import CryptoAgent  # type: ignore
+from agents.equities import EquitiesAgent  # type: ignore
+from agents.fx import FXAgent  # type: ignore
 
 # Optional router (only if you plan/execute)
 try:
-    from backend.execution_plus.factory import build_router # type: ignore
-    from backend.execution_plus.adapters import Order, OrderType, Side # type: ignore
+    from backend.execution_plus.adapters import Order, OrderType, Side  # type: ignore
+    from backend.execution_plus.factory import build_router  # type: ignore
     HAVE_ROUTER = True
 except Exception:
     HAVE_ROUTER = False

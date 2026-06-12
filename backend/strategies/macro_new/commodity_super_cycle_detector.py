@@ -24,11 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 CYCLE_PHASES = {
     "early_bull": "rising prices, still-low but accelerating demand",

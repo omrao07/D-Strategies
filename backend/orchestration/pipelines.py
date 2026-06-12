@@ -25,17 +25,15 @@ No external dependencies.
 from __future__ import annotations
 
 import json
-import math
 import os
 import time
-import traceback
-from dataclasses import dataclass, field, asdict
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 # --- bring your graph runner ---
 try:
-    from backend.common.graph import DirectedGraph, GraphRunner, Node # type: ignore
-except Exception as e:  # very small fallback so file can import standalone
+    from backend.common.graph import DirectedGraph, GraphRunner, Node  # type: ignore
+except Exception:  # very small fallback so file can import standalone
     DirectedGraph = object  # type: ignore
     GraphRunner = object    # type: ignore
     class Node:             # type: ignore
@@ -107,7 +105,7 @@ class Stage:
             try:
                 if self.timeout_sec:
                     # soft timeout check via elapsed comparisons inside fn boundary
-                    t0 = time.perf_counter()
+                    time.perf_counter()
                 out = self.fn(self, bus, context)
                 if isinstance(out, dict):
                     bus.update(out)

@@ -33,19 +33,16 @@ python materialize_jobs/backfill_equities.py --repo ./feature-store --views eq_r
 
 from __future__ import annotations
 
-import os
-import sys
-import time
-import math
 import argparse
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Tuple
 
 import pandas as pd
 
 # Feast
-from feast import FeatureStore # type: ignore
-from feast.feature_view import FeatureView # type: ignore
+from feast import FeatureStore  # type: ignore
+from feast.feature_view import FeatureView  # type: ignore
 
 ISO_FMT = "%Y-%m-%d"
 

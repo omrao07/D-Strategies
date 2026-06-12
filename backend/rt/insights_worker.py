@@ -42,7 +42,7 @@ except Exception:
     redis = None  # type: ignore
 
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset # type: ignore
+    from backend.bus.streams import consume_stream, hset, publish_stream  # type: ignore
 except Exception:
     # Minimal fallbacks for probe mode
     def consume_stream(stream: str, start_id: str = "$", block_ms: int = 1000, count: int = 100):
@@ -247,7 +247,7 @@ class InsightsWorker:
     def _on_risk(self, stream: str, ev: Dict[str, Any]):
         dd  = self._to_float(ev.get("dd") or ev.get("drawdown"))
         vol = self._to_float(ev.get("vol") or ev.get("volatility"))
-        slip= self._to_float(ev.get("slip_bps") or ev.get("slippage_bps"))
+        self._to_float(ev.get("slip_bps") or ev.get("slippage_bps"))
         strat = ev.get("strategy") or ev.get("bank") or ev.get("country") or "system"
 
         if dd is not None and dd >= self.cfg.dd_kill:

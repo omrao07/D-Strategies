@@ -27,11 +27,11 @@ You can pass a custom taxonomy like:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Iterable, List, Tuple, Optional
 import math
 import re
 import unicodedata
+from dataclasses import dataclass
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # ------------------------- default taxonomy -------------------------
 

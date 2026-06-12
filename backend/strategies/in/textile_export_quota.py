@@ -117,13 +117,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -387,14 +386,14 @@ def window_utilization(Q: pd.DataFrame, ship_win: pd.DataFrame,
     for _, r in W.iterrows():
         shipped = float(r.get("shipped_qty",0.0))
         alloc   = float(r.get("allocated_qty", np.nan))
-        start   = r["window_start"]; end = r["window_end"]
+        r["window_start"]; end = r["window_end"]
         rrpd    = float(r.get("run_rate_qty_per_day", np.nan))
         if np.isnan(alloc) or np.isnan(rrpd) or rrpd<=0:
             fc_rows.append(np.nan)
             continue
         remaining = max(0.0, alloc - shipped)
         days_needed = remaining / rrpd if rrpd>0 else np.inf
-        ex_date = r["date"] if "date" in W.columns else pd.NaT  # not used
+        r["date"] if "date" in W.columns else pd.NaT  # not used
         exhaustion = r["window_start"] + pd.to_timedelta(int(np.ceil(days_needed)), unit="D")
         # cap at window end
         exhaustion = min(exhaustion, end)
@@ -731,7 +730,7 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
     outdir = ensure_dir(args.outdir)
-    freq = "M" if args.freq.startswith("m") else "Q"
+    "M" if args.freq.startswith("m") else "Q"
 
     Q  = load_quotas(args.quotas)
     S  = load_shipments(args.shipments)

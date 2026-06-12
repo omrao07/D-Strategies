@@ -8,9 +8,9 @@ import logging
 import signal
 import sys
 import time
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -22,8 +22,10 @@ CACHE_DIR = REPO_ROOT / "data" / "cache"
 
 # ---- Router (reuse your CDS router; others can plug in similarly) ------------
 try:
-    from engines.credit_cds.order_router import ( # type: ignore
-        build_default_router, OrderRouter, RouteResult
+    from engines.credit_cds.order_router import (  # type: ignore
+        OrderRouter,
+        RouteResult,
+        build_default_router,
     )
 except Exception:  # optional import so equity-only books still run
     OrderRouter = object  # type: ignore

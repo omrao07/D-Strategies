@@ -2,12 +2,10 @@
 from __future__ import annotations
 
 import math
-import sys
 
 import numpy as np
 import pandas as pd
-import pytest # type: ignore
-
+import pytest  # type: ignore
 
 # ------------------------ Almgren–Chriss -----------------------------------
 
@@ -63,7 +61,7 @@ def test_var_es_empty_raises():
 # ------------------------ Scenarios ----------------------------------------
 
 def test_scenarios_pnl_and_contribs():
-    from research.risk.scenarios import pct_shock, abs_shock, run_scenarios
+    from research.risk.scenarios import abs_shock, pct_shock, run_scenarios
 
     positions = {"AAPL": 100, "MSFT": -50}
     ref = {"AAPL": 200.0, "MSFT": 120.0}
@@ -88,9 +86,7 @@ def test_scenarios_pnl_and_contribs():
 # ------------------------ Evaluator ----------------------------------------
 
 def test_evaluator_simple_fill_and_metrics():
-    from research.exec.rl_agent.evaluator import (
-        ParentOrder, ChildDecision, evaluate_policy
-    )
+    from research.exec.rl_agent.evaluator import ChildDecision, ParentOrder, evaluate_policy
 
     # Flat market with fixed spread; sufficient volume to fill
     n = 30
@@ -123,7 +119,7 @@ def test_evaluator_simple_fill_and_metrics():
 # ------------------------ DDQN (optional) ----------------------------------
 
 def test_ddqn_smoke_act_and_train_step():
-    torch = pytest.importorskip("torch")
+    pytest.importorskip("torch")
 
     from research.exec.rl_agent.policy_ddqn import DDQNConfig, DDQNPolicy
 

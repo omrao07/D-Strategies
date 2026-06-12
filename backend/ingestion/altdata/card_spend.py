@@ -30,7 +30,6 @@ import os
 import sqlite3
 import statistics as stats
 import time
-from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # Optional deps
@@ -118,7 +117,7 @@ def _day(ms: int) -> str:
     return f"{t.tm_year:04d}-{t.tm_mon:02d}-{t.tm_mday:02d}"
 
 def _week_tag(ms: int) -> str:
-    t = time.gmtime(ms/1000)
+    time.gmtime(ms/1000)
     # ISO year-week
     import datetime as _dt
     dt = _dt.datetime.utcfromtimestamp(ms/1000)

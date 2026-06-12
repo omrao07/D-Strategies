@@ -24,9 +24,12 @@ Notes:
 
 from __future__ import annotations
 
-import os, json, time, sqlite3, contextlib
+import json
+import os
+import sqlite3
+import time
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 # Optional bus (graceful if missing)
 try:
@@ -355,7 +358,7 @@ def run_bus_listener(db_path: str = "runtime/trades.db"):
 # ------------------------------- CLI -----------------------------------------
 
 def main():
-    import argparse, random
+    import argparse
     ap = argparse.ArgumentParser(description="Trade History Store/Query")
     ap.add_argument("--run", action="store_true", help="Run bus listener (needs backend.bus.streams)")
     ap.add_argument("--db", type=str, default="runtime/trades.db")

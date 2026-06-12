@@ -1,13 +1,12 @@
 # engines/stat_arb/tests/test_pairs.py
 import numpy as np
 import pandas as pd
-
-from engines.stat_arb.signals.pairs import ( # type: ignore
-    rolling_corr,
-    engle_granger,
-    select_pairs,
-    generate_pair_signal,
+from engines.stat_arb.signals.pairs import (  # type: ignore
     compute_pair_diagnostics,
+    engle_granger,
+    generate_pair_signal,
+    rolling_corr,
+    select_pairs,
 )
 
 # ----------------------- Helpers -----------------------
@@ -53,7 +52,7 @@ def test_rolling_corr_and_engle_granger_on_coint_pair():
 
 def test_rolling_corr_and_engle_granger_on_non_coint_pair():
     y, x = _independent_walks()
-    corr = rolling_corr(y, x, lookback=60).iloc[-1]
+    rolling_corr(y, x, lookback=60).iloc[-1]
     pval, is_coint = engle_granger(y, x, lookback=252, signif=0.05)
 
     # Corr could be anything; we only assert lack of cointegration

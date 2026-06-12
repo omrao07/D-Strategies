@@ -67,13 +67,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -116,8 +115,8 @@ def roll_ols_beta(Y: pd.Series, X: pd.DataFrame, window: int) -> pd.DataFrame:
     # Precompute rolling means
     mX = X_.rolling(window, min_periods=max(30, window//4)).mean()
     mY = Y_.rolling(window, min_periods=max(30, window//4)).mean()
-    Xm = X_ - mX
-    Ym = (Y_ - mY)
+    X_ - mX
+    (Y_ - mY)
     # Covariances & variances
     # Σxx
     for t in X_.columns:
@@ -292,8 +291,12 @@ def min_ticket_usd(ticker: str, COSTS: pd.DataFrame, default_min: float=0.0) -> 
 
 # ----------------------------- collar pricing (Black–76) -----------------------------
 
-from math import log, sqrt, exp
-from scipy.stats import norm  # acceptable dependency; if unavailable, can approximate with error function
+from math import exp, log, sqrt
+
+from scipy.stats import (
+    norm,  # acceptable dependency; if unavailable, can approximate with error function
+)
+
 
 def black76_price(F: float, K: float, vol: float, tau: float, r: float, is_call: bool=True) -> float:
     """
@@ -362,8 +365,8 @@ def backtest(
             exposure = pd.Series(1.0, index=J.index, name="fuel_bbl")
 
     # Returns (for P&L)
-    RJ = dlog(J)
-    RH = H.apply(dlog)
+    dlog(J)
+    H.apply(dlog)
 
     # Rebalance dates (use previous day betas)
     rdates = [d for d in rebalance_dates(J.index, rebalance) if d in J.index]
@@ -612,7 +615,7 @@ def main():
     trades, pnl, betas_used, summary = backtest(
         J_price=J, H_price=H, betas=betas, exposure_bbl=EXP, rebalance=args.rebalance,
         COSTS=COSTS, turnover_pen_bps=float(args.turnover_pen_bps),
-        collar_cfg=collar_cfg, vols=VOL(S=VOLs) if False else VOLS, collar_days=int(args.collar_days)
+        collar_cfg=collar_cfg, vols=VOLS, collar_days=int(args.collar_days)
     )
 
     # Outputs

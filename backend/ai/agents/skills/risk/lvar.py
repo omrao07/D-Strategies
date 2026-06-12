@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Tuple, Literal
+from typing import Iterable, List, Literal, Optional, Tuple
 
 Side = Literal["buy", "sell"]
 
@@ -145,7 +145,7 @@ def lvar_parametric(
 
     # If capped too hard, we might not liquidate completely; warn via participation list sum
     # (we still price the portion executed).
-    executed_qty = min(qty, sum(p * slice_mkt_vol for p in parts))
+    min(qty, sum(p * slice_mkt_vol for p in parts))
 
     # Costs (bps)
     spread_bps = half_spread_cost_bps(profile.spread_bps)

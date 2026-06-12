@@ -24,7 +24,17 @@
 #   python backend/data/adapters/bybit_ws.py --mode mock --symbols BTCUSDT
 #
 from __future__ import annotations
-import argparse, asyncio, contextlib, csv, json, os, random, signal, sys, time
+
+import argparse
+import asyncio
+import contextlib
+import csv
+import json
+import os
+import random
+import signal
+import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional

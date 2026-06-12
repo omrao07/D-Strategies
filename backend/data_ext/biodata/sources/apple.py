@@ -17,7 +17,7 @@ Here we provide a stub interface for plugging any of those sources in.
 """
 
 import datetime as dt
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from backend.bus import streams
 

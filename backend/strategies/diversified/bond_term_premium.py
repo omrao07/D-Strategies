@@ -32,9 +32,8 @@ For research parity with ACM/Kim-Wright, swap in an affine term structure & macr
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -260,7 +259,7 @@ class TermPremiumNS:
         If horizon_years_list is None, uses the original maturities of the input curve.
         """
         assert self.curve_history is not None, "Call fit() first."
-        last_curve = self.curve_history.iloc[-1]
+        self.curve_history.iloc[-1]
         mats = self.maturities_ if horizon_years_list is None else np.array(list(horizon_years_list), dtype=float)
 
         # expected average short over horizon n:

@@ -44,7 +44,6 @@ Outputs (written to --outdir):
 import argparse
 import json
 import os
-import sys
 import warnings
 from pathlib import Path
 

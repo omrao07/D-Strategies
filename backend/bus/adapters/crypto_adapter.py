@@ -53,8 +53,8 @@ import hashlib
 import json
 import random
 import time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterator, List, Optional, Sequence
+from dataclasses import dataclass
+from typing import Any, Dict, Iterator, List, Optional
 
 # ---------------- Optional dependencies ----------------
 try:
@@ -71,7 +71,7 @@ except Exception:
 
 # ---------------- Bus hook ----------------
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:
         print(f"[stub publish_stream] {stream} <- {json.dumps(payload, separators=(',',':'))[:200]}...")
@@ -205,13 +205,14 @@ class CryptoAdapter:
             parse = _parse_okx_trade(inst)
         elif exid == "bybit":
             inst = sym.replace("/", "")
-            url = f"wss://stream.bybit.com/v5/public/spot"
+            url = "wss://stream.bybit.com/v5/public/spot"
             parse = _parse_bybit_trade(inst)
         else:
             raise RuntimeError(f"WebSocket trades not implemented for exchange: {exid}")
 
         # Run the async consumer and yield events
-        loop = _ensure_group() # type: ignore
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         queue: asyncio.Queue = asyncio.Queue()
 
         async def runner():
@@ -298,7 +299,7 @@ class CryptoAdapter:
         for attempt in range(1, self.cfg.max_retries + 1):
             try:
                 return fn()
-            except Exception as e:
+            except Exception:
                 if attempt >= self.cfg.max_retries:
                     raise
                 time.sleep(min(self.cfg.backoff_cap_s, delay + random.random()))

@@ -1,9 +1,11 @@
 # engines/rates/signals/yield_curve.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, List, Literal, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional, Literal
 
 # ----------------------------- Types & config -----------------------------
 

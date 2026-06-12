@@ -21,11 +21,10 @@ You can swap step (1) with a heavier NER upstream and feed us mentions directly.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Optional, Tuple
 import re
 import unicodedata
-import math
+from dataclasses import dataclass, field
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # Optional fuzzy matcher (pip install rapidfuzz)
 try:

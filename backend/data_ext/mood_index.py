@@ -23,8 +23,8 @@ import json
 import math
 import statistics
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, Iterable, List, Optional
 
 # Optional pandas (for to_dataframe)
 try:

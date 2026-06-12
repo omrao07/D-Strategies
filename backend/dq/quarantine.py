@@ -1,9 +1,13 @@
 # backend/risk/quarantine.py
 from __future__ import annotations
 
-import os, json, time, asyncio, signal, uuid
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional, List, Tuple
+import asyncio
+import json
+import os
+import signal
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---------- Optional Redis (graceful) ----------------------------------------
 HAVE_REDIS = True
@@ -338,7 +342,7 @@ def _cli():
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     # daemon
-    d = sub.add_parser("daemon", help="Run auto-quarantine daemon (listens to surv.alerts)")
+    sub.add_parser("daemon", help="Run auto-quarantine daemon (listens to surv.alerts)")
     # manual add
     a = sub.add_parser("add", help="Manually quarantine")
     a.add_argument("--scope", required=True, choices=["symbol","strategy","account","venue"])
@@ -352,7 +356,7 @@ def _cli():
     r.add_argument("--value", required=True)
 
     # list
-    l = sub.add_parser("list", help="List current quarantines")
+    sub.add_parser("list", help="List current quarantines")
 
     args = ap.parse_args()
 

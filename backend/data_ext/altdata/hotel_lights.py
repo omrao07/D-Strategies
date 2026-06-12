@@ -46,12 +46,12 @@ Environment (optional bus):
 """
 
 import csv
+import json
 import math
 import os
 import time
-import json
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Optional deps
 try:
@@ -64,7 +64,7 @@ except Exception:
     _np = None
 try:
     from shapely.geometry import Point  # type: ignore
-    from shapely.geometry.polygon import Polygon as _Polygon # type: ignore
+    from shapely.geometry.polygon import Polygon as _Polygon  # type: ignore
     _has_shapely = True
 except Exception:
     _has_shapely = False

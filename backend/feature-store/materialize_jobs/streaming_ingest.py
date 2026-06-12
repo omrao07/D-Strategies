@@ -41,13 +41,12 @@ Notes
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
-import os
 import signal
 import time
-import hashlib
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 import pandas as pd
 
@@ -57,7 +56,7 @@ try:
 except Exception:
     def _json_loads(b: bytes) -> Any: return json.loads(b.decode("utf-8"))
 
-from feast import FeatureStore # type: ignore
+from feast import FeatureStore  # type: ignore
 
 # ------------------------- Config / Mappings -------------------------
 
@@ -301,7 +300,7 @@ class FeastBatchWriter:
 
 async def run_kafka(settings: Settings, writer: FeastBatchWriter):
     try:
-        from aiokafka import AIOKafkaConsumer # type: ignore
+        from aiokafka import AIOKafkaConsumer  # type: ignore
     except Exception:
         raise SystemExit("Kafka selected but aiokafka not installed. pip install aiokafka")
 

@@ -63,7 +63,7 @@ except Exception:
     yaml = None  # type: ignore
 
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception as e:
     raise RuntimeError("backend.bus.streams not found; ensure your bus helpers are in place") from e
 

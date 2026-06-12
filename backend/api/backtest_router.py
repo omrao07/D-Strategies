@@ -16,12 +16,12 @@ from __future__ import annotations
 
 import datetime
 import logging
+import os
 import threading
 import time
 import uuid
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
-import os
 import numpy as np
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
@@ -269,7 +269,7 @@ def backtest_result(run_id: str):
 def list_strategies():
     """List all strategies available in the registry."""
     try:
-        from backend.engine.registry import auto_register_strategies, HUB
+        from backend.engine.registry import HUB, auto_register_strategies
         auto_register_strategies()
         strategies = []
         for name, cls in HUB.strategies._store.items():
@@ -292,6 +292,7 @@ def standalone_walk_forward(req: WalkForwardRequest, _auth: None = Depends(_requ
     try:
         import numpy as np
         import pandas as pd
+
         from backend.backtester.vectorized_backtester import walk_forward
 
         rets = np.array(req.daily_returns, dtype=float)
@@ -312,7 +313,6 @@ def standalone_walk_forward(req: WalkForwardRequest, _auth: None = Depends(_requ
             slippage_bps=req.slippage_bps,
         )
 
-        from backend.backtester.metrics import sharpe as _sharpe
         windows = []
         for i, r in enumerate(results):
             windows.append({
@@ -344,6 +344,7 @@ def standalone_monte_carlo(req: MonteCarloRequest, _auth: None = Depends(_requir
     """Run Monte Carlo bootstrap on a provided daily returns series."""
     try:
         import numpy as np
+
         from backend.backtester.vectorized_backtester import monte_carlo
 
         rets = np.array(req.daily_returns, dtype=float)

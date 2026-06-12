@@ -38,20 +38,23 @@ Notes
 
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple, Iterable
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
+from .meta_allocator import (
+    Limits as StratLimits,
+)
+
 # --- reuse within-region allocator primitives
 from .meta_allocator import (
     StratMetrics,
-    Limits as StratLimits,
+)
+from .meta_allocator import (
     allocate as intra_region_allocate,
-    decision_proof as intra_region_proof,
 )
 
 # ----- Data structures --------------------------------------------------------

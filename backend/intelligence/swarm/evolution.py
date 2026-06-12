@@ -6,8 +6,8 @@ import math
 import os
 import random
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Callable, Dict, Iterable, List, Optional, Protocol, Sequence, Tuple, Union
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Sequence, Tuple, Union
 
 # Optional: numpy for fast arrays (falls back to pure Python if absent)
 try:

@@ -21,7 +21,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 
@@ -55,9 +55,9 @@ def run() -> dict:
 
     # ── 1. Download OHLCV ────────────────────────────────────────────────────
     try:
+
         from backend.live_engine.config import NIFTY500_SYMBOLS
         from backend.live_engine.market_data_service import MarketDataService
-        import pandas as pd
 
         _DATA_DIR.mkdir(parents=True, exist_ok=True)
         svc = MarketDataService()
@@ -151,6 +151,7 @@ def _rebuild_features() -> int:
     count = 0
     try:
         import pandas as pd
+
         from backend.backtester.signal_engine import generate_features
 
         r = _redis()
@@ -181,8 +182,7 @@ def _rerank_strategies() -> int:
     """Re-rank all strategies by rolling 252-day Sharpe, persist to Redis."""
     count = 0
     try:
-        import pandas as pd
-        from backend.engine.registry import auto_register_strategies, HUB
+        from backend.engine.registry import HUB, auto_register_strategies
 
         auto_register_strategies()
         strategy_names = list(HUB.strategies._items.keys())
@@ -230,8 +230,9 @@ def _rerank_strategies() -> int:
 def _run_anti_overfit_checks() -> None:
     """Run anti-overfit validation for all active strategies."""
     try:
-        from backend.backtester.anti_overfit_engine import MandatoryRules
         import pandas as pd
+
+        from backend.backtester.anti_overfit_engine import MandatoryRules
 
         r = _redis()
         if not r:

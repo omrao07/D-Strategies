@@ -1,7 +1,10 @@
 # backend/strategies/diversified/statistical_pair_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
@@ -195,7 +198,7 @@ class StatisticalPairArbitrage(Strategy):
         hedge_on_log = bool(meta.get("hedge_on_log", True))
         beta_fixed = float(meta.get("beta", 1.0))
         lot = float(meta.get("lot", 1.0))
-        tick_size = float(meta.get("tick_size", 0.01))
+        float(meta.get("tick_size", 0.01))
 
         p1 = _price(f"EQ:{s1}"); p2 = _price(f"EQ:{s2}")
         if p1 is None or p2 is None or p1 <= 0 or p2 <= 0: return
@@ -241,7 +244,7 @@ class StatisticalPairArbitrage(Strategy):
         gross = qty1 * p1 + qty2 * p2
         if gross > USD_NOTIONAL * MAX_LEVER or gross < MIN_TICKET_USD: return
 
-        fee = _fees_bps(VENUE_EQ) * 1e-4  # bps guard
+        _fees_bps(VENUE_EQ) * 1e-4  # bps guard
 
         if z > 0:
             # Short SYM1, Long SYM2

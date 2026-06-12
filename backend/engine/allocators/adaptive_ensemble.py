@@ -1,15 +1,12 @@
 # backend/engine/allocators/adaptive_ensemble.py
 from __future__ import annotations
 
-import os
 import json
-import time
-import math
+import os
 import signal
+import time
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple
-
-import redis
+from typing import Any, Dict
 
 # Your existing Redis/stream helpers
 from backend.bus.streams import hset, publish_stream
@@ -52,6 +49,7 @@ HKEY_WEIGHTS  = os.getenv("ALLOCATOR_WEIGHTS_KEY", "strategy:weight")     # hset
 STREAM_WEIGHTS = os.getenv("ALLOCATOR_STREAM",     "allocator.weights")   # xadd events for history/UI
 
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 

@@ -22,12 +22,11 @@ callable to a node for execution (or leave data=None if you only need topology).
 
 from __future__ import annotations
 
-import time
 import threading
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 # ------------------------------ Graph model ----------------------------
 

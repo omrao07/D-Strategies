@@ -1,10 +1,13 @@
 # engines/futures_macro/tests/test_backtest.py
 import numpy as np
 import pandas as pd
-
-from engines.futures_macro.backtest.pnl import ( # type: ignore
-    ContractSpec, FeeSpec, SlippageSpec,
-    compute_futures_pnl, make_trades_from_positions, target_positions_to_trades
+from engines.futures_macro.backtest.pnl import (  # type: ignore
+    ContractSpec,
+    FeeSpec,
+    SlippageSpec,
+    compute_futures_pnl,
+    make_trades_from_positions,
+    target_positions_to_trades,
 )
 
 # ------------------------- helpers -------------------------

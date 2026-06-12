@@ -20,11 +20,10 @@ import dataclasses
 import datetime as _dt
 import enum
 import gzip
-import io
 import json
 import pathlib
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 # Optional deps
 try:
@@ -207,7 +206,7 @@ def _msgpack_default(o: Any) -> Any:
 # CSV / Parquet helpers (optional)
 # -------------------------------------------------------------------
 
-def df_to_csv(df: "pd.DataFrame", path: Union[str, Path], *, index: bool = False) -> Path:# type: ignore
+def df_to_csv(df: "_pd.DataFrame", path: Union[str, Path], *, index: bool = False) -> Path:
     """Save DataFrame to CSV (requires pandas)."""
     if _pd is None:
         raise RuntimeError("pandas is not installed. `pip install pandas`")
@@ -216,8 +215,8 @@ def df_to_csv(df: "pd.DataFrame", path: Union[str, Path], *, index: bool = False
     return p
 
 
-def df_to_parquet(df: "pd.DataFrame", path: Union[str, Path], *, compression: str = "snappy") -> Path:# type: ignore
-    """Save DataFrame to Parquet (requires pandas + pyarrow/fastparquet)."""# type: ignore
+def df_to_parquet(df: "_pd.DataFrame", path: Union[str, Path], *, compression: str = "snappy") -> Path:
+    """Save DataFrame to Parquet (requires pandas + pyarrow/fastparquet)."""
     if _pd is None:
         raise RuntimeError("pandas is not installed. `pip install pandas`")
     p = _ensure_path(path, auto_suffix=".parquet")
@@ -225,13 +224,13 @@ def df_to_parquet(df: "pd.DataFrame", path: Union[str, Path], *, compression: st
     return p
 
 
-def load_csv(path: Union[str, Path]) -> "._pd.DataFrame":# type: ignore
+def load_csv(path: Union[str, Path]) -> "_pd.DataFrame":
     if _pd is None:
         raise RuntimeError("pandas is not installed. `pip install pandas`")
     return _pd.read_csv(path)
 
 
-def load_parquet(path: Union[str, Path]) -> "pd.DataFrame":# type: ignore
+def load_parquet(path: Union[str, Path]) -> "_pd.DataFrame":
     if _pd is None:
         raise RuntimeError("pandas is not installed. `pip install pandas`")
     return _pd.read_parquet(path)

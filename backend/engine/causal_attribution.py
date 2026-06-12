@@ -30,7 +30,7 @@ import os
 import time
 from typing import Dict, Optional
 
-from backend.bus.streams import consume_stream, STREAM_FILLS
+from backend.bus.streams import STREAM_FILLS, consume_stream
 
 log = logging.getLogger(__name__)
 

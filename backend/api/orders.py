@@ -1,10 +1,22 @@
 # backend/api/orders.py
 from __future__ import annotations
 
-import os, time, json, hashlib, uuid
-from typing import Any, Dict, List, Optional, Literal
+import hashlib
+import json
+import os
+import time
+import uuid
+from typing import Any, Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Security, WebSocket, WebSocketDisconnect, Query
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Security,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, Field, field_validator
 
@@ -17,7 +29,7 @@ except Exception:
     AsyncRedis = None  # type: ignore
 
 try:
-    from prometheus_client import Counter, Histogram # type: ignore
+    from prometheus_client import Counter, Histogram  # type: ignore
 except Exception:
     Counter = Histogram = None  # type: ignore
 
@@ -200,7 +212,7 @@ async def place_order(p: OrderCreate, _auth: None = Depends(_require_key), r: Op
         try:
             await _xadd(r, INCOMING_ORDERS, order_payload)  # risk → OMS pipeline
             await r.hset(ORDERS_HASH, oid, json.dumps(order_payload))
-        except Exception as e:
+        except Exception:
             # fallback to memory
             pass
     _mem.upsert({**order_payload, "status": "accepted"})

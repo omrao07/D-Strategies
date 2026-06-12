@@ -21,7 +21,10 @@ outdir/signal_log.csv             all ignition signals detected
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

@@ -41,9 +41,8 @@ from __future__ import annotations
 import math
 import random
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Tuple
-
 
 # ------------------------------ Config models ---------------------------------
 
@@ -322,7 +321,7 @@ def _hhmm_to_seconds(hhmm: str) -> int:
 
 if __name__ == "__main__":
     # Minimal demo that prints a few ticks and triggers fills via ExecutionAgent broker.
-    from agents.execution_agent import ExecutionAgent, Side, OrderType
+    from agents.execution_agent import ExecutionAgent, OrderType, Side
 
     x = ExecutionAgent(starting_cash=100_000.0)
     specs = [

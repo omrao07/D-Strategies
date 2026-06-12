@@ -18,11 +18,13 @@ Dependencies: numpy, pandas. Optional: statsmodels, scikit-learn, scipy (for p-v
 """
 
 from __future__ import annotations
+
 import math
+from dataclasses import dataclass
+from typing import List, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, List
 
 # Optional libs
 try:
@@ -32,7 +34,8 @@ except Exception:
     _HAS_SM = False
 
 try:
-    from sklearn.linear_model import Ridge as _Ridge, Lasso as _Lasso  # type: ignore
+    from sklearn.linear_model import Lasso as _Lasso
+    from sklearn.linear_model import Ridge as _Ridge  # type: ignore
     _HAS_SK = True
 except Exception:
     _HAS_SK = False

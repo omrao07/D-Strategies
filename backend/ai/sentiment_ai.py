@@ -29,8 +29,12 @@ CLI:
     python -m backend.ai.nlp.sentiment_ai --in texts.json --out scored.json
 """
 
-import os, re, json, math, time
-from dataclasses import dataclass, asdict
+import json
+import math
+import os
+import re
+import time
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 # -------- Optional libs (graceful fallbacks) --------

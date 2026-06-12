@@ -114,13 +114,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -636,7 +635,7 @@ def main():
 
     # Baselines
     OAPS = oadr_psr(POP)
-    BASE_DEM = current_demand(POP, UTIL) if not UTIL.empty else pd.DataFrame()
+    current_demand(POP, UTIL) if not UTIL.empty else pd.DataFrame()
 
     # Projections
     base_year = int(POP["year"].max())

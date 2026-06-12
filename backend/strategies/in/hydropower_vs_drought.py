@@ -101,13 +101,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -324,7 +323,7 @@ def build_panel(DF: pd.DataFrame, drought_var: str,
     has_cap = "capacity_mw" in df.columns and df["capacity_mw"].notna().any()
     if has_cap:
         # expand capacity per month per group
-        cap_g = df[["group","capacity_mw"]].drop_duplicates(subset=["group"]).set_index("group")["capacity_mw"]
+        df[["group","capacity_mw"]].drop_duplicates(subset=["group"]).set_index("group")["capacity_mw"]
         df["hours"] = month_hours(df["date"])
         df["cf"] = df["gen_mwh"] / (df["hours"] * df["capacity_mw"])
         df["cf"] = df["cf"].clip(lower=0)

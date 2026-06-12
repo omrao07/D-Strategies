@@ -7,7 +7,7 @@ import math
 import os
 import threading
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 log = logging.getLogger("broker")

@@ -34,11 +34,11 @@ Returned record schema (raw):
 
 from __future__ import annotations
 
+import asyncio
+import datetime as dt
 import os
 import re
 import time
-import asyncio
-import datetime as dt
 from typing import Any, Dict, List, Optional
 
 # Try real client

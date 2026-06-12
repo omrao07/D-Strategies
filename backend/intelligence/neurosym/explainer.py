@@ -17,11 +17,10 @@ the explainer will try both (attr and dict access) for convenience.
 
 from __future__ import annotations
 
-import math
 import json
+import math
 from dataclasses import asdict, is_dataclass
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
-
+from typing import Any, Dict, List, Optional, Sequence
 
 # ------------------------ helpers: safe getters ------------------------
 

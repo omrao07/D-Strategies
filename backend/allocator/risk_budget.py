@@ -1,17 +1,16 @@
 # backend/allocator/risk_budget.py
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple, Iterable
-import math
 import time
+from dataclasses import dataclass
+from typing import Any, Dict, Iterable
 
 import numpy as np
 import pandas as pd
 
 # Reuse StratMetrics definition from meta_allocator for consistency
 try:
-    from .meta_allocator import StratMetrics # type: ignore
+    from .meta_allocator import StratMetrics  # type: ignore
 except Exception:
     @dataclass
     class StratMetrics:  # fallback typing if imported standalone

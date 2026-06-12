@@ -21,11 +21,13 @@ outdir/backtest.csv             cumulative P&L from calendar spread
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 STRUCTURE_THRESHOLDS = {
     "strong_backwardation": 2.0,   # M1-M6 spread > $2
@@ -121,7 +123,7 @@ def run(cfg):
         # Roll yield vs spot return
         m1_ret = wide[m1_col].pct_change().dropna()
         roll_yield_daily = wide["roll_yield_ann"].reindex(m1_ret.index) / 100 / 365
-        roll_total = m1_ret + roll_yield_daily.fillna(0)
+        m1_ret + roll_yield_daily.fillna(0)
 
         fwd5 = m1_ret.rolling(5).sum().shift(-5)
         ry_series = wide["roll_yield_zscore"].reindex(m1_ret.index).ffill().dropna()

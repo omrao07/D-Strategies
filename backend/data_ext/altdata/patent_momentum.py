@@ -1,5 +1,6 @@
 # backend/altdata/patent_momentum.py
 from __future__ import annotations
+
 """
 Patent Momentum
 ---------------
@@ -42,11 +43,13 @@ CLI:
 
 """
 
-import csv, json, math, os, time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+import csv
+import os
+import time
 from collections import defaultdict
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # -------- optional deps (graceful fallbacks) --------
 try:
@@ -350,7 +353,7 @@ class PatentMomentum:
             zf = _z([r["yoy_filings"] for r in recs])
             zc = _z([r["cite_intensity"] for r in recs])
             for i, r in enumerate(recs):
-                pm_raw = self.w_filings * (zf[i] + 0.5 * r["accel_filings"]) + self.w_cites * zc[i]
+                self.w_filings * (zf[i] + 0.5 * r["accel_filings"]) + self.w_cites * zc[i]
                 # min-max to 0..100
                 # collect raw list
                 recs[i]["z_filings"] = float(zf[i])

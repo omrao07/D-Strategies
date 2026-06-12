@@ -1,15 +1,17 @@
 # engines/stat_arb/backtest/simulator.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, List, Literal, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Literal, Callable
 
 from .pnl import (
-    estimate_spread,
+    PairSpec,
     compute_pair_pnl,
     compute_portfolio_pnl,
-    PairSpec,
+    estimate_spread,
 )
 
 BetaMethod = Literal["rolling_ols", "expanding_ols", "static_ols"]
@@ -159,7 +161,7 @@ def simulate_pairs(
         trades_x = shares_x.diff().fillna(shares_x.iloc[0])
 
         # Compute P&L for this pair
-        summary = compute_pair_pnl(
+        compute_pair_pnl(
             # reuse costs/carry directly from cfg via PairInputs inside compute_pair_pnl
             inputs=None  # type: ignore
         )  # placeholder so mypy quiet; we’ll build a PairSpec below and use compute_portfolio_pnl

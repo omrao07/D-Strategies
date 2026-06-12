@@ -13,8 +13,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 try:
     import nats
     from nats.aio.client import Client as NATS
-    from nats.js import JetStreamContext
     from nats.errors import TimeoutError
+    from nats.js import JetStreamContext
     from nats.js.errors import NotFoundError
 except Exception as e:  # pragma: no cover
     raise RuntimeError("Please install 'nats-py' (pip install nats-py)") from e

@@ -20,7 +20,10 @@ outdir/trade_log.csv           entry/exit details per trade
 outdir/summary.json            avg crush, win rate, total P&L
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

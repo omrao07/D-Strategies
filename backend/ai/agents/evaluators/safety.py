@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import re
 import time
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
+
 
 # ------------------------------------------------------------
 # Data models
@@ -49,7 +50,7 @@ class SafetyManager:
 
         # Circuit breaker
         if self.blocked_until and ts < self.blocked_until:
-            self._log("block", f"Trading temporarily blocked", {"until": self.blocked_until})
+            self._log("block", "Trading temporarily blocked", {"until": self.blocked_until})
             return False
 
         # Blocklist
@@ -60,7 +61,7 @@ class SafetyManager:
         # Quantity / Notional
         notional = qty * price
         if qty > self.max_qty or notional > self.max_notional:
-            self._log("block", f"Order exceeds limits", {"qty": qty, "notional": notional})
+            self._log("block", "Order exceeds limits", {"qty": qty, "notional": notional})
             return False
 
         # Leverage
@@ -75,7 +76,7 @@ class SafetyManager:
 
         # If passed
         self._last_order_ts = ts
-        self._log("info", f"Order passed checks", {"symbol": symbol, "qty": qty, "notional": notional})
+        self._log("info", "Order passed checks", {"symbol": symbol, "qty": qty, "notional": notional})
         return True
 
     # --------------- Failures / breaker ---------------

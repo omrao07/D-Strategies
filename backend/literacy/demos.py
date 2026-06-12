@@ -16,16 +16,15 @@ from __future__ import annotations
 import argparse
 import asyncio
 import time
-from dataclasses import dataclass
-from typing import Optional, List
 from collections import deque
+from dataclasses import dataclass
+from typing import List
 
 # sentiment + news sources (use your existing modules)
-from backend.analytics.sentiment_ai import SentimentModel, sentiment_weight # type: ignore
+from backend.analytics.sentiment_ai import SentimentModel, sentiment_weight  # type: ignore
 from backend.ingestion.news.news_base import NewsEvent
+from backend.ingestion.news.news_moneycontrol import MoneycontrolNews  # type: ignore
 from backend.ingestion.news.news_yahoo import YahooNews
-from backend.ingestion.news.news_moneycontrol import MoneycontrolNews # type: ignore
-
 
 # ---------- Pretty printing helpers ----------
 

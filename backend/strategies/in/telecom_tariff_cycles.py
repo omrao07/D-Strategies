@@ -101,13 +101,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -386,7 +385,7 @@ def market_panel(OP: pd.DataFrame, freq_rule: str) -> pd.DataFrame:
         "data_usage_gb":"sum" if "data_usage_gb" in OP.columns else "first",
         "capex_inr":"sum" if "capex_inr" in OP.columns else "first"
     })
-    yo = 12 if freq_rule.startswith("M") else 4
+    12 if freq_rule.startswith("M") else 4
     df["dlog_market_subs"] = dlog(df["subs_total"])
     if "revenue_inr" in df.columns: df["dlog_market_rev"] = dlog(df["revenue_inr"])
     if "data_usage_gb" in df.columns: df["dlog_market_data"] = dlog(df["data_usage_gb"])

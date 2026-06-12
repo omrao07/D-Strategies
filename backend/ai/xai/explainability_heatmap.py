@@ -36,10 +36,10 @@ Notes
 - `weight` lets you scale by trade size / notional / confidence.
 """
 
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Tuple, Iterable, Any
-import math
 import json
+import math
+from dataclasses import dataclass
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 try:
     import numpy as _np
@@ -157,8 +157,8 @@ class ExplainabilityHeatmap:
 
         # If pandas available, use it for convenience
         if _pd is not None:
-            import pandas as pd
             import numpy as np
+            import pandas as pd
             idx = pd.Index(features, name="feature")
             cols = pd.Index(columns, name=self.cfg.group_by)
             df = pd.DataFrame(0.0, index=idx, columns=cols)

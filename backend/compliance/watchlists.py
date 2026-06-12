@@ -37,7 +37,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # Optional bus (graceful if missing)
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception:
     consume_stream = publish_stream = hset = None  # type: ignore
 
@@ -312,7 +312,7 @@ class Watchlists:
         # News keyword rule
         m = _news_kw_re.match(r)
         if m:
-            kw_expr = m.group(1).strip()
+            m.group(1).strip()
             # We don’t store news text here; recommend handling keyword match in normalizer,
             # setting ctx['news_kw_hit']=True on last event. But we give a fallback:
             hit = bool(ctx.get("news_kw_hit"))

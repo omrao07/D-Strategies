@@ -37,10 +37,10 @@ sim = mc.simulate(n=1000)
 
 from __future__ import annotations
 
-import math
-import numpy as np
 from dataclasses import dataclass
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple
+
+import numpy as np
 
 # Optional SciPy for logsumexp
 try:

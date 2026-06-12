@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, List, Optional
 
 try:
     # Prefer your shared schema if present
-    from backend.common.schemas import Quote as QuoteSchema # type: ignore
+    from backend.common.schemas import Quote as QuoteSchema  # type: ignore
 except Exception:
     @dataclass
     class QuoteSchema:

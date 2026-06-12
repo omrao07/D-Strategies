@@ -18,7 +18,6 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-
 # ── Factor definitions ────────────────────────────────────────────────────────
 
 FACTOR_NAMES = [
@@ -443,7 +442,7 @@ class StrategyClusterer:
 
         # Simple agglomerative clustering via distance matrix
         clusters = self._agglomerate(corr, threshold=self.high_corr_threshold)
-        n_unique = len(clusters)
+        len(clusters)
 
         # Diversification ratio
         # DR = (sum of individual vols) / portfolio_vol (equal weight)
@@ -471,7 +470,7 @@ class StrategyClusterer:
         """Simple single-linkage clustering by correlation."""
         cols = list(corr.columns)
         labels = {col: i for i, col in enumerate(cols)}
-        cluster_id = len(cols)
+        len(cols)
 
         # Merge pairs with correlation > threshold
         changed = True

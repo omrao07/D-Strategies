@@ -3,14 +3,12 @@ from __future__ import annotations
 
 import math
 import time
-import json
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, List
+from typing import Any, Dict, List, Optional, Tuple
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
-from backend.microstructure.queue_position import QueueTracker # type: ignore
-
+from backend.engine.strategy_base import Strategy
+from backend.microstructure.queue_position import QueueTracker  # type: ignore
 
 # ----------------------------- Config -----------------------------
 

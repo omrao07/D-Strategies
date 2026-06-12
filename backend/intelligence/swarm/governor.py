@@ -1,11 +1,11 @@
 # backend/risk/governor.py
 from __future__ import annotations
 
+import json
 import os
 import time
-import json
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import Any, Dict, Optional
 
 # -------- Optional Redis + your stream helpers (kept soft) -------------------
 try:
@@ -17,7 +17,7 @@ try:
     # Your earlier helper signatures:
     #   publish_stream(stream, payload)
     #   hset(key, field, value)
-    from backend.bus.streams import publish_stream, hset  # type: ignore
+    from backend.bus.streams import hset, publish_stream  # type: ignore
 except Exception:
     def publish_stream(_s, _p): pass
     def hset(_k, _f, _v): pass

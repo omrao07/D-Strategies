@@ -19,8 +19,6 @@ import logging
 import time
 from typing import Callable, Dict, Optional
 
-import requests
-
 log = logging.getLogger("connect.shhk")
 
 DEFAULT_POLL_INTERVAL = 30  # seconds

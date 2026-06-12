@@ -24,11 +24,10 @@ explode your workers if a field is missing. Validate stricter at the edges.
 
 from __future__ import annotations
 
-import time
 import json
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional, List
-
+import time
+from dataclasses import dataclass, field
+from typing import Any, Dict, Optional
 
 # ----------------------------- utils ----------------------------------
 

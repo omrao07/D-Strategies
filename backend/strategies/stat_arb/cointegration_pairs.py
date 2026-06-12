@@ -18,8 +18,11 @@ outdir/backtest.csv             cumulative P&L from all cointegrated pairs
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
 from itertools import combinations
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -37,7 +40,7 @@ def engle_granger_coint(y: np.ndarray, x: np.ndarray):
     b2 = np.linalg.lstsq(X2, d_resid, rcond=None)[0]
     pred = X2 @ b2
     sse = np.sum((d_resid - pred) ** 2)
-    sst = np.sum((d_resid - d_resid.mean()) ** 2)
+    np.sum((d_resid - d_resid.mean()) ** 2)
     n = len(d_resid)
     se = np.sqrt(sse / (n - 2) / np.sum((lag_resid - lag_resid.mean()) ** 2))
     t_stat = b2[0] / se if se > 0 else 0

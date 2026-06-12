@@ -1,11 +1,13 @@
 # engines/futures_macro/backtest/simulator.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Literal
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Literal, List, Tuple
 
-from .pnl import compute_futures_portfolio_pnl, ContractSpec # type: ignore
+from .pnl import ContractSpec, compute_futures_portfolio_pnl  # type: ignore
 
 Freq = Literal["D","W-FRI","M","Q"]
 
@@ -132,7 +134,7 @@ if __name__ == "__main__":
         "Gold": -_zscore(prices["Gold"].pct_change().cumsum(),60),
     }, index=idx)
 
-    from engines.futures_macro.backtest.pnl import ContractSpec # type: ignore
+    from engines.futures_macro.backtest.pnl import ContractSpec  # type: ignore
     specs = {
         "S&P": ContractSpec(point_value=50.0),
         "Gold": ContractSpec(point_value=100.0),

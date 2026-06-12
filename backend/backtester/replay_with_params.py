@@ -1,8 +1,14 @@
 # backend/sim/replay_with_params.py
 from __future__ import annotations
-import os, csv, json, time, asyncio, random, math
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple
+
+import asyncio
+import csv
+import json
+import os
+import random
+import time
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
 # ---- optional deps (graceful) ----------------------------------------------
 HAVE_REDIS = True

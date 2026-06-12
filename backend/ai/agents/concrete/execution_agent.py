@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Literal, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 # ============================================================
 # Optional framework imports (with safe fallbacks)
@@ -194,7 +194,7 @@ class ExecutionAgent(BaseAgent): # type: ignore
         sym = req.target.symbol
         side = req.target.side
         qty_total = float(req.target.qty)
-        now_ms = int(time.time() * 1000)
+        int(time.time() * 1000)
 
         # Fetch reference candles for planning (1m bars)
         bars_needed = max(5, int(req.schedule.duration_min / max(1, req.schedule.slice_minutes)) * 2)

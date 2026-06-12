@@ -19,7 +19,10 @@ outdir/signals.csv       dates where price is far from max pain (signal to rever
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

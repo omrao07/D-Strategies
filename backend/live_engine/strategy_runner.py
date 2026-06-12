@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import logging
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
@@ -27,7 +26,8 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 try:
     import redis as _redis_mod
-    from backend.live_engine.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+
+    from backend.live_engine.config import REDIS_HOST, REDIS_PASSWORD, REDIS_PORT
     _redis_client = _redis_mod.Redis(
         host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
     )

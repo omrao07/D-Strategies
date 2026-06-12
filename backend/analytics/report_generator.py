@@ -1,9 +1,14 @@
 # backend/analytics/report_generator.py
 from __future__ import annotations
 
-import os, io, json, base64, time, math, datetime as dt
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Callable
+import base64
+import datetime as dt
+import io
+import json
+import os
+import time
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional
 
 # -------- optional deps (all graceful) ---------------------------------------
 try:

@@ -37,11 +37,11 @@ Returned record schema (raw):
 
 from __future__ import annotations
 
+import datetime as dt
 import os
+import random
 import re
 import time
-import random
-import datetime as dt
 from typing import Any, Dict, List, Optional
 
 # Try real client
@@ -93,7 +93,7 @@ def _fetch_x_real(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     symbols_whitelist: Optional[List[str]] = cfg.get("symbols")
 
     out: List[Dict[str, Any]] = []
-    now = _iso_now()
+    _iso_now()
 
     for q in queries:
         try:

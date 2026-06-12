@@ -11,11 +11,11 @@ from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, Optional
 
 try:
-    import nats # type: ignore
-    from nats.aio.client import Client as NATS # type: ignore
-    from nats.js import JetStreamContext # type: ignore
-    from nats.js.client import ConsumerConfig # type: ignore
-    from nats.js.errors import NotFoundError # type: ignore
+    import nats  # type: ignore
+    from nats.aio.client import Client as NATS  # type: ignore
+    from nats.js import JetStreamContext  # type: ignore
+    from nats.js.client import ConsumerConfig  # type: ignore
+    from nats.js.errors import NotFoundError  # type: ignore
 except Exception as e:  # pragma: no cover
     raise RuntimeError("Please install 'nats-py' (pip install nats-py)") from e
 

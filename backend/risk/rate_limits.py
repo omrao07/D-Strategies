@@ -14,7 +14,7 @@ clamped = rl.apply(shock)  # parallel_bp=200, rates_by_tenor={"10y": 300}
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional
+from typing import Dict
 
 
 @dataclass

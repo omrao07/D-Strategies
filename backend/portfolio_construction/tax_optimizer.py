@@ -6,11 +6,9 @@ US: wash-sale rule, short/long-term capital gains.
 """
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Dict, List, Optional, Tuple
-
+from typing import List
 
 # ── India ────────────────────────────────────────────────────────────────────
 

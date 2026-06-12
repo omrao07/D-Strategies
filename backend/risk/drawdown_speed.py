@@ -1,12 +1,11 @@
 # backend/risk/drawdown_speed.py
 from __future__ import annotations
 
-import time
-from dataclasses import dataclass, field
-from typing import Deque, Dict, List, Optional, Tuple
-from collections import deque
 import math
-
+import time
+from collections import deque
+from dataclasses import dataclass
+from typing import Deque, List, Optional, Tuple
 
 _now_ms = lambda: int(time.time() * 1000)
 

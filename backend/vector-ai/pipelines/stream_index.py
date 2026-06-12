@@ -54,19 +54,18 @@ pip install pandas pyarrow sentence-transformers faiss-cpu nats-py aiokafka open
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
 import re
-import json
-import uuid
-import time
-import asyncio
 import signal
+import time
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
-
 
 # ======================= Embedders =======================
 
@@ -112,7 +111,6 @@ class HFEmbedder(BaseEmbedder):
         self.dim = self.model.get_sentence_embedding_dimension() # type: ignore
 
     def encode(self, texts: List[str]) -> List[List[float]]:
-        import numpy as np
         arr = self.model.encode(
             texts, batch_size=self.batch, convert_to_numpy=True,
             show_progress_bar=False, normalize_embeddings=True

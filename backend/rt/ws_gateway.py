@@ -57,16 +57,16 @@ import os
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
+from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
 # --- Redis (async) ---
 try:
     import redis.asyncio as aioredis  # pip install redis>=4.6
-except Exception as e:  # pragma: no cover
+except Exception:  # pragma: no cover
     aioredis = None
     raise
 

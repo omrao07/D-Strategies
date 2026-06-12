@@ -6,10 +6,10 @@ import html
 import json
 import re
 import time
-from typing import Any, Dict, Iterable, List, Optional, Tuple
-from urllib import request, error as urlerror
-from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
+from typing import Any, Dict, Optional
+from urllib import request
 
 # -------- HTTP (stdlib) --------
 

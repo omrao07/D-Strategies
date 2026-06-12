@@ -35,9 +35,8 @@ from __future__ import annotations
 import json
 import os
 import socket
-import time
 import uuid
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
 
 # Optional deps (Kafka)
@@ -238,8 +237,8 @@ class LineageEmitter:
     @staticmethod
     def _post_http(url: str, body: str, headers: Optional[Dict[str, str]] = None, timeout: float = 8.0) -> None:
         # stdlib HTTP POST to avoid extra dependency
-        import urllib.request
         import urllib.error
+        import urllib.request
 
         req = urllib.request.Request(
             url=url,

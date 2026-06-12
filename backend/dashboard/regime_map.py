@@ -24,7 +24,7 @@ from __future__ import annotations
 import json
 import math
 import statistics
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # Optional deps

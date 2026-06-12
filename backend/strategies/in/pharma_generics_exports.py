@@ -93,13 +93,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -308,7 +307,7 @@ def build_panel(EX: pd.DataFrame, FX: pd.DataFrame, PR: pd.DataFrame, FDA: pd.Da
 
     if "anda_approvals" in df.columns:
         df["dlog1p_anda"] = dlog1p(df["anda_approvals"])
-    for c in [col for col in df.columns if c.endswith("_index") and col!="price_index"]:
+    for c in [col for col in df.columns if col.endswith("_index") and col != "price_index"]:
         df[f"dlog_{c}"] = dlog(df[c])
 
     # ASP transform if units present

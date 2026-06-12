@@ -13,13 +13,13 @@ Design goals:
 
 from __future__ import annotations
 
+import json
 import os
 import time
-import json
-import requests
-from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
+import requests
 
 # ============================
 # Types

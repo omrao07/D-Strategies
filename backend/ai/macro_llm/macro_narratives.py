@@ -51,8 +51,8 @@ features.json:
 
 import json
 import math
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Tuple, Iterable, Any
+from dataclasses import dataclass
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # ---------------------------- Models ----------------------------
 

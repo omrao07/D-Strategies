@@ -5,8 +5,8 @@ import bisect
 import itertools
 import time
 from collections import deque
-from dataclasses import dataclass, field, asdict
-from typing import Callable, Deque, Dict, List, Optional, Tuple, Literal, Any
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Deque, Dict, List, Literal, Optional, Tuple
 
 Side = Literal["buy", "sell"]
 

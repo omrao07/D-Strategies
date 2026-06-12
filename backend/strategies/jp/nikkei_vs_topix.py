@@ -21,20 +21,18 @@ Usage:
 """
 
 import argparse
-import os
-import sys
 import math
-import time
+import os
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Tuple, Dict, Optional
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 try:
     import yfinance as yf
-except ImportError as e:
+except ImportError:
     print("yfinance is required. Install with: pip install yfinance pandas numpy matplotlib statsmodels")
     raise
 

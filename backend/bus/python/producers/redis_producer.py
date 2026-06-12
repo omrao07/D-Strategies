@@ -8,7 +8,7 @@ import socket
 import time
 import uuid
 from dataclasses import asdict, is_dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional
 
 try:
     import redis.asyncio as redis  # redis-py >= 4.2

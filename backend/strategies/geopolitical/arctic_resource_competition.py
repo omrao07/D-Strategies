@@ -26,11 +26,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 ARCTIC_BENEFICIARIES = {
     "lng": ["novatek", "lng", "lngg", "cqp", "total", "shell"],
@@ -92,7 +94,7 @@ def run(cfg):
     for _, ev in events.iterrows():
         ev_date = ev["date"]
         inv = float(ev.get("investment_bn_usd", 0)) if pd.notna(ev.get("investment_bn_usd")) else 0
-        category = str(ev.get("category", "other")).lower()
+        str(ev.get("category", "other")).lower()
         # Long-lived investment signal (3 years)
         for i in range(756):
             fd = ev_date + pd.Timedelta(days=i)

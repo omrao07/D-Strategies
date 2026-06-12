@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 # ----------------------- Optional pandas -------------------------------------
 try:
@@ -31,11 +31,15 @@ except Exception:
 try:
     from backend.intelligence.neurosym.pnl_xray import PnLXray  # type: ignore
 except Exception as e:
-    # Soft fallback if pnl_xray isn't present yet
+    # Soft fallback if pnl_xray isn't present yet.
+    # `as e` is cleared at block exit, so capture a stable reference for the
+    # lazily-raised ImportError below.
+    _pnl_xray_err = e
+
     class PnLXray:  # type: ignore
         def __init__(self, *a, **k): raise ImportError(
             "backend.analytics.pnl_xray not found. Please add pnl_xray.py from your repo."
-        ) from e
+        ) from _pnl_xray_err
 
 
 # =============================================================================

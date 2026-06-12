@@ -1,8 +1,8 @@
 # tests/test_fix_gateway.py
 import importlib
-import time
-from typing import Optional, Callable, Dict, Any, List
-import pytest # type: ignore
+from typing import Any, Callable, Dict, List
+
+import pytest  # type: ignore
 
 # ---------------------- Import candidates (edit if needed) ----------------------
 IMPORT_PATH_CANDIDATES = [
@@ -162,7 +162,7 @@ def last_sent_frame(transport: FakeTransport) -> str:
 def test_logon_flow_builds_valid_A(api, transport):
     # Request a Logon (A)
     api.send("A", {"98": "0", "108": "30"})  # 98=EncryptMethod=0; 108=HeartBtInt
-    s = last_sent_frame(transport)
+    last_sent_frame(transport)
     assert_header_and_checksum(transport.sent[-1])
     msg = api.parser()(transport.sent[-1])
     assert msg["35"] == "A"

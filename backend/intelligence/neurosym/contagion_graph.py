@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 import json
-import math
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass
 from typing import Dict, List, Optional, Tuple
 
 # Optional NumPy for faster linear ops; falls back to pure Python if absent.

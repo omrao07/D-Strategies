@@ -1,9 +1,9 @@
 # backend/ai/ml — ML model stack for signal generation and regime detection
-from .models import XGBoostSignal, RandomForestSignal, LSTMSignal, TransformerSignal
-from .unsupervised import HMMRegime, PCAFactors, AutoencoderAnomaly
-from .nlp import FinBERTSentiment
 from .generative import GANSynthetic
 from .kalman import KalmanPairFilter
+from .models import LSTMSignal, RandomForestSignal, TransformerSignal, XGBoostSignal
+from .nlp import FinBERTSentiment
+from .unsupervised import AutoencoderAnomaly, HMMRegime, PCAFactors
 
 __all__ = [
     "XGBoostSignal", "RandomForestSignal", "LSTMSignal", "TransformerSignal",

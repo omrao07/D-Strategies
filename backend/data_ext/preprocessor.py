@@ -14,12 +14,11 @@ Responsibilities:
 
 from __future__ import annotations
 
-import math
 import json
-from typing import Iterable, Dict, List, Any, Optional, Callable
+import math
 from collections import defaultdict, deque
 from statistics import mean, pstdev
-
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 # ============================
 # Types

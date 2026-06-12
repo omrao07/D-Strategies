@@ -89,13 +89,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -147,7 +146,7 @@ def pca_first_factor(df: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
     C = np.cov(Xm, rowvar=False)
     w, V = np.linalg.eigh(C)  # symmetric
     idx = np.argsort(w)[::-1]
-    w1 = w[idx[0]]
+    w[idx[0]]
     v1 = V[:, idx[0]]
     # Normalize sign so factor correlates positively with the average of columns
     if np.sum(v1) < 0:
@@ -676,7 +675,7 @@ def main():
         X = pd.concat([pd.Series(1.0, index=X.index, name="const"), X], axis=1)
         r2_oos, preds = rolling_train_predict(X, df_model["y"])
     else:
-        r2_oos, preds = np.nan, pd.Series(dtype=float)
+        r2_oos, _preds = np.nan, pd.Series(dtype=float)
 
     # Nowcast next quarter
     nowc = nowcast_next_quarter(LQ, Mz, FXm, loadings, betas) if (not LQ.empty and not Mz.empty and betas) else pd.DataFrame()

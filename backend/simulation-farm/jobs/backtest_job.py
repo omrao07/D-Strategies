@@ -41,23 +41,23 @@ python -m simulation_farm.jobs.backtest_job \
 
 from __future__ import annotations
 
-import math
-import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 # soft deps
 try:
+    import numpy as np  # type: ignore
     import pandas as pd  # type: ignore
-    import numpy as np   # type: ignore
 except Exception as e:  # pragma: no cover
     raise SystemExit("backtest_job.py requires pandas and numpy. Install with: pip install pandas numpy") from e
 
 from pathlib import Path
 
 # reports
-from simulation_farm.artifacts.reports.report_generator import ReportGenerator, ReportInputs  # type: ignore
-
+from simulation_farm.artifacts.reports.report_generator import (  # type: ignore
+    ReportGenerator,
+    ReportInputs,
+)
 
 # --------------------------- Spec ---------------------------
 
@@ -382,7 +382,7 @@ def _extract_trades(weights: pd.DataFrame, prices: pd.DataFrame) -> List[Dict]:
 # --------------------------- CLI ---------------------------
 
 def _parse_cli():
-    import argparse, json
+    import argparse
 
     ap = argparse.ArgumentParser(description="Run a vectorized backtest and emit reports.")
     ap.add_argument("--run-id", required=True)

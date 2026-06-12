@@ -44,8 +44,8 @@ except Exception as e:  # pragma: no cover
 
 # --- cryptography (for RS256/EdDSA objects) ---
 try:
-    from cryptography.hazmat.primitives import serialization # type: ignore
-    from cryptography.hazmat.primitives.asymmetric import rsa, ed25519 # type: ignore
+    from cryptography.hazmat.primitives import serialization  # type: ignore
+    from cryptography.hazmat.primitives.asymmetric import ed25519  # type: ignore
     _HAVE_CRYPTO = True
 except Exception:
     _HAVE_CRYPTO = False

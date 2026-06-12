@@ -18,13 +18,12 @@ CLI:
 bars.csv needs at least: date,symbol,close,fwd_ret_1d,(volume optional)
 """
 
-from dataclasses import dataclass, asdict, field
-from typing import Callable, Dict, List, Optional, Tuple, Any
 import json
 import math
 import os
 import time
-import warnings
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ---- Optional deps (graceful fallbacks) --------------------------------
 try:

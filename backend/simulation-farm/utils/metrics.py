@@ -12,11 +12,9 @@ Dependencies:
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-
 
 # ---------------- Basic KPIs ----------------
 

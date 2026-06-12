@@ -18,7 +18,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -46,7 +49,7 @@ def run(cfg):
 
     tickers = df["ticker"].unique() if "ticker" in df.columns else ["default"]
     all_signals = []
-    equity_curve = pd.Series(dtype=float)
+    pd.Series(dtype=float)
 
     for ticker in tickers:
         sub = df[df["ticker"] == ticker].set_index("date").sort_index() if "ticker" in df.columns else df.set_index("date").sort_index()

@@ -1,9 +1,11 @@
 # backend/execution/cost_model_v2.py
 from __future__ import annotations
 
-import math, json, os, time, statistics
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional, Tuple, List
+import json
+import math
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional
 
 # -------- optional numpy (graceful) ------------------------------------------
 HAVE_NP = True
@@ -185,7 +187,7 @@ class CostModelV2:
         """
         Estimate *child* order execution cost in pnl_ccy for the provided market state.
         """
-        notional_px_ccy = abs(ci.qty) * ci.mid_px
+        abs(ci.qty) * ci.mid_px
         spread = self._spread_cost(ci)
         fees = self._fee_cost(ci)
         impact = self._impact_cost(ci)
@@ -320,7 +322,7 @@ class CostModelV2:
 
 # -------- CLI ----------------------------------------------------------------
 def _cli():
-    import argparse, sys
+    import argparse
     ap = argparse.ArgumentParser("cost_model_v2")
     sub = ap.add_subparsers(dest="cmd", required=True)
 

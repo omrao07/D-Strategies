@@ -1,5 +1,6 @@
 # backend/ops/chaos_money.py
 from __future__ import annotations
+
 """
 Chaos Money — fault & shock injector for your trading stack
 -----------------------------------------------------------
@@ -28,14 +29,19 @@ CLI:
   python -m backend.ops.chaos_money run --cfg chaos.yaml --duration 120
 """
 
-import os, time, json, random, threading, queue
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional, List, Callable, Tuple, Iterable
+import json
+import os
+import queue
+import random
+import threading
+import time
 from contextlib import contextmanager
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 # -------- Optional bus / Redis ----------
 try:
-    from backend.bus.streams import publish_stream, consume_stream, hset  # type: ignore
+    from backend.bus.streams import consume_stream, hset, publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:  # type: ignore
         print(f"[CHAOS] publish_stream -> {stream}: {payload}")

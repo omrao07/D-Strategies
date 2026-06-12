@@ -1,10 +1,9 @@
 # backend/ai/agents/connectors/llm/local_gguf.py
 from __future__ import annotations
 
+import base64
 import os
 import time
-import base64
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 # ============================================================

@@ -45,7 +45,6 @@ import datetime as dt
 import random
 from typing import Any, Dict, List, Sequence
 
-
 # --- Fake generators (replace with real vendor calls later) --------------------
 
 def _fake_tanker_count(region_name: str) -> int:

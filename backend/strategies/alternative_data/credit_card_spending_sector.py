@@ -249,7 +249,7 @@ def main():
         "signal_logic": "top_momentum=LONG, bottom_momentum=SHORT, monthly_rebalance",
     }
 
-    print(f"\n[SUMMARY]")
+    print("\n[SUMMARY]")
     print(f"  Date range     : {summary['date_range_start']} → {summary['date_range_end']}")
     print(f"  Sectors        : {summary['sectors']}")
     print(f"  Sharpe proxy   : {bt_stats['sharpe_annualized']:.4f}")

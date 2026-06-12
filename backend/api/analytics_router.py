@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -284,7 +284,8 @@ class OptimizerRequest(BaseModel):
 def optimizer_run(req: OptimizerRequest):
     try:
         import numpy as np
-        from backend.analytics.optimizer import Optimizer, Config
+
+        from backend.analytics.optimizer import Config, Optimizer
 
         returns_arr = np.array(req.returns, dtype=float)
         if returns_arr.ndim != 2:

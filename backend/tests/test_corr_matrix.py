@@ -1,9 +1,10 @@
 # test_corr_matrix.py
 import numpy as np
 import pandas as pd
-import pytest # type: ignore
+import pytest  # type: ignore
 
 from backend.analytics.corr_matrix import compute_corr_matrix  # type: ignore # adjust path
+
 
 def make_data(seed=42, n_assets=5, n_days=200):
     rng = np.random.default_rng(seed)

@@ -6,8 +6,8 @@ import json
 import logging
 import os
 from typing import Any, Dict, Optional
-from urllib.request import urlopen, Request
 from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 logger = logging.getLogger("notifications.slack")
 

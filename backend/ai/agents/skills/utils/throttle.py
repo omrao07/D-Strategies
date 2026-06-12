@@ -4,9 +4,8 @@ from __future__ import annotations
 import asyncio
 import threading
 import time
-from collections import defaultdict, deque
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional
+from typing import Callable, Dict
 
 
 def now_ms() -> int:

@@ -45,12 +45,11 @@ from __future__ import annotations
 import os
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, List
+from typing import Any, Dict, Optional
 
-from eth_abi import encode as abi_encode # type: ignore
-from eth_account import Account # type: ignore
-from web3 import Web3 # type: ignore
-from web3.contract import Contract # type: ignore
+from eth_account import Account  # type: ignore
+from web3 import Web3  # type: ignore
+from web3.contract import Contract  # type: ignore
 
 # ---------- Minimal ABIs (trimmed) ----------
 ERC20_ABI = [

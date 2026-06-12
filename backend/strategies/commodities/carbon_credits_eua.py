@@ -31,17 +31,17 @@ Strategy modes:
 """
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 
 try:
     from backend.commodities.base import (
-        CommodityStrategy, CommoditySignal, CommoditySector,
-        SignalDirection, SignalSource, CommodityRiskParams, ContractSpec,
+        CommoditySector,
+        CommodityStrategy,
+        SignalDirection,
+        SignalSource,
     )
     from backend.commodities.curve_analytics import dark_spread, spark_spread
 except Exception:
@@ -217,7 +217,7 @@ class CarbonCreditsEUA(CommodityStrategy):  # type: ignore
         gas   = float(row.get("gas_price_mmbtu", 3.0))
         coal  = float(row.get("coal_price_tonne", 80.0))
         power = float(row.get("power_price_mwh", 65.0))
-        ip    = float(row.get("ip_index", 100.0))
+        float(row.get("ip_index", 100.0))
 
         # ── Signal 1: Fuel-switching ──
         sw = fuel_switching_signal(gas, coal, power, eua)

@@ -13,15 +13,14 @@ Shared utilities for the OCR stack:
 """
 
 from __future__ import annotations
-import os
-import io
-import sys
-import re
-import json
-import time
+
 import glob
+import json
 import logging
-from dataclasses import dataclass
+import os
+import re
+import sys
+import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np

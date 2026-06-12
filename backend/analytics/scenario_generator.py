@@ -1,9 +1,13 @@
 # backend/risk/scenario_generator.py
 from __future__ import annotations
 
-import os, json, time, math, random
-from dataclasses import dataclass, asdict, field
-from typing import Dict, List, Tuple, Optional, Iterable, Any
+import json
+import math
+import os
+import random
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---- core deps (numpy required) ---------------------------------------------
 try:
@@ -390,7 +394,8 @@ def quick_run_preset(
 # -----------------------------------------------------------------------------
 
 def _cli():
-    import argparse, asyncio
+    import argparse
+    import asyncio
     ap = argparse.ArgumentParser("scenario_generator")
     ap.add_argument("--demo", action="store_true", help="Run a demo INR stress on a toy portfolio.")
     ap.add_argument("--preset", type=str, default=None, help="Use a preset stress pack (e.g., gfc, covid, 87, tapertantrum, inrcrisis)")

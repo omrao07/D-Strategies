@@ -1,14 +1,12 @@
 # backend/engine/exec_policies/portfolio_insurance_obpi.py
 from __future__ import annotations
 
-import os
 import json
-import time
 import math
+import os
 import signal
-from typing import Dict, Any, Optional
-
-import redis
+import time
+from typing import Any, Dict
 
 from backend.bus.streams import hset, publish_stream  # your helpers
 
@@ -16,6 +14,7 @@ from backend.bus.streams import hset, publish_stream  # your helpers
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 # NAV inputs

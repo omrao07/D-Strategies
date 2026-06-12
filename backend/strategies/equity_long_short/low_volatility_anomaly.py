@@ -18,7 +18,10 @@ outdir/portfolio.csv        date, long_return, short_return, ls_return
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

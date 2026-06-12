@@ -95,13 +95,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -139,7 +138,6 @@ def dayofweek(d: pd.Series) -> pd.Series:
 
 def parse_time_like(df: pd.DataFrame) -> pd.DataFrame:
     """Ensure df has 'dt' (datetime) and 'date' columns. Accept date+time, or timestamp/datetime."""
-    cols = df.columns
     # Combined timestamp?
     ts = ncol(df, "timestamp","datetime","ts")
     if ts:
@@ -572,7 +570,7 @@ def main():
     FL = load_flows(args.flows, bucket_map=bucket_map)
     WT = load_weights(args.weights, bucket_map=bucket_map) if args.weights else pd.DataFrame()
     ST = load_stocks(args.stocks) if args.stocks else pd.DataFrame()
-    EV = load_events(args.events) if args.events else pd.DataFrame()
+    load_events(args.events) if args.events else pd.DataFrame()
 
     # Date filters
     if args.start:

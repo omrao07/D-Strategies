@@ -5,10 +5,10 @@ Extended math & finance utilities for quant strategies.
 Provides safe wrappers around common stats, finance, and matrix operations.
 """
 
+from typing import List, Optional, Union
+
 import numpy as np
 import pandas as pd
-from typing import List, Union, Tuple, Optional
-
 
 # ---------- Basic Safe Math ----------
 
@@ -55,7 +55,7 @@ def sharpe_ratio(returns: Union[pd.Series, np.ndarray], rf: float = 0.0, freq: i
         freq: periods per year (252 = daily, 12 = monthly)
     """
     r = pd.Series(returns).dropna()
-    excess = r - rf
+    r - rf
     mu = r.mean() * freq
     sigma = r.std(ddof=0) * np.sqrt(freq)
     return safe_div(mu, sigma)

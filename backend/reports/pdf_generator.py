@@ -45,7 +45,7 @@ import datetime as dt
 import os
 import sys
 import textwrap
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 # Optional imports
 WEASYPRINT_OK = False
@@ -53,7 +53,7 @@ MARKDOWN_OK = False
 JINJA2_OK = False
 
 try:
-    from weasyprint import HTML, CSS, default_url_fetcher  # type: ignore
+    from weasyprint import CSS, HTML, default_url_fetcher  # type: ignore
     WEASYPRINT_OK = True
 except Exception:
     WEASYPRINT_OK = False
@@ -73,9 +73,9 @@ except Exception:
 # Fallback text-only PDF
 REPORTLAB_OK = False
 try:
-    from reportlab.lib.pagesizes import A4, LETTER, legal # type: ignore
-    from reportlab.lib.units import inch # type: ignore
-    from reportlab.pdfgen import canvas # type: ignore
+    from reportlab.lib.pagesizes import A4, LETTER, legal  # type: ignore
+    from reportlab.lib.units import inch  # type: ignore
+    from reportlab.pdfgen import canvas  # type: ignore
     REPORTLAB_OK = True
 except Exception:
     REPORTLAB_OK = False

@@ -40,12 +40,12 @@ import argparse
 import importlib
 import json
 import os
-import re
 import sqlite3
 import sys
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
+
 
 # ---------- optional deps (we test their presence, not require them) ----------
 def _try_import(name: str):

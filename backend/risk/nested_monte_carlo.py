@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import math
 import random
-from dataclasses import dataclass, field, asdict
-from typing import Callable, Dict, Iterable, List, Optional, Tuple
-
+from dataclasses import dataclass, field
+from typing import Callable, Dict, List, Optional, Tuple
 
 # ---------------------------------------------------------------------
 # Small utils (no external deps)

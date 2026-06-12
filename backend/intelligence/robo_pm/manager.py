@@ -31,19 +31,18 @@ mgr.run_once(do_execute=False)
 
 from __future__ import annotations
 
-import os
-import sys
 import json
-import time
+import os
 import signal as _os_signal
+import sys
+import time
 import traceback
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Optional, Protocol
 
-from agents.base import MarketContext, Constraints # type: ignore
-from coordinator import Coordinator # type: ignore
-from backend.common.explainer import explain_proposal, explain_decision, md_report # type: ignore
-
+from agents.base import Constraints, MarketContext  # type: ignore
+from backend.common.explainer import explain_decision, explain_proposal, md_report  # type: ignore
+from coordinator import Coordinator  # type: ignore
 
 # ----------------------------- provider protocols -----------------------------
 
@@ -243,7 +242,7 @@ class Manager:
         while not self._should_stop:
             try:
                 step += 1
-                res = self.run_once(do_execute=do_execute)
+                self.run_once(do_execute=do_execute)
                 backoff = 0.0  # reset backoff on success
             except Exception as e:
                 print("[manager] step error:", e, file=sys.stderr)
@@ -287,9 +286,9 @@ class Manager:
 
 if __name__ == "__main__":
     # Minimal demo run (dry-run)
-    from agents.crypto import CryptoAgent # type: ignore
-    from agents.equities import EquitiesAgent # type: ignore
-    from agents.fx import FXAgent # type: ignore
+    from agents.crypto import CryptoAgent  # type: ignore
+    from agents.equities import EquitiesAgent  # type: ignore
+    from agents.fx import FXAgent  # type: ignore
 
     prices = {"BTCUSDT": 65000, "ETHUSDT": 3200, "AAPL": 210.0, "EURUSD": 1.09}
     signals = {

@@ -16,14 +16,12 @@ from __future__ import annotations
 import os
 import sys
 import time
-import math
-import json
 import typing as T
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-import requests
 import pandas as pd
+import requests
 
 # Optional but recommended for Parquet
 try:

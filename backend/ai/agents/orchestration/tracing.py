@@ -1,15 +1,15 @@
 # backend/ai/agents/core/tracing.py
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import sys
+import threading
 import time
 import uuid
-import threading
-import contextvars
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, Optional, Callable, Iterable, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, Iterable, Optional
 
 # ---------------- Optional Redis (safe fallback) ----------------
 try:

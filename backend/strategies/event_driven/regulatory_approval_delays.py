@@ -20,7 +20,10 @@ outdir/delay_analysis.csv       drop on delay, recovery on resolution
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

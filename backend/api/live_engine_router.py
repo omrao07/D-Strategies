@@ -6,10 +6,10 @@ stream portfolio state, and inspect health.
 from __future__ import annotations
 
 import logging
+import os
 import time
 from typing import Any, Dict, List, Optional
 
-import os
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
@@ -27,7 +27,8 @@ def _require_key(key: str = Security(_key_header)) -> None:
 # ── Shared Redis helper (with password) ───────────────────────────────────────
 def _get_redis():
     import redis as _redis_mod
-    from backend.live_engine.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+
+    from backend.live_engine.config import REDIS_HOST, REDIS_PASSWORD, REDIS_PORT
     return _redis_mod.Redis(
         host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
     )

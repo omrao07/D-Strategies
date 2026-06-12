@@ -1,8 +1,7 @@
 # tests/test_hy_vs_ig_backtest.py
+import engines.credit.hy_vs_ig as hyig  # type: ignore
 import numpy as np
 import pandas as pd
-
-import engines.credit.hy_vs_ig as hyig # type: ignore
 
 
 def make_data(n=300, seed=7):

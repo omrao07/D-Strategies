@@ -9,15 +9,16 @@ import logging
 import os
 import threading
 import time
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from backend.engine.strategy_base import Strategy
+
+from .risk_gates import RiskGates
 from .runner import StrategyRunner
 from .signal_aggregator import SignalAggregator
-from .risk_gates import RiskGates
 
 try:
-    from backend.execution.brokers.paper import PaperBroker, OrderRequest
+    from backend.execution.brokers.paper import OrderRequest, OrderResult, PaperBroker
     _HAVE_PAPER = True
 except Exception:
     _HAVE_PAPER = False

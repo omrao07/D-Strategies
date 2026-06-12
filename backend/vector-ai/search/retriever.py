@@ -17,13 +17,14 @@ pip install numpy pinecone-client weaviate-client faiss-cpu whoosh
 """
 
 from __future__ import annotations
+
 import warnings
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, List, Optional
 
 import numpy as np
 
-from search.reranker import Candidate
 from search.filters import Filter
+from search.reranker import Candidate
 
 # optional deps
 try:

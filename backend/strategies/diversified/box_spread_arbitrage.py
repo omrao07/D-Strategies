@@ -13,7 +13,7 @@ Category: Diversified / Arbitrage
 """
 
 import pandas as pd
-import numpy as np
+
 
 class BoxSpreadArbitrageStrategy:
     def __init__(self, options_data: pd.DataFrame, risk_free_rate: float = 0.03):

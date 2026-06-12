@@ -89,13 +89,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- utilities -----------------------------
 
@@ -482,17 +481,16 @@ def run_country_sector_impacts(
             ship_idx[(str(r["origin"]).upper(), str(r["dest"]).upper())] = float(r["shipping_cost_idx"]) if pd.notna(r["shipping_cost_idx"]) else 100.0
 
     # For friend-shoring, map countries to bloc
-    bloc = allies.set_index("country")["bloc"] if not allies.empty else pd.Series(dtype=str)
+    allies.set_index("country")["bloc"] if not allies.empty else pd.Series(dtype=str)
 
     # Aggregate structures
-    imp_rows = []
     sec_rows = []
 
     # Pre-aggregate imports by importer×sector×exporter
     G = TR.groupby(["importer","sector","exporter"], as_index=False)["value"].sum()
 
     # Precompute country-level imports and import shares (inputs)
-    imp_by_country = G.groupby(["importer"])["value"].sum().to_dict()
+    G.groupby(["importer"])["value"].sum().to_dict()
 
     # Iterate import relationships
     for (imp, sec), g in G.groupby(["importer","sector"]):
@@ -540,8 +538,8 @@ def run_country_sector_impacts(
             dQ_Q = params.trade_elasticity * price_chg
             vol_after = vol_after_controls * (1.0 + dQ_Q)
             # Reshoring portion: remove from imports → produce domestically with cost differential
-            resh_vol = vol_after * resh_share
-            friend_vol = vol_after * frnd_share
+            vol_after * resh_share
+            vol_after * frnd_share
 
             # Domestic production cost premium proxy from country wage/energy vs exporter
             # If costs.csv given, use wage_idx/energy_idx; else assume domestic=110 vs foreign=100
@@ -739,7 +737,7 @@ def main():
 
     # Summary
     top_cpi = IMP_C.nlargest(5, "delta_cpi_pp", keep="all")[["country","delta_cpi_pp"]].to_dict(orient="records") if not IMP_C.empty else []
-    bot_cpi = IMP_C.nsmallest(5, "delta_cpi_pp", keep="all")[["country","delta_cpi_pp"]].to_dict(orient="records") if not IMP_C.empty else []
+    IMP_C.nsmallest(5, "delta_cpi_pp", keep="all")[["country","delta_cpi_pp"]].to_dict(orient="records") if not IMP_C.empty else []
     top_marg = IMP_S.nsmallest(5, "delta_margin_pp", keep="all")[["country","sector","delta_margin_pp"]].to_dict(orient="records") if not IMP_S.empty else []
     sumy = {
         "scenario": args.scenario or "BASELINE",

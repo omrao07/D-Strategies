@@ -51,16 +51,15 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-
 # ----------------------- Bus hook (optional) -----------------------
 
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:
         # Safe stub
@@ -401,7 +400,7 @@ class DarkSim:
 
         # Time to finish (last fill timestamp)
         t_last = int(times[int(t_idx[-1])])
-        t_first = int(times[int(t_idx[0])])
+        int(times[int(t_idx[0])])
         ttf = int((t_last - times[0])) if filled >= order.qty else None
 
         # Venue stats & toxicity-adjusted markout

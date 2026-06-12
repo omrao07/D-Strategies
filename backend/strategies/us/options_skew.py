@@ -44,7 +44,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -59,9 +59,9 @@ try:
 except Exception:
     plt = None
 
-from dateutil import parser as dtp
 from datetime import datetime, timezone
 
+from dateutil import parser as dtp
 
 # --------------------- Config & IO helpers ---------------------
 
@@ -100,8 +100,8 @@ def _coerce_num(x):
 
 # --------------------- Black–Scholes utils ---------------------
 
-from math import log, sqrt, exp
-from math import erf
+from math import erf, sqrt
+
 
 def _norm_cdf(x: float) -> float:
     # Φ(x) via error function
@@ -221,9 +221,9 @@ def load_chain_from_yf(ticker: str, expiries: List[str]) -> Tuple[pd.DataFrame, 
         # fallback
         spot = float(tk.history(period="1d")["Close"][-1])
     frames = []
-    for exp in expiries:
+    for exp_date in expiries:
         try:
-            opt = tk.option_chain(exp)
+            opt = tk.option_chain(exp_date)
         except Exception:
             continue
         for typ, tab in [("C", opt.calls), ("P", opt.puts)]:
@@ -231,7 +231,7 @@ def load_chain_from_yf(ticker: str, expiries: List[str]) -> Tuple[pd.DataFrame, 
             sub = tab.rename(columns=str.lower).copy()
             # yfinance usually provides 'lastPrice','bid','ask','strike' and 'impliedVolatility' (but we recompute)
             sub["type"] = typ
-            sub["expiry"] = pd.Timestamp(exp)
+            sub["expiry"] = pd.Timestamp(exp_date)
             # mid
             sub["mid"] = (pd.to_numeric(sub.get("bid", np.nan), errors="coerce") + pd.to_numeric(sub.get("ask", np.nan), errors="coerce")) / 2.0
             if "lastprice" in sub.columns:

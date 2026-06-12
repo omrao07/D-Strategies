@@ -92,7 +92,7 @@ def run_health_check(streams: list[str] = None, r=None) -> Dict:
             pass
         logger.warning(f"[health_monitor] degraded: {report}")
     else:
-        logger.debug(f"[health_monitor] ok")
+        logger.debug("[health_monitor] ok")
     return report
 
 

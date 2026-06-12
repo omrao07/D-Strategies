@@ -1,10 +1,12 @@
 # engines/options/hedging/tail_hedges.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from math import erf, log, sqrt
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Literal, Callable, List, Any
-from math import erf, sqrt, log
 
 TRADING_DAYS = 252
 

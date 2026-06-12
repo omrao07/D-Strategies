@@ -1,14 +1,19 @@
 # backend/gateway.py
 from __future__ import annotations
-import os, json, asyncio, signal, time, traceback
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional, Set, DefaultDict, Tuple, List
+
+import asyncio
+import json
+import os
+import time
+import traceback
 from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any, DefaultDict, Dict, Optional, Set
 
 # ---------- FastAPI / WS ----------
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Depends
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # ---------- Redis (graceful if missing) ----------
 HAVE_REDIS = True

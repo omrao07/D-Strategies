@@ -1,9 +1,13 @@
 # backend/surveillance/surveillance.py
 from __future__ import annotations
 
-import os, json, time, asyncio, math, collections, statistics
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Deque, DefaultDict
+import asyncio
+import collections
+import json
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, DefaultDict, Deque, Dict, Optional, Tuple
 
 # -------- Optional Redis (graceful) ------------------------------------------
 HAVE_REDIS = True

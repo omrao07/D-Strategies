@@ -41,14 +41,15 @@ except Exception:
 
 # Project imports (guarded so this file can be imported standalone)
 try:
-    from .policy_sim import PolicySimConfig, PolicySimulator # type: ignore
-except Exception as e:
+    from .policy_sim import PolicySimConfig, PolicySimulator  # type: ignore
+except Exception:
     PolicySimConfig = None  # type: ignore
     PolicySimulator = None  # type: ignore
 
 # Prefer the richer ScenarioRunner (with timeline blocks). Fallback to ScenarioLibrary if not present.
 try:
-    from .scenarios import ScenarioRunner, load_yaml as load_scen_yaml, ScenarioSpec  # type: ignore # rich API
+    from .scenarios import ScenarioRunner, ScenarioSpec  # type: ignore # rich API
+    from .scenarios import load_yaml as load_scen_yaml
     _SCEN_KIND = "runner"
 except Exception:
     ScenarioRunner = None  # type: ignore
@@ -61,7 +62,16 @@ except Exception:
 
 # Shock models (optional)
 try:
-    from .shock_models import ShockEngine, JumpDiffusion, HawkesLike, RegimeConditional, VolatilitySpike, LiquidityDrain, CrossAssetPropagator, apply_to_sim # type: ignore
+    from .shock_models import (  # type: ignore
+        CrossAssetPropagator,
+        HawkesLike,
+        JumpDiffusion,
+        LiquidityDrain,
+        RegimeConditional,
+        ShockEngine,
+        VolatilitySpike,
+        apply_to_sim,
+    )
     _HAVE_SHOCKS = True
 except Exception:
     _HAVE_SHOCKS = False

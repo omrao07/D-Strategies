@@ -5,8 +5,8 @@ import json
 import logging
 import math
 import os
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional
 
 log = logging.getLogger("reconciler")
 if not log.handlers:
@@ -26,12 +26,11 @@ except Exception:
 
 # Internal storage & broker APIs
 try:
-    from backend.execution.order_store import OrderStore # type: ignore
+    from backend.execution.order_store import OrderStore  # type: ignore
 except Exception:
     OrderStore = None  # type: ignore
 
-from backend.runtime.broker_base import BrokerBase, PaperBroker, Position as BrokerPosition, Account as BrokerAccount  # type: ignore
-
+from backend.runtime.broker_base import BrokerBase, PaperBroker  # type: ignore
 
 # ============================ Data Models ============================
 
@@ -224,7 +223,7 @@ class Reconciler:
         internal_cash = None
         if self._store:
             try:
-                pnl = self._store.get_pnl_day()
+                self._store.get_pnl_day()
                 # If you store starting equity/cash elsewhere, wire it here.
                 # For now we only surface today's realized/fees; equity must be checked at broker.
                 internal_cash = None

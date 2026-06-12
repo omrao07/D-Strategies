@@ -3,22 +3,22 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 import yaml
 
 # Optional: your existing stack (soft imports so this module is standalone)
 try:
-    from risk.risk_limits import RiskLimits, LimitsConfig # type: ignore
+    from risk.risk_limits import LimitsConfig, RiskLimits  # type: ignore
 except Exception:  # pragma: no cover
     RiskLimits = object             # type: ignore
     LimitsConfig = object           # type: ignore
 
 try:
-    from orchestrator.alerts import Alerts # type: ignore
+    from orchestrator.alerts import Alerts  # type: ignore
 except Exception:  # pragma: no cover
     class Alerts:                      # minimal shim
         def __init__(self, *_, **__): pass
@@ -88,6 +88,52 @@ class AuditEvent:
     action: str
     reason: str
     meta: Dict[str, Any]
+
+
+# ======================================================================
+# Applicability
+# ======================================================================
+
+def _policy_matches(policy: Policy, ctx: PolicyContext, registry: Optional[pd.DataFrame]) -> bool:
+    """
+    Decide whether `policy` applies to the strategy/context `ctx`.
+
+    A policy with neither `families` nor `tags_any` filters applies universally.
+    Otherwise we look up the strategy's family/tags in `registry` (keyed by
+    'strategy_id') and require a family match OR a tag overlap. When registry
+    metadata is unavailable we fail safe and apply the governance policy.
+    """
+    fams = [f for f in (policy.families or []) if f]
+    tags = [t for t in (policy.tags_any or []) if t]
+    if not fams and not tags:
+        return True
+
+    fam_val = ""
+    tag_val = ""
+    if registry is not None:
+        try:
+            rows = registry[registry["strategy_id"].astype(str) == str(ctx.sid)]
+            if len(rows):
+                row = rows.iloc[0]
+                fam_val = str(row.get("family", "") or "")
+                tag_val = str(row.get("tags", "") or "")
+        except Exception:
+            # Registry malformed / missing columns → fail safe (apply policy)
+            return True
+
+    if not fam_val and not tag_val:
+        # Unknown strategy metadata → fail safe (apply governance policy)
+        return True
+
+    if fams and fam_val in fams:
+        return True
+
+    if tags and tag_val:
+        strat_tags = {t.strip() for t in tag_val.replace("|", ",").split(",") if t.strip()}
+        if strat_tags.intersection(tags):
+            return True
+
+    return False
 
 
 # ======================================================================
@@ -174,7 +220,7 @@ class RiskPolicyEngine:
             return {"approved": df.iloc[0:0], "queued": df.iloc[0:0], "rejected": df.iloc[0:0], "halted": df}
 
         # 1) Apply policies
-        applicable = [p for p in self._policies if p.enabled and _policy_matches(p, ctx, self.registry)] # type: ignore
+        applicable = [p for p in self._policies if p.enabled and _policy_matches(p, ctx, self.registry)]
         applicable.sort(key=lambda p: p.name)
 
         for pol in applicable:
@@ -484,7 +530,6 @@ if __name__ == "__main__":
     eng.load_yaml(tmp)
 
     # Orders sample
-    import numpy as np
     df = pd.DataFrame([
         {"ticker":"GAZP_RX", "trade_notional":250_000, "side":"BUY", "country":"RU", "issuer":"GAZPROM", "tags":"em,style:procyc", "hhmm": 931, "strategy_id":"BW-0001"},
         {"ticker":"SPY",     "trade_notional":500_000, "side":"BUY", "country":"US", "issuer":"-", "tags":"style:defens", "hhmm": 932, "strategy_id":"BW-0002"},

@@ -1,12 +1,10 @@
 # backend/tests/test_live.py
 """Tests for backend/live/ modules."""
 import time
-import pytest
 
+from backend.live.engine import LiveEngine
 from backend.live.risk_gates import RiskGates
 from backend.live.signal_aggregator import SignalAggregator
-from backend.live.engine import LiveEngine
-
 
 # ---- RiskGates tests -------------------------------------------------------
 

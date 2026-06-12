@@ -25,12 +25,12 @@ Usage (CLI):
 """
 
 from __future__ import annotations
-import os
-import sys
-import json
-import csv
+
 import argparse
+import csv
 import datetime
+import json
+import os
 from typing import Any, Dict, List, Optional
 
 

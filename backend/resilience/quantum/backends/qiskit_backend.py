@@ -8,7 +8,7 @@ This module is SAFE even if Qiskit is not installed.
 If unavailable, it raises a clear runtime error only when used.
 """
 
-from typing import Dict, Tuple, Optional, List
+from typing import Dict, List, Optional, Tuple
 
 # ─────────────────────────────────────────────────────────────
 # Optional import guard
@@ -17,10 +17,10 @@ from typing import Dict, Tuple, Optional, List
 try:
     from qiskit import Aer
     from qiskit.algorithms import QAOA
+    from qiskit.algorithms.optimizers import COBYLA
     from qiskit.utils import QuantumInstance
     from qiskit_optimization import QuadraticProgram
     from qiskit_optimization.algorithms import MinimumEigenOptimizer
-    from qiskit.algorithms.optimizers import COBYLA
     _QISKIT_AVAILABLE = True
 except Exception:
     _QISKIT_AVAILABLE = False

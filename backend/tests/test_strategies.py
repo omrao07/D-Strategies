@@ -19,9 +19,9 @@ import csv
 import io
 import math
 import unittest
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple
+from typing import Dict, List, Literal, Optional, Sequence
 
 UTC = timezone.utc
 StrategyStatus = Literal["live", "paper", "paused"]

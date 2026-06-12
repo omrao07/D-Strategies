@@ -1,9 +1,10 @@
 # tests/test_optimizer.py
 import importlib
 import math
+from typing import Optional, Tuple
+
 import numpy as np
-import pytest # type: ignore
-from typing import Any, Dict, Optional, Tuple, List
+import pytest  # type: ignore
 
 """
 Expected public APIs (any one is fine)
@@ -179,7 +180,7 @@ def test_unconstrained_solution_matches_closed_form(api, data):
     one = np.ones_like(mu)
     A = one @ inv @ one
     B = one @ inv @ mu
-    C = mu  @ inv @ mu
+    mu  @ inv @ mu
     w_tan = (inv @ (mu - (B/A)*one))
     w_cf = w_tan / np.sum(w_tan)  # budget 1
     # Compare direction (cosine similarity close to 1)

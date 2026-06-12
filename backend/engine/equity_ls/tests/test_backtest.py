@@ -1,13 +1,12 @@
 # engines/equity_ls/tests/test_backtest.py
 import numpy as np
 import pandas as pd
-
-from engines.equity_ls.backtest.pnl import compute_pnl, run_equity_ls_pnl # type: ignore
-from engines.equity_ls.backtest.risk import ( # type: ignore
-    size_equity_ls_weights,
+from engines.equity_ls.backtest.pnl import compute_pnl, run_equity_ls_pnl  # type: ignore
+from engines.equity_ls.backtest.risk import (  # type: ignore
     risk_report_from_positions,
+    size_equity_ls_weights,
 )
-from engines.equity_ls.backtest.simulator import simulate_from_scores # type: ignore
+from engines.equity_ls.backtest.simulator import simulate_from_scores  # type: ignore
 
 
 def _toy_prices(n_days=260, tickers=("AAA", "BBB", "CCC", "DDD"), seed=7):

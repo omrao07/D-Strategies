@@ -2,19 +2,19 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 # ---- optional imports from your codebase (kept loose) -----------------
 try:
-    from backend.execution.pricer import ( # type: ignore
+    from backend.execution.pricer import (  # type: ignore
         Position as EqPosition,
+    )
+    from backend.execution.pricer import (
         Quote,
-        quotes_from_last,
         mark_portfolio,
         mtm_dicts,
-        bs_price,
-        bs_greeks,
+        quotes_from_last,
     )
 except Exception:
     # Minimal fallbacks so the module can import without your pricer
@@ -54,8 +54,12 @@ except Exception:
         return result
 
 try:
-    from backend.treasury.soverign_adapter import ( # type: ignore
-        YieldCurve, CurvePoint, BondSpec, SovereignAdapter, price_from_curve,
+    from backend.treasury.soverign_adapter import (  # type: ignore
+        BondSpec,
+        CurvePoint,
+        SovereignAdapter,
+        YieldCurve,
+        price_from_curve,
     )
 except Exception:
     # Tiny stand-in types to keep imports happy if treasury module not present
@@ -95,10 +99,8 @@ except Exception:
     def price_from_curve(spec, curve, asof, clean=True):
         # primitive: discount level (no accrual nuance)
         # assume equal coupon intervals; good enough for delta comparison
-        from datetime import datetime
         def yf(a,b): return (b-a).days/365.0
         if hasattr(asof,"date"): asof = asof
-        cds = []  # not building full schedule here (sim is delta-oriented)
         T = max(0.001, (spec.maturity - asof).days/365.0)
         pv_red = spec.face * curve.discount_factor(T)
         # crude coupon PV: level annuity with duration T and freq F

@@ -18,13 +18,14 @@ Minimal deps. All 3rd-party libraries are optional.
 """
 
 from __future__ import annotations
+
 import hashlib
 import json
 import re
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
 # -------- Optional imports (graceful fallback) --------

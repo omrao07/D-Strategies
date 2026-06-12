@@ -30,17 +30,17 @@ Cathode chemistry market share (2024 trend):
 """
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 
 try:
     from backend.commodities.base import (
-        CommodityStrategy, CommoditySignal, CommoditySector,
-        SignalDirection, SignalSource, CommodityRiskParams,
+        CommoditySector,
+        CommodityStrategy,
+        SignalDirection,
+        SignalSource,
     )
 except Exception:
     CommodityStrategy = object  # type: ignore
@@ -228,8 +228,8 @@ class BatteryMetalsEVDemand(CommodityStrategy):  # type: ignore
 
         row = prices.iloc[-1]
         ni    = float(row.get("ni_price",  18_000.0))
-        co    = float(row.get("co_price",  28_000.0))
-        li    = float(row.get("li_price",  12_000.0))
+        float(row.get("co_price",  28_000.0))
+        float(row.get("li_price",  12_000.0))
         ev_yoy = float(row.get("ev_yoy_pct", 20.0))
         ev_pen  = float(row.get("ev_penetration", 0.18))
         lfp     = float(row.get("lfp_market_share", 0.38))
@@ -436,7 +436,7 @@ class BatteryMetalsEVDemand(CommodityStrategy):  # type: ignore
 if __name__ == "__main__":
     print("=== Battery Metals / EV Demand Strategy ===")
     demand = ev_demand_score(ev_yoy=35.0, ev_penetration=0.22, lfp_share=0.42)
-    print(f"EV growth=35%YoY, penetration=22%, LFP share=42%")
+    print("EV growth=35%YoY, penetration=22%, LFP share=42%")
     for metal, score in demand.items():
         if metal not in ("base_ev", "lfp_share"):
             print(f"  {metal:10}: score={score:+.3f}")

@@ -38,10 +38,9 @@ Output example:
 
 from __future__ import annotations
 
-import os
 import json
+import os
 import time
-import math
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -219,7 +218,7 @@ class RiskExplainer:
         sev = "🚨" if v >= (self.var_warn * 1.5) else "⚠️" if v >= self.var_warn else "OK"
         bullets = [
             f"VaR {pct(v, 1)} of NAV ({'↑' if dv_pp>0 else '↓' if dv_pp<0 else '→'} {abs(dv_pp):.1f}pp vs 24h). "
-            + (f"Top contrib: " + ", ".join(f"{k} ({pct(val,1)})" for k, val in top) + "." if top else "")
+            + ("Top contrib: " + ", ".join(f"{k} ({pct(val,1)})" for k, val in top) + "." if top else "")
         ]
 
         # Context from DD/ES
@@ -430,7 +429,7 @@ def main():
         rx.run()
     except KeyboardInterrupt:
         pass
-    except AssertionError as e:
+    except AssertionError:
         # Bus not available; print a single synthetic explanation as a hint
         demo = explain_snapshot(
             var={"firm_var_pct_nav": 0.031, "per_strategy": {"alpha.momo":0.009,"statarb.pairs":0.007}},

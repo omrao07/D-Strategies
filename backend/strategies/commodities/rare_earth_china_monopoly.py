@@ -24,11 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 REE_STOCK_TICKERS = ["mp", "novn", "mkts", "arafura", "lyc", "iluka"]
 HIGH_VALUE_REE = ["neodymium", "dysprosium", "praseodymium", "terbium"]  # Used in EV motors
@@ -85,7 +86,7 @@ def run(cfg):
     signal_records = []
     for date, row in ree_wide.iterrows():
         z = row.get("hv_zscore", np.nan)
-        mom = row.get("hv_mom_pct", np.nan)
+        row.get("hv_mom_pct", np.nan)
         q_sig = quota_signals.loc[date] if date in quota_signals.index else "no_data"
 
         if not np.isnan(z) and (z > cfg.zscore_threshold or q_sig == "reduction"):

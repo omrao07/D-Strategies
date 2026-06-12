@@ -1,9 +1,11 @@
 # engines/options/vol/vol_surface.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Iterable, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Tuple, Optional, Iterable, Callable
 
 # ============================================================
 # SVI (raw) parameterization
@@ -186,7 +188,7 @@ class Surface:
 
         F1, F2 = float(self.forwards.loc[e1]), float(self.forwards.loc[e2]) # type: ignore
         # forward interpolation in log space (simple)
-        Fq = np.exp(np.interp(T_query, [T1, T2], [np.log(F1), np.log(F2)]))
+        np.exp(np.interp(T_query, [T1, T2], [np.log(F1), np.log(F2)]))
 
         # map given K to log-moneyness against each forward
         k1, k2 = np.log(K / F1), np.log(K / F2)
@@ -244,8 +246,7 @@ def butterfly_arbitrage_metric(K: np.ndarray, iv: np.ndarray, T: float) -> float
     iv = np.asarray(iv, dtype=float)
     # Black call price convex in strike under no butterfly arb.
     # We'll approximate using finite differences on normalized call prices.
-    from math import exp, sqrt, log
-    F = 1.0  # normalized
+    from math import sqrt
     tau = max(T, 1e-12)
     # Rough Black call with F=1, discount=1:
     def black_call(k_, vol_):

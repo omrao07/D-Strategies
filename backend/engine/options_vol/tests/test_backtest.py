@@ -3,29 +3,41 @@ import numpy as np
 import pandas as pd
 
 # ---- Imports from your project ----
-from engines.core.simulator import SimConfig, simulate_backtest # type: ignore
-from engines.stat_arb.signals.dispersion import ( # type: ignore
-    SignalConfig as DispCfg,
-    BacktestConfig as DispBT,
-    backtest_dispersion,
-    build_weights as build_dispersion_weights,
-)
-from engines.options.signals.skew import ( # type: ignore
-    SkewConfig,
-    backtest_skew_rr,
-    build_rr_bf_from_iv,
-    build_realized_skew,
-)
-from engines.options.hedging.tail_hedges import ( # type: ignore
-    SignalConfig as THCfg,
+from engines.core.simulator import SimConfig, simulate_backtest  # type: ignore
+from engines.options.hedging.tail_hedges import (
     BacktestConfig as THBT,
+)
+from engines.options.hedging.tail_hedges import (  # type: ignore
+    SignalConfig as THCfg,
+)
+from engines.options.hedging.tail_hedges import (
     backtest_tail_hedge,
 )
-from engines.options.signals.var_risk_premium import ( # type: ignore
-    VRPConfig,
+from engines.options.signals.skew import (  # type: ignore
+    SkewConfig,
+    backtest_skew_rr,
+    build_realized_skew,
+    build_rr_bf_from_iv,
+)
+from engines.options.signals.var_risk_premium import (
     BacktestConfig as VRPBT,
+)
+from engines.options.signals.var_risk_premium import (  # type: ignore
+    VRPConfig,
     backtest_vrp,
     realized_variance,
+)
+from engines.stat_arb.signals.dispersion import (
+    BacktestConfig as DispBT,
+)
+from engines.stat_arb.signals.dispersion import (  # type: ignore
+    SignalConfig as DispCfg,
+)
+from engines.stat_arb.signals.dispersion import (
+    backtest_dispersion,
+)
+from engines.stat_arb.signals.dispersion import (
+    build_weights as build_dispersion_weights,
 )
 
 # ---------------------------------------------------------------------

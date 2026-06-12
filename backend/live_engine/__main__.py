@@ -22,7 +22,6 @@ import os
 import signal
 import sys
 import threading
-import time
 from pathlib import Path
 
 # ── Logging ───────────────────────────────────────────────────────────────────
@@ -151,9 +150,7 @@ def _arm_risk_limits(state) -> None:
     try:
         if not state.redis:
             return
-        from backend.live_engine.config import (
-            CAPITAL_BASE, MAX_DAILY_LOSS_PCT, MAX_DRAWDOWN_PCT
-        )
+        from backend.live_engine.config import CAPITAL_BASE, MAX_DAILY_LOSS_PCT, MAX_DRAWDOWN_PCT
         daily_loss_abs = CAPITAL_BASE * MAX_DAILY_LOSS_PCT / 100
         state.redis.set("risk:daily_loss_limit",     str(daily_loss_abs))
         state.redis.set("risk:drawdown_kill_pct",    str(MAX_DRAWDOWN_PCT / 100))

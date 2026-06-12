@@ -43,7 +43,7 @@ import sqlite3
 import statistics as stats
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Optional stack
 try:
@@ -66,7 +66,7 @@ except Exception:
     transform_geom = None  # type: ignore
 
 try:
-    from shapely.geometry import shape, Point, mapping  # type: ignore
+    from shapely.geometry import Point, mapping, shape  # type: ignore
     from shapely.ops import unary_union  # type: ignore
 except Exception:
     shape = Point = mapping = unary_union = None  # type: ignore

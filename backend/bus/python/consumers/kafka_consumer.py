@@ -7,11 +7,11 @@ import os
 import signal
 import threading
 import time
-from dataclasses import dataclass, field
-from typing import Callable, Iterable, Optional, Dict, Any
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, Iterable, Optional
 
-from confluent_kafka import Consumer, KafkaError, KafkaException # type: ignore
-from confluent_kafka.serialization import StringDeserializer # type: ignore
+from confluent_kafka import Consumer, KafkaError, KafkaException  # type: ignore
+from confluent_kafka.serialization import StringDeserializer  # type: ignore
 
 # Local utilities (you already have these in bus/python/utils/)
 try:
@@ -24,7 +24,9 @@ except Exception:  # fallback if utils not wired yet
             return payload  # raw bytes if not JSON
 
 try:
-    from ..utils.tracing import start_consume_span  # type: ignore # (topic, key, headers) -> context manager
+    from ..utils.tracing import (
+        start_consume_span,  # type: ignore # (topic, key, headers) -> context manager
+    )
 except Exception:
     from contextlib import nullcontext
     def start_consume_span(*_args, **_kwargs):

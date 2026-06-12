@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import abc
 import enum
-import time
 import random
+import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Protocol
-
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---------------------------------------------------------------------
 # Core types

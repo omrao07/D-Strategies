@@ -25,9 +25,8 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
-import redis
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -48,6 +47,7 @@ CLICKHOUSE_TABLE_PREFIX = os.getenv("REC_CH_TABLE_PREFIX", "rec")
 
 # ---- Redis client (lazy — connects on first use) ----
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 

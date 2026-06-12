@@ -29,17 +29,17 @@ Streams:
 
 from __future__ import annotations
 
+import logging
 import os
 import time
-import logging
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from backend.config.feature_flags import is_enabled
 from backend.bus import streams
+from backend.config.feature_flags import is_enabled
 
 # Source loaders
-from backend.sources.apple import AppleHealthIngestor # type: ignore
-from backend.sources.fitbit import FitbitIngestor # type: ignore
+from backend.sources.apple import AppleHealthIngestor  # type: ignore
+from backend.sources.fitbit import FitbitIngestor  # type: ignore
 
 log = logging.getLogger(__name__)
 if not log.handlers:

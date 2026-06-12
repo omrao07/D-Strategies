@@ -16,9 +16,9 @@ from __future__ import annotations
 
 try:
     # Re-export everything you need from the original file
-    from .contagian_graph import ( # type: ignore
-        ContagionGraph,
+    from .contagian_graph import (  # type: ignore
         Bank,
+        ContagionGraph,
         Exposure,
         ShockParams,
     )
@@ -26,14 +26,18 @@ try:
     __all__ = ["ContagionGraph", "Bank", "Exposure", "ShockParams"]
 
 except Exception as _e:
-    # Graceful error that tells you exactly what to fix
+    # Graceful error that tells you exactly what to fix.
+    # Bind to a stable name: the `as _e` target is cleared at block exit,
+    # so the lazily-raised ImportError must reference this captured copy.
+    _import_err = _e
+
     class _MissingDep:
         def __init__(self, *args, **kwargs):
             raise ImportError(
                 "Could not import from 'backend/risk/contagian_graph.py'. "
                 "Make sure that file exists (with your implementation) "
                 "or copy it here and fix imports."
-            ) from _e
+            ) from _import_err
 
     class ContagionGraph(_MissingDep): ...
     class Bank(_MissingDep): ...

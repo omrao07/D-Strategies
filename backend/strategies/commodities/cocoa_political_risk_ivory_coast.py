@@ -24,11 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 MAIN_CROP_MONTHS = [10, 11, 12, 1, 2, 3]   # Main crop (Ivory Coast): Oct-Mar
 MID_CROP_MONTHS = [4, 5, 6, 7, 8, 9]       # Mid crop: Apr-Sep (smaller)
@@ -48,7 +49,7 @@ def run(cfg):
     politics.columns = [c.lower().strip() for c in politics.columns]
     stocks = pd.read_csv(cfg.stocks_file, parse_dates=["date"])
     stocks.columns = [c.lower().strip() for c in stocks.columns]
-    ret_wide = stocks.pivot(index="date", columns="ticker", values="return").sort_index()
+    stocks.pivot(index="date", columns="ticker", values="return").sort_index()
 
     cocoa_col = "cocoa_usd_ton" if "cocoa_usd_ton" in cocoa.columns else cocoa.columns[0]
 

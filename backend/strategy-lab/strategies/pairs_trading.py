@@ -36,12 +36,11 @@ sa.register(strat, weight=1.0)
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Tuple
 import math
 import statistics
 import time
-
+from dataclasses import dataclass
+from typing import Dict, Iterable, List, Optional, Tuple
 
 Pair = Tuple[str, str]
 

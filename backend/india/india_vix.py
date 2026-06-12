@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from typing import Optional
+
 import redis
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")

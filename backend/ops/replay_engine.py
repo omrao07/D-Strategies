@@ -1,5 +1,6 @@
 # backend/backtest/replay_engine.py
 from __future__ import annotations
+
 """
 Replay Engine
 -------------
@@ -17,17 +18,20 @@ Example:
     eng.run(lambda ev: my_strategy.on_tick(ev))
 """
 
-import os, sys, time, json, csv
+import csv
+import json
+import sys
+import time
 from typing import Any, Callable, Dict, List, Optional
 
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:
         print(f"[bus:{stream}] {payload}")
 
 try:
-    from backend.ledger.ledger import Ledger # type: ignore
+    from backend.ledger.ledger import Ledger  # type: ignore
 except Exception:
     Ledger = None  # type: ignore
 
@@ -82,8 +86,8 @@ class ReplayEngine:
 
         while True:
             prev_ts = None
-            start_wall = time.time()
-            base_event_ts = int(self._events[0]["ts_ms"])
+            time.time()
+            int(self._events[0]["ts_ms"])
             for ev in self._events:
                 ev_ts = int(ev["ts_ms"])
                 if prev_ts is not None and self.speed > 0:

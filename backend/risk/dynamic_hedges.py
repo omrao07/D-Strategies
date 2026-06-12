@@ -50,12 +50,12 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from math import erf, exp, pi, sqrt
 from pathlib import Path
-from typing import Optional, Tuple, List, Dict
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from math import log, sqrt, exp, erf, pi
 
 
 # =========================
@@ -203,7 +203,7 @@ def delta_hedge_path(
 
         # initial option value (liability)
         tau0 = opt.T - times[0]
-        V0 = bs_price(opt.kind, s[0], opt.K, r, q, sigma, tau0)
+        bs_price(opt.kind, s[0], opt.K, r, q, sigma, tau0)
         # replicate from t=0: set Δ and buy shares
         delta_new = bs_delta(opt.kind, s[0], opt.K, r, q, sigma, tau0)
         do_trade = True

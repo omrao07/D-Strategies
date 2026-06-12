@@ -47,17 +47,17 @@
 import argparse
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from itertools import combinations
-from typing import List, Optional, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 try:
-    from statsmodels.tsa.stattools import adfuller, coint
+    from statsmodels.tsa.stattools import adfuller
 except ImportError:
     raise SystemExit("statsmodels required: pip install statsmodels")
 
@@ -341,7 +341,7 @@ def main():
     final_val = equity_df["portfolio_value"].iloc[-1]
     total_ret = (final_val / cfg.capital - 1) * 100
     n_signals = int((signal_df["signal"] != 0).sum())
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Cointegrated pairs: {len(coint_pairs)}")
     print(f"Total signal bars: {n_signals}")
     print(f"Final portfolio value: ${final_val:,.0f}")

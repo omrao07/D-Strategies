@@ -12,11 +12,9 @@ Tests the full decision path:
 from __future__ import annotations
 
 import json
-import time
 import unittest
-from typing import Dict, Any
-from unittest.mock import MagicMock, patch, call
-
+from typing import Any, Dict
+from unittest.mock import MagicMock, patch
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -239,8 +237,8 @@ class TestTickRiskOMSPipeline(unittest.TestCase):
 
     def test_full_pipeline_smoke(self):
         """Risk accepts → execution fills → fill event published."""
-        from backend.engine import risk_manager as rm
         from backend.engine import execution_engine as ee
+        from backend.engine import risk_manager as rm
 
         order = _make_order(strategy="smoke_strat", symbol="MSFT", qty=2.0, price=300.0)
 

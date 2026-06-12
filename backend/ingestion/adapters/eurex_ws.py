@@ -23,7 +23,17 @@
 #   python backend/data/adapters/eurex_ws.py --mode replay --replay data/eurex_ticks.csv
 #   EUREX_WS_MODE=live EUREX_WS_URL=wss://host/ws/eurex python backend/data/adapters/eurex_ws.py
 from __future__ import annotations
-import argparse, asyncio, contextlib, csv, json, os, random, signal, sys, time
+
+import argparse
+import asyncio
+import contextlib
+import csv
+import json
+import os
+import random
+import signal
+import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple

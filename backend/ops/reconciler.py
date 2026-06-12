@@ -1,5 +1,6 @@
 # backend/oms/reconciler.py
 from __future__ import annotations
+
 """
 Reconciler — broker ↔ ledger state
 ----------------------------------
@@ -35,18 +36,22 @@ By default runs in dry mode (no mutations). Set --apply_fixes true to write
 missing orders/fills and correction events into the ledger (append-only).
 """
 
-import argparse, json, math, os, csv, time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple
+import argparse
+import csv
+import json
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional
 
 # ---------- optional modules ----------
 try:
-    from backend.ledger.ledger import Ledger # type: ignore
-except Exception as e:
+    from backend.ledger.ledger import Ledger  # type: ignore
+except Exception:
     Ledger = None  # type: ignore
 
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload: Dict[str, Any]) -> None:  # type: ignore
         pass

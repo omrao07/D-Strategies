@@ -23,11 +23,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 WEIGHTS = {"overall_rating": 0.30, "ceo_approval": 0.20, "culture_rating": 0.25,
            "work_life_rating": 0.10, "recommend_pct": 0.15}
@@ -134,7 +136,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Glassdoor sentiment | Tickers: {len(tickers)} | Avg corr: {f'{summary['avg_corr_fwd21d']:.3f}' if summary['avg_corr_fwd21d'] else 'N/A'} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Glassdoor sentiment | Tickers: {len(tickers)} | Avg corr: {format(summary['avg_corr_fwd21d'], '.3f') if summary['avg_corr_fwd21d'] else 'N/A'} | Sharpe: {format(sharpe, '.2f') if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

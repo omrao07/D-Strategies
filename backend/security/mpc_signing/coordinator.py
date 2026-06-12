@@ -29,7 +29,6 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Tuple
 
-
 # ========================= Protocol & Transport Interfaces =========================
 
 class Transport(Protocol):
@@ -204,7 +203,7 @@ class Coordinator:
         and call `accept_response` for each successful response.
         Returns the list of successful participant IDs (quorum first if requested).
         """
-        N = len(self.participants)
+        len(self.participants)
         t = self.cfg.threshold
         quorum = t if need_quorum else 1
 

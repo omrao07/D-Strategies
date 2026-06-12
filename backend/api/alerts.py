@@ -1,13 +1,21 @@
 # backend/api/alerts.py
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import time
-import json
-import hashlib
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Security, WebSocket, WebSocketDisconnect, Query
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Security,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, Field, field_validator
 
@@ -20,7 +28,7 @@ except Exception:
     AsyncRedis = None  # type: ignore
 
 try:
-    from prometheus_client import Counter, Histogram # type: ignore
+    from prometheus_client import Counter, Histogram  # type: ignore
 except Exception:
     Counter = Histogram = None  # type: ignore
 

@@ -1,9 +1,16 @@
 # backend/engine/backtester.py
 from __future__ import annotations
 
-import csv, json, math, os, importlib, time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Iterable, Tuple, Callable
+import csv
+import importlib
+import json
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
+# Duck-typed strategy object (any class exposing an `.order(...)` method).
+Strategy = Any
 
 # ---- optional deps (graceful) ----------------------------------------------
 try:

@@ -15,20 +15,18 @@ Connects to:
 """
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 
 # ── BaseAgent ──
 try:
-    from backend.ai.agents.core.base_agent import BaseAgent, AgentResult
+    from backend.ai.agents.core.base_agent import AgentResult, BaseAgent
 except Exception:
     try:
-        from ..core.base_agent import BaseAgent, AgentResult  # type: ignore
+        from ..core.base_agent import AgentResult, BaseAgent  # type: ignore
     except Exception:
         class AgentResult:  # type: ignore
             def __init__(self, ok, agent, started_at, finished_at, took_ms, payload=None, error=None, trace=None, meta=None):
@@ -58,18 +56,17 @@ except Exception:
 
 # ── Strategy registry ──
 try:
-    from backend.strategies.commodities.lng_henry_hub_ttf_arb import LNGHenryHubTTFArb
-    from backend.strategies.commodities.corn_soybean_crush import CornSoybeanCrush
-    from backend.strategies.commodities.carbon_credits_eua import CarbonCreditsEUA
     from backend.strategies.commodities.battery_metals_ev_demand import BatteryMetalsEVDemand
+    from backend.strategies.commodities.carbon_credits_eua import CarbonCreditsEUA
     from backend.strategies.commodities.copper_gold_ratio_economy import CopperGoldRatioEconomy
+    from backend.strategies.commodities.corn_soybean_crush import CornSoybeanCrush
+    from backend.strategies.commodities.lng_henry_hub_ttf_arb import LNGHenryHubTTFArb
     _HAS_STRATEGIES = True
 except Exception:
     _HAS_STRATEGIES = False
 
 # ── COT engine ──
 try:
-    from backend.commodities.cot_positioning import COTEngine, generate_synthetic_cot
     _HAS_COT = True
 except Exception:
     _HAS_COT = False
@@ -496,7 +493,7 @@ if __name__ == "__main__":
     print(f"Cu/Au ratio: {brief.copper_gold_ratio}")
     print(f"Signals generated: {brief.n_signals_generated} → {brief.n_signals_filtered} filtered")
     print(f"\nTop idea: {brief.top_idea_rationale}")
-    print(f"\nSignal summary:")
+    print("\nSignal summary:")
     for commodity, summary in brief.signal_summary.items():
         print(f"  {commodity:15}: {summary['direction']:12} score={summary['composite_score']:.3f} n={summary['n_signals']}")
     if brief.risk_flags:

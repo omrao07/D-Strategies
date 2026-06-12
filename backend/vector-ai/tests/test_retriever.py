@@ -15,14 +15,14 @@ Run:
 
 from __future__ import annotations
 
-from pathlib import Path
 import shutil
 import tempfile
+from pathlib import Path
+
 import numpy as np
 import pytest
-
-from search.retriever import VectorRetriever, LexicalRetriever, HybridRetriever
 from search.filters import Filter
+from search.retriever import HybridRetriever, LexicalRetriever, VectorRetriever
 
 # Optional deps for specific tests
 try:
@@ -32,8 +32,8 @@ except Exception:
 
 try:
     from whoosh import index as windex  # type: ignore
-    from whoosh.fields import Schema, TEXT, ID, STORED  # type: ignore
     from whoosh.analysis import StemmingAnalyzer  # type: ignore
+    from whoosh.fields import ID, STORED, TEXT, Schema  # type: ignore
 except Exception:
     windex = None
     Schema = None

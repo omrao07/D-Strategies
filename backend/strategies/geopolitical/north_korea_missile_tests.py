@@ -24,11 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 DEFENSE_TICKERS = ["lmt", "rtx", "noc", "ba", "lig", "hanwha", "kai"]
 RISK_OFF_TICKERS = ["ewy", "ewj", "kospi", "krw", "yen", "jpy"]  # sell on tests
@@ -102,7 +103,7 @@ def run(cfg):
     signal_records = []
     for date in all_dates:
         risk = float(dprk_risk.loc[date]) if date in dprk_risk.index else 0
-        risk_z = (risk - dprk_risk.rolling(252).mean().reindex([date]).ffill().iloc[0]) / \
+        (risk - dprk_risk.rolling(252).mean().reindex([date]).ffill().iloc[0]) / \
                  (dprk_risk.rolling(252).std().reindex([date]).ffill().iloc[0] + 1e-10) \
                  if date in dprk_risk.index else 0
 

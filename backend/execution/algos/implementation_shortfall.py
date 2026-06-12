@@ -1,9 +1,14 @@
 # backend/tca/implementation_shortfall.py
 from __future__ import annotations
 
-import csv, json, math, os, statistics, time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+import csv
+import json
+import os
+import statistics
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Iterable, List, Optional
+
 
 # ----------------------- helpers -----------------------
 def now_ms() -> int: return int(time.time() * 1000)
@@ -269,7 +274,7 @@ def write_results_csv(path: str, results: Iterable[ISResult]) -> None:
 
 # ----------------------- CLI --------------------------
 def _cli():
-    import argparse, json
+    import argparse
     ap = argparse.ArgumentParser("implementation_shortfall")
     ap.add_argument("--orders", type=str, required=True, help="CSV of orders")
     ap.add_argument("--fills", type=str, required=True, help="CSV of fills")

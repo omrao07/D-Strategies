@@ -1,8 +1,8 @@
 # tests/test_arb_map.py
-import math
 import importlib
-import pytest # type: ignore
-from typing import Any, Dict, Optional, Tuple, Callable
+import math
+
+import pytest  # type: ignore
 
 """
 What this tests

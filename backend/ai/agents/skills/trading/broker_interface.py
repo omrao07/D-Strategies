@@ -4,7 +4,7 @@ from __future__ import annotations
 import abc
 import time
 from dataclasses import dataclass
-from typing import Dict, Optional, Literal, Any
+from typing import Any, Dict, Literal, Optional
 
 Side = Literal["buy", "sell"]
 

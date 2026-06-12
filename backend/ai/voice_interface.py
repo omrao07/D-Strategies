@@ -2,14 +2,22 @@
 from __future__ import annotations
 
 import io
-import os
 import json
-import time
+import os
 import tempfile
-from typing import Optional, Dict, Any, List
+import time
+from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect, Query
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi import (
+    APIRouter,
+    File,
+    HTTPException,
+    Query,
+    UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
+)
+from fastapi.responses import JSONResponse, StreamingResponse
 
 # ---------------- Optional deps (all gracefully optional) --------------------
 HAVE_VOSK = True

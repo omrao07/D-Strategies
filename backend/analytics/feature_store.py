@@ -1,9 +1,13 @@
 # backend/data/feature_store.py
 from __future__ import annotations
 
-import os, time, json, math, hashlib, threading
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Iterable, Union
+import hashlib
+import json
+import math
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Union
 
 # ---------- Optional deps (all graceful) -------------------------------------
 HAVE_REDIS = True
@@ -359,7 +363,7 @@ class FeatureStore:
             return None
         for day in sorted(os.listdir(root)):
             try:
-                day_int = int(day)
+                int(day)
             except Exception:
                 continue
             # quick filter by day; read if overlaps window

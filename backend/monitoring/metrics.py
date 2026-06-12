@@ -1,9 +1,13 @@
 # backend/ops/metrics.py
 from __future__ import annotations
 
-import os, time, math, json, threading
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple, Callable
+import json
+import math
+import os
+import threading
+import time
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ---------- optional Redis (graceful fallback) ----------
 HAVE_REDIS = True
@@ -328,14 +332,15 @@ def get_metrics() -> Metrics:
 
 # ---------- CLI (quick demo) -------------------------------------------------
 def _cli():
-    import argparse, random
+    import argparse
+    import random
     ap = argparse.ArgumentParser("metrics")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     demo = sub.add_parser("demo", help="Emit some sample metrics")
     demo.add_argument("--iters", type=int, default=200)
 
-    expo = sub.add_parser("prom", help="Print Prometheus text once")
+    sub.add_parser("prom", help="Print Prometheus text once")
 
     args = ap.parse_args()
     m = get_metrics()

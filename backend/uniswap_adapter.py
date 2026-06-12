@@ -6,8 +6,8 @@ import time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-from web3 import Web3 # type: ignore # 
-from web3.middleware import geth_poa_middleware # type: ignore
+from web3 import Web3  # type: ignore # 
+from web3.middleware import geth_poa_middleware  # type: ignore
 
 # --- Minimal ABIs (trimmed) --------------------------------------------------
 ERC20_ABI = [

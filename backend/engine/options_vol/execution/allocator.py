@@ -1,9 +1,11 @@
 # engines/core/allocator.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
 
 # ---------------------------------------------------------------------
 # Configs

@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass
 from typing import Dict, List, Optional, Tuple
 
 # Soft deps to play nicely with the rest of your codebase
 try:
-    from backend.execution.pricer import Quote # type: ignore
+    from backend.execution.pricer import Quote  # type: ignore
 except Exception:
     @dataclass
     class Quote:
@@ -232,7 +232,6 @@ def simulate_spiral(
                 break
 
             # Allocate sales by rule
-            sales_plan: Dict[str, float] = {}
             if sp.delever_priority == "worst_liquidity_first":
                 # rank by (vol * impact / ADV) descending
                 ranked = sorted(pos.keys(), key=lambda s: (assets[s].vol * assets[s].impact_lambda / max(assets[s].adv,1e-9)), reverse=True)

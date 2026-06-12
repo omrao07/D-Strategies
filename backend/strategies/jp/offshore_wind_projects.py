@@ -51,11 +51,11 @@ NOTES
 """
 
 import argparse
-import os
 import math
+import os
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Dict, Tuple, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import pandas as pd
@@ -477,7 +477,7 @@ def main():
             # Subset columns for events matching facet value
             vals = sorted([v for v in events[facet_col].dropna().unique()])
             for val in vals:
-                cols = [c for c in panel.columns if c[0].startswith("event_")]
+                [c for c in panel.columns if c[0].startswith("event_")]
                 keep_events = [f"event_{i+1}_" for i in range(len(events)) if str(events.loc[i, facet_col]) == str(val)]
                 sub_cols = [c for c in panel.columns if any(c[0].startswith(k) for k in keep_events)]
                 if not sub_cols:

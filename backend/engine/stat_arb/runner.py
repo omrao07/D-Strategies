@@ -1,14 +1,19 @@
 # engines/stat_arb/runner.py
 from __future__ import annotations
+
 import logging
+from typing import Dict, List, Literal, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, List, Literal
-
-from engines.stat_arb.signals import pairs, dispersion # type: ignore
-from engines.stat_arb.execution.allocator import allocate_from_units, AllocConfig # type: ignore
-from engines.stat_arb.execution.order_router import Order, default_router, ExecutionReport # type: ignore
-from engines.stat_arb.backtest.pnl import compute_portfolio_pnl, PairSpec # type: ignore
+from engines.stat_arb.backtest.pnl import PairSpec, compute_portfolio_pnl  # type: ignore
+from engines.stat_arb.execution.allocator import AllocConfig, allocate_from_units  # type: ignore
+from engines.stat_arb.execution.order_router import (  # type: ignore
+    ExecutionReport,
+    Order,
+    default_router,
+)
+from engines.stat_arb.signals import dispersion, pairs  # type: ignore
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -127,7 +132,7 @@ def run_stat_arb_strategy(
     pair_specs: Dict[str,PairSpec] = {}
     for name,(y,x) in legs.items():
         u = units[name]
-        b = betas[name]
+        betas[name]
         pair_specs[name] = PairSpec(
             price_y=prices[y], price_x=prices[x],
             spread_units=pd.DataFrame(u, index=prices.index, columns=["u"]),

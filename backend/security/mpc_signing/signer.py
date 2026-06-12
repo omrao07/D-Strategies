@@ -22,8 +22,7 @@ import hashlib
 import os
 import secrets
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Callable, Awaitable
-
+from typing import Any, Awaitable, Callable, Dict, Optional
 
 # --------------------------- Signer ---------------------------
 
@@ -158,7 +157,7 @@ async def demo_local_agents():
     """
     Run a quick in-process smoke test pairing with Coordinator.LocalTransport.
     """
-    from .coordinator import Coordinator, Participant, RoundConfig, LocalTransport
+    from .coordinator import Coordinator, LocalTransport, Participant, RoundConfig
     from .protocol import FrostLikeStrategy
 
     # create three local signers

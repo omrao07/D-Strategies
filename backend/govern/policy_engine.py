@@ -1,9 +1,13 @@
 # backend/risk/policy_engine.py
 from __future__ import annotations
 
-import os, time, json, math, re, threading
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, List, Optional, Callable, Tuple
+import json
+import math
+import os
+import re
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ----- optional deps (graceful) ----------------------------------------------
 HAVE_YAML = True
@@ -364,7 +368,7 @@ class PolicyEngine:
 
 # ----- CLI -------------------------------------------------------------------
 def _cli():
-    import argparse, sys
+    import argparse
     ap = argparse.ArgumentParser("policy_engine")
     sub = ap.add_subparsers(dest="cmd", required=True)
 

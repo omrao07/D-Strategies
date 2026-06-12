@@ -24,10 +24,11 @@ outdir/arb_backtest.csv         re-peg arb P&L
 outdir/summary.json
 """
 
-import argparse, json, os
-import numpy as np
-import pandas as pd
+import argparse
+import json
+import os
 
+import pandas as pd
 
 SEVERITY_THRESHOLDS = {"minor": 0.10, "moderate": 0.50, "severe": 2.00, "crisis": 5.00}
 

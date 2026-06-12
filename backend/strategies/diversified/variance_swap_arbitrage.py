@@ -1,7 +1,10 @@
 # backend/strategies/diversified/variance_swap_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -273,7 +276,7 @@ class VarianceSwapArbitrage(Strategy):
         if not (abs(edge_vol_bps) >= ENTRY_VOL_BPS and abs(z) >= ENTRY_Z): return
 
         # Sizing: spend a slice of USD_BUDGET on variance notional
-        fee = _fees_bps("OTC") * 1e-4
+        _fees_bps("OTC") * 1e-4
         qty = max(1.0, math.floor(USD_BUDGET / max(1.0, notional)))  # number of var notional units
         if qty * notional < MIN_TICKET_USD: return
 

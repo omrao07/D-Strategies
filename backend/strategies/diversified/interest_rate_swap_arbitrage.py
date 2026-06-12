@@ -1,8 +1,12 @@
 # backend/strategies/diversified/interest_rate_swap_arbitrage.py
 from __future__ import annotations
-import os, time, json, math
+
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
-from typing import Optional, Dict, Tuple
+from typing import Dict, Optional
 
 try:
     import redis as _redis_mod

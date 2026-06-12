@@ -24,11 +24,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 PREMIUM_BUY_THRESHOLD = 0.3   # % premium → expect gap-up → buy ahead
 PREMIUM_SELL_THRESHOLD = -0.3  # % discount → expect gap-down → short
@@ -67,7 +69,7 @@ def run(cfg):
         merged["open_gap_pct"] = (merged["nse_open"] / merged[nse_col].shift(1) - 1) * 100
         merged["premium_to_gap"] = merged["open_gap_pct"] - merged["premium_pct"].shift(1)
         for q in [5, 4, 3, 2, 1]:
-            mask = pd.qcut(merged["premium_pct"].dropna(), q=5, labels=False, duplicates="drop")
+            pd.qcut(merged["premium_pct"].dropna(), q=5, labels=False, duplicates="drop")
             pass  # handled below
 
         df_corr = merged[["premium_pct", "open_gap_pct"]].dropna()

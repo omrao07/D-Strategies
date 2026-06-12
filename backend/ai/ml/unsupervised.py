@@ -7,7 +7,8 @@ All models degrade gracefully when optional deps are absent.
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Tuple
+from typing import Optional
+
 import numpy as np
 
 logger = logging.getLogger("ai.ml.unsupervised")

@@ -20,9 +20,9 @@ A) Class LiquiditySpiral(config: dict | None = None)
 B) Function simulate_liquidity_spiral(state: dict, shock: dict, **kw) -> list[dict] | dict
 """
 
-import math
 import copy
-import pytest # type: ignore
+
+import pytest  # type: ignore
 
 ls = pytest.importorskip("backend.risk.liquidity_spiral", reason="liquidity_spiral module not found")
 

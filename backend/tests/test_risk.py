@@ -18,12 +18,11 @@ from __future__ import annotations
 
 import csv
 import io
-import json
 import math
 import unittest
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 UTC = timezone.utc
 

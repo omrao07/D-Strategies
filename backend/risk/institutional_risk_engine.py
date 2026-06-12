@@ -27,8 +27,8 @@ import json
 import logging
 import math
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Any
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -44,7 +44,6 @@ except Exception:
 
 # ---------- optional pandas -----------------------------------------------
 try:
-    import pandas as pd
     _HAS_PANDAS = True
 except Exception:
     _HAS_PANDAS = False
@@ -1084,7 +1083,7 @@ class InstitutionalRiskEngine:
         india_breach = india_vix > self.config.india_vix_halt_threshold
         cboe_breach = cboe_vix > self.config.vix_halt_threshold
         breached = india_breach or cboe_breach
-        worst_vix = max(india_vix / self.config.india_vix_halt_threshold,
+        max(india_vix / self.config.india_vix_halt_threshold,
                         cboe_vix / self.config.vix_halt_threshold)
         scale = 1.0 - self.config.vix_size_reduction_pct if breached else 1.0
         threshold = max(self.config.india_vix_halt_threshold, self.config.vix_halt_threshold)

@@ -1,8 +1,10 @@
 # engines/equity_ls/signals/sector_rotation.py
 from __future__ import annotations
+
+from typing import Dict, Iterable, Mapping, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Iterable, Mapping, Optional
 
 # --- Defaults: SPDR sector ETFs ---
 DEFAULT_SECTORS: Mapping[str, str] = {

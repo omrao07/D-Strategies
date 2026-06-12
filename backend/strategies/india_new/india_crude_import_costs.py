@@ -24,11 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 OIL_BENEFICIARIES = ["ongc", "oil", "cairn", "vedl"]
 OIL_IMPACTED = ["bpcl", "hpcl", "iocl", "aviation", "paint"]
@@ -101,7 +102,7 @@ def run(cfg):
         brent = row.get(brent_col, np.nan)
         inr_val = row.get(inr_col, np.nan)
         brent_rising = row.get("brent_mom", 0) > 5
-        inr_depreciating = row.get("inr_mom", 0) > 1
+        row.get("inr_mom", 0) > 1
 
         if not np.isnan(z):
             if z > IMPORT_COST_HIGH and brent_rising:

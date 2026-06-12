@@ -1,12 +1,13 @@
 # engines/equity_ls/tests/test_signals.py
 import numpy as np
 import pandas as pd
-
-from engines.equity_ls.signals.momentum import build_signal as build_mom # type: ignore
-from engines.equity_ls.signals.value import build_signal as build_val, proxy_book_to_price # type: ignore
-from engines.equity_ls.signals.quality import build_signal as build_qual, proxy_quality_from_prices # type: ignore
-from engines.equity_ls.signals.sector_rotation import build_signal as build_sector, DEFAULT_SECTORS # type: ignore
-
+from engines.equity_ls.signals.momentum import build_signal as build_mom  # type: ignore
+from engines.equity_ls.signals.quality import build_signal as build_qual  # type: ignore
+from engines.equity_ls.signals.quality import proxy_quality_from_prices
+from engines.equity_ls.signals.sector_rotation import DEFAULT_SECTORS
+from engines.equity_ls.signals.sector_rotation import build_signal as build_sector  # type: ignore
+from engines.equity_ls.signals.value import build_signal as build_val  # type: ignore
+from engines.equity_ls.signals.value import proxy_book_to_price
 
 # ---------------------- Helpers ----------------------
 

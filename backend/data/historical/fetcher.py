@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import os
 from datetime import date, datetime
-from typing import Optional
+
 import pandas as pd
 
 logger = logging.getLogger("data.historical")

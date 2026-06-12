@@ -7,10 +7,10 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
-from .telegram import send_telegram, format_alert
 from .email_report import send_email
+from .telegram import format_alert, send_telegram
 
 log = logging.getLogger(__name__)
 

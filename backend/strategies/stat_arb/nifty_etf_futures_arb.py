@@ -25,8 +25,10 @@ outdir/backtest.csv          cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
-from datetime import datetime
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -76,7 +78,7 @@ def run(cfg):
 
     # Signal generation
     entry_threshold_pct = BASIS_ENTRY_BPS / 100
-    exit_threshold_pct = BASIS_EXIT_BPS / 100
+    BASIS_EXIT_BPS / 100
 
     records = []
     for dt, row in merged.iterrows():
@@ -117,7 +119,7 @@ def run(cfg):
     # Backtest: capture arb spread when signal active
     sig_map = {"sell_futures_buy_etf": -1, "buy_futures_sell_etf": 1, "neutral": 0, "close_near_expiry": 0}
     pos = basis_df.set_index("date")["signal"].map(sig_map).fillna(0)
-    spot_ret = merged["spot"].pct_change()
+    merged["spot"].pct_change()
     futures_ret = merged["fut_close"].pct_change()
     etf_ret = merged["etf_close"].pct_change()
 

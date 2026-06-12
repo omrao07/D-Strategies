@@ -27,14 +27,14 @@ sa.maybe_rebalance()  # will place orders if time/cadence criteria met
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Iterable
 import math
 import time
+from dataclasses import dataclass
+from typing import Dict, Iterable, List, Optional, Tuple
 
 try:
     # Local import within this repo layout
-    from .execution_agent import ExecutionAgent, Side, OrderType, RiskReject # type: ignore
+    from .execution_agent import ExecutionAgent, OrderType, RiskReject, Side  # type: ignore
 except Exception:  # pragma: no cover
     # Fallback names for linting if imported standalone
     ExecutionAgent = object  # type: ignore
@@ -315,7 +315,7 @@ class StrategyAgent:
                     bps = self.cfg.limit_price_bps / 1e4
                     limit = px * (1 + bps) if side == Side.BUY else px * (1 - bps)
                     self.x.submit_order(s, side, qty, type=OrderType.LIMIT, limit_price=limit) # type: ignore
-            except RiskReject as e:
+            except RiskReject:
                 # Skip this symbol if risk rejects; continue others
                 # (You can add logging here.)
                 continue

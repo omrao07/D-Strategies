@@ -9,10 +9,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 # --- your modules ---
-from backend.bus.streams import publish_stream, hset, hgetall
-from backend.execution.order_store import OrderStore # type: ignore
-from backend.execution.pricer import Position as PricerPos, Quote, quotes_from_last, mark_portfolio, mtm_dicts # type: ignore
-from backend.engine.models import Side, OrderType, TIF # type: ignore
+from backend.bus.streams import hgetall, hset, publish_stream
+from backend.engine.models import TIF, OrderType, Side  # type: ignore
+from backend.execution.order_store import OrderStore  # type: ignore
+from backend.execution.pricer import Position as PricerPos  # type: ignore
+from backend.execution.pricer import Quote, mark_portfolio, mtm_dicts, quotes_from_last
 
 # ------------------- config / streams -------------------
 ORDERS_IN     = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
@@ -118,7 +119,7 @@ def kill_switch(on: bool = Query(True, description="true to halt, false to resum
 
 @router.get("/risk/kill")
 def get_kill() -> Dict[str, Any]:
-    v = (hget("risk:halt", "flag") or "").lower() == "true" # type: ignore
+    v = ((hgetall("risk:halt") or {}).get("flag", "") or "").lower() == "true"
     return {"halt": v}
 
 @router.get("/orders", response_model=List[Dict[str, Any]])

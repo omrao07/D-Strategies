@@ -15,8 +15,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, List
-
+from typing import Any, Dict, List, Optional
 
 # ============================
 # Types

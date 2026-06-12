@@ -18,10 +18,7 @@ Assumptions (duck-typed, any similar API works):
 If neither API is present, tests are skipped.
 """
 
-from importlib import import_module
-import math
-import pytest # type: ignore
-
+import pytest  # type: ignore
 
 cg = pytest.importorskip("backend.risk.contagion_graph", reason="contagion_graph module not found")
 
@@ -136,7 +133,7 @@ def test_two_round_cascade(tiny_net):
     B.equity = 30.0  # type: ignore # small buffer
     _set_default(g, "C", True)
 
-    frames = _run(g, rounds=3)  # allow cascade
+    _run(g, rounds=3)  # allow cascade
     # After C default: A loses 63; if that causes A default, C exposure back etc.
     # More importantly, B loses from exposure to C: (1-0.4)*100 = 60 > 30 equity → B should default in cascade.
     B = _bank(g, "B")

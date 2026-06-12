@@ -1,15 +1,23 @@
 # engines/stat_arb/tests/test_backtest.py
 import numpy as np
 import pandas as pd
-
-from engines.stat_arb.backtest.pnl import ( # type: ignore
-    compute_pair_pnl, compute_portfolio_pnl, PairInputs, PairSpec
+from engines.stat_arb.backtest.pnl import (  # type: ignore
+    PairInputs,
+    PairSpec,
+    compute_pair_pnl,
+    compute_portfolio_pnl,
 )
-from engines.stat_arb.backtest.simulator import simulate_pairs, PairConfig, SimConfig # type: ignore
-from engines.stat_arb.execution.allocator import ( # type: ignore
-    PairTarget, AllocConfig, generate_orders_from_pairs, allocate_from_units
+from engines.stat_arb.backtest.simulator import (  # type: ignore
+    PairConfig,
+    SimConfig,
+    simulate_pairs,
 )
-
+from engines.stat_arb.execution.allocator import (  # type: ignore
+    AllocConfig,
+    PairTarget,
+    allocate_from_units,
+    generate_orders_from_pairs,
+)
 
 # ----------------------- Helpers -----------------------
 

@@ -21,14 +21,13 @@ Dependencies: numpy, pandas. Optional: scipy for stats.quantiles.
 """
 
 from __future__ import annotations
+
+import glob
 import os
 import re
-import math
-import glob
-import json
 import warnings
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Iterable
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -437,9 +436,9 @@ def _demo_dcf(root: str) -> Dict[str, float | pd.DataFrame]:
     # pick a sample company (requires columns present; otherwise use placeholders)
     df = data.companies()
     row = df.iloc[0]
-    eps = float(row.get("eps", 5.0))
+    float(row.get("eps", 5.0))
     shares = float(row.get("shares", 1_000.0))
-    price = float(row.get("price", 100.0))
+    float(row.get("price", 100.0))
     revenue = float(row.get("revenue", 10_000.0))
     ebit_m = float(row.get("ebit_margin", row.get("operating_margin", 0.15)))
     tax = float(row.get("tax", 0.23))

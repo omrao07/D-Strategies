@@ -40,14 +40,13 @@
 import argparse
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 # ----------------------------- Config -----------------------------
 
@@ -279,7 +278,7 @@ def main():
     with open(os.path.join(outdir, "run_params.json"), "w") as f:
         json.dump(asdict(cfg), f, indent=2)
 
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Sessions processed: {len(session_df)}")
     n_signals = int((session_df["signal"] != 0).sum())
     print(f"Active signal days: {n_signals} ({n_signals/len(session_df)*100:.1f}%)")

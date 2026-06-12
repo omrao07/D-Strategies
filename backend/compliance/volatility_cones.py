@@ -1,5 +1,6 @@
 # backend/risk/volatility_cones.py
 from __future__ import annotations
+
 """
 Volatility Cones
 ----------------
@@ -43,10 +44,14 @@ Notes
 - Percentile rank for today's RV is computed vs the historical distribution for that window.
 """
 
-import csv, json, math, os, sys
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+import csv
+import json
+import math
+import os
+import sys
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 TRADING_DAYS = float(os.getenv("TRADING_DAYS", "252"))
 

@@ -5,10 +5,10 @@ import pandas as pd
 import pytest
 
 from backend.backtester.vectorized_backtester import (
+    BacktestResult,
+    monte_carlo,
     run_backtest,
     walk_forward,
-    monte_carlo,
-    BacktestResult,
 )
 
 

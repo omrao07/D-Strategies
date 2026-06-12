@@ -1,11 +1,11 @@
 # backend/microstructure/queue_position.py
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Deque, Dict, Optional, Tuple, Literal
-from collections import deque
-import time
 import math
+import time
+from collections import deque
+from dataclasses import dataclass, field
+from typing import Deque, Dict, Literal, Optional, Tuple
 
 Side = Literal["buy", "sell"]
 

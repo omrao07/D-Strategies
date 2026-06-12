@@ -1,12 +1,10 @@
 # backend/execution/broker_interface.py
 from __future__ import annotations
 
-import math
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Any, Protocol
-
+from typing import Any, Dict, Optional, Protocol
 
 # --- Optional Kite Connect (Zerodha) ---
 try:
@@ -18,7 +16,10 @@ except ImportError:
 
 # --- Optional ib_insync (IBKR) ---
 try:
-    from ib_insync import IB as _IB, Stock as _Stock, MarketOrder as _MarketOrder, LimitOrder as _LimitOrder  # pip install ib_insync
+    from ib_insync import IB as _IB  # pip install ib_insync
+    from ib_insync import LimitOrder as _LimitOrder
+    from ib_insync import MarketOrder as _MarketOrder
+    from ib_insync import Stock as _Stock
     _HAVE_IB = True
 except ImportError:
     _IB = None  # type: ignore

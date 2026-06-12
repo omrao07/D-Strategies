@@ -3,20 +3,27 @@ from __future__ import annotations
 
 import json
 import pathlib
-from dataclasses import dataclass, asdict
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from dataclasses import asdict, dataclass
+from typing import Any, Callable, Dict, List, Tuple
 
 try:
-    from backend.backtester.backtester import ( # type: ignore
-        Backtester, DataFeed, Candle, TradeTick, Quote,
-        CommissionModel, SlippageModel, LatencyModel, ExecConfig
+    from backend.backtester.backtester import (  # type: ignore
+        Backtester,
+        Candle,
+        CommissionModel,
+        DataFeed,
+        ExecConfig,
+        LatencyModel,
+        Quote,
+        SlippageModel,
+        TradeTick,
     )
 except Exception:
     Backtester = DataFeed = Candle = TradeTick = Quote = None  # type: ignore
     CommissionModel = SlippageModel = LatencyModel = ExecConfig = None  # type: ignore
 
 try:
-    from backend.common.schemas import PortfolioSnapshot, LedgerEvent  # type: ignore
+    from backend.common.schemas import LedgerEvent, PortfolioSnapshot  # type: ignore
 except Exception:
     from dataclasses import dataclass, field
     from typing import List
@@ -106,7 +113,8 @@ class ScenarioRunner:
 # ---------------- Example Usage ----------------
 
 if __name__ == "__main__":  # demo
-    import time, random
+    import random
+    import time
 
     # Fake candle generator for testing
     now = int(time.time() * 1000)

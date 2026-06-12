@@ -1,5 +1,6 @@
 # backend/altdata/satellite_ndvi.py
 from __future__ import annotations
+
 """
 Satellite NDVI (Alt-Data)
 -------------------------
@@ -47,10 +48,14 @@ Notes
 - Pre-extract/cloud-mask upstream (e.g., QA60/SCL/Fmask) or pass cloud_flag here.
 """
 
-import csv, math, os, json, time, re
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+import csv
+import json
+import math
+import os
+import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # ---------- Optional deps ----------
 try:

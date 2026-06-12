@@ -26,10 +26,8 @@ Pairs well with:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Set
-import math
 import statistics
+from typing import Dict, Iterable, List, Optional, Set
 
 # ----------------------------- helpers -----------------------------
 

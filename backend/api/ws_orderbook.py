@@ -1,13 +1,13 @@
 # backend/api/ws_orderbook.py
 from __future__ import annotations
 
-import os
-import json
-import time
 import bisect
+import json
+import os
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 # ---------- Optional Redis ----------
 USE_REDIS = True

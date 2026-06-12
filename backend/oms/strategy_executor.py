@@ -49,7 +49,7 @@ except Exception:
     yaml = None  # type: ignore
 
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset
+    from backend.bus.streams import consume_stream, hset, publish_stream
 except Exception as e:
     raise RuntimeError("backend.bus.streams not found; add your Redis bus helpers") from e
 
@@ -410,7 +410,6 @@ def _probe():
     """
     print("Probe: spinning a single ExampleBuyTheDip with fake ticks...")
     try:
-        from backend.engine.strategy_base import ExampleBuyTheDip
         # Build a spec that points at no streams (we'll feed directly)
         spec = StratSpec(
             module="backend.engine.strategy_base",

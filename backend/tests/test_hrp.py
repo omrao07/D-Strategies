@@ -10,7 +10,7 @@ HRP tests (duck-typed)
 
 import numpy as np
 import pandas as pd
-import pytest # type: ignore
+import pytest  # type: ignore
 
 hrp_mod = pytest.importorskip("backend.analytics.hrp", reason="backend.analytics.hrp not found")
 

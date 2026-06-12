@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass, field, asdict, is_dataclass
-from typing import Any, Dict, List, Optional, Literal, Type, TypeVar
+from dataclasses import asdict, dataclass, field, is_dataclass
+from typing import Any, Dict, List, Literal, Optional, TypeVar
 
 SCHEMA_VERSION = "0.5.0"
 

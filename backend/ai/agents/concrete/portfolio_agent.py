@@ -27,7 +27,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -51,9 +51,6 @@ except Exception:
 
 # ── optional: kelly ──
 try:
-    from backend.portfolio_construction.kelly import (  # type: ignore
-        kelly_fraction, kelly_size,
-    )
     _HAS_KELLY = True
 except Exception:
     _HAS_KELLY = False
@@ -67,7 +64,6 @@ except Exception:
 
 # ── optional: allocator ──
 try:
-    from backend.engine.allocator import Allocator  # type: ignore
     _HAS_ALLOC = True
 except Exception:
     _HAS_ALLOC = False
@@ -369,7 +365,8 @@ class PortfolioAgent(BaseAgent):  # type: ignore
 
         if _HAS_KELLY:
             try:
-                from backend.portfolio_construction.kelly import kelly_fraction as kf, kelly_size as ks
+                from backend.portfolio_construction.kelly import kelly_fraction as kf
+                from backend.portfolio_construction.kelly import kelly_size as ks
                 f_full = kf(p, b)
                 f_frac = f_full * req.kelly_fraction
                 cap = ks(req.total_capital, f_full, kelly_fraction=req.kelly_fraction)

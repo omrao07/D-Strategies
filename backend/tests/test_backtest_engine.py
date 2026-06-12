@@ -7,18 +7,26 @@ _collector hook, and the BacktestReport API.
 from __future__ import annotations
 
 import datetime
-import math
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from backend.backtester.data_feeds import Bar, BarBatch, CSVFeed, SyntheticFeed
+from backend.backtester.backtest_engine import (
+    BacktestBook,
+    BacktestCollector,
+    BacktestEngine,
+    BacktestReport,
+    Fill,
+    MarketSimulator,
+)
+from backend.backtester.data_feeds import Bar, BarBatch, SyntheticFeed
 from backend.backtester.metrics import (
     AntiOverfitResult,
-    check_anti_overfit,
     cagr,
     calmar,
+    check_anti_overfit,
+    compute_all_metrics,
     cvar_historical,
     detect_lookahead,
     detect_regimes,
@@ -36,19 +44,8 @@ from backend.backtester.metrics import (
     ulcer_index,
     var_historical,
     vol_regime_sharpe,
-    compute_all_metrics,
-)
-from backend.backtester.backtest_engine import (
-    BacktestBook,
-    BacktestCollector,
-    BacktestEngine,
-    BacktestReport,
-    Fill,
-    MarketSimulator,
-    run_all_strategies,
 )
 from backend.backtester.vectorized_backtester import monte_carlo
-
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 

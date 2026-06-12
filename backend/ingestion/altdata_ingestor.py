@@ -1,9 +1,14 @@
 # backend/altdata/altdata_ingestor.py
 from __future__ import annotations
 
-import os, sys, json, csv, time, math, hashlib, threading
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, List, Optional, Iterable, Tuple, Callable
+import csv
+import hashlib
+import json
+import math
+import os
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # -------- optional deps (graceful) -------------------------------------------
 HAVE_YAML = True

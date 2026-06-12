@@ -23,11 +23,12 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 PCR_EXTREME_HIGH = 1.3   # Bearish extreme → contrarian buy
 PCR_EXTREME_LOW  = 0.75  # Bullish extreme → contrarian sell

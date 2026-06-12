@@ -1,5 +1,6 @@
 # backend/ops/dr_orchestration.py
 from __future__ import annotations
+
 """
 DR Orchestrator — cutover, failover, failback & drills
 ------------------------------------------------------
@@ -24,8 +25,12 @@ CLI
   python -m backend.ops.dr_orchestration status --cfg dr.yaml
 """
 
-import os, json, time, socket, subprocess, shutil
-from dataclasses import dataclass, asdict
+import json
+import os
+import socket
+import subprocess
+import time
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 # -------- optional bus ----------
@@ -39,14 +44,17 @@ OPS_STREAM = os.getenv("DR_EVENTS_STREAM", "ops.dr.events")
 
 # -------- optional compliance ledger ----------
 try:
-    from backend.compliance.compliance_recorder import ComplianceRecorder, LedgerHeader  # type: ignore
+    from backend.compliance.compliance_recorder import (  # type: ignore
+        ComplianceRecorder,
+        LedgerHeader,
+    )
 except Exception:
     ComplianceRecorder = None  # type: ignore
     LedgerHeader = None        # type: ignore
 
 # -------- optional chaos (for drills) ----------
 try:
-    from backend.ops.chaos_money import ChaosMoney, ChaosConfig, BusFaults  # type: ignore
+    from backend.ops.chaos_money import ChaosMoney  # type: ignore
 except Exception:
     ChaosMoney = None  # type: ignore
 
@@ -295,7 +303,7 @@ class DROrchestrator:
         if ChaosMoney is not None:
             chaos_used = True
             try:
-                from backend.ops.chaos_money import ChaosConfig, BusFaults  # type: ignore
+                from backend.ops.chaos_money import BusFaults, ChaosConfig  # type: ignore
                 cm = ChaosMoney(ChaosConfig(dry_run=False, bus_faults=BusFaults(enable=True, drop_prob=0.02, jitter_ms=25)))
                 with cm.patch_bus():
                     time.sleep(max(2, min(10, duration_s // 4)))
@@ -424,8 +432,8 @@ def _parse_args():
     sub.add_parser("readiness")
     sub.add_parser("status")
 
-    fo = sub.add_parser("failover")
-    fb = sub.add_parser("failback")
+    sub.add_parser("failover")
+    sub.add_parser("failback")
 
     dr = sub.add_parser("drill")
     dr.add_argument("--duration", type=int, default=120)

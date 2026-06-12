@@ -17,13 +17,12 @@ Outputs:
   data/adamodar/curated/betas_by_region.csv
 """
 
-import os
 import argparse
+import os
 from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 CURATED_DIR = "data/adamodar/curated"
 COMPANY_OUT = os.path.join(CURATED_DIR, "betas_by_company.csv")

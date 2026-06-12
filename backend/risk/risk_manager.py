@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import os
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
 # ----------------------- Soft dependencies (kept optional) -------------------
@@ -19,7 +19,7 @@ try:
     #   publish_stream(stream: str, payload: dict) -> None
     #   consume_stream(stream: str, start_id: str = '$', block_ms: int = 1000, count: int = 200) -> Iterator[(id, dict)]
     #   hset(key: str, field: str, value: Any) -> None
-    from backend.bus.streams import publish_stream, consume_stream, hset  # type: ignore
+    from backend.bus.streams import consume_stream, hset, publish_stream  # type: ignore
 except Exception:
     def publish_stream(_s, _p): pass
     def hset(_k, _f, _v): pass
@@ -29,14 +29,19 @@ except Exception:
 
 try:
     # Governor from earlier file
-    from backend.risk.governor import Governor, Policy as GovPolicy  # type: ignore
+    from backend.risk.governor import Governor  # type: ignore
+    from backend.risk.governor import Policy as GovPolicy
 except Exception:
     Governor = None
     class GovPolicy: ...
 
 try:
     # Optional: adversary toxicity pre-checks
-    from backend.risk.adversary import AdversarySuite, default_suite, GuardrailPolicy  # type: ignore
+    from backend.risk.adversary import (  # type: ignore
+        AdversarySuite,
+        GuardrailPolicy,
+        default_suite,
+    )
 except Exception:
     AdversarySuite = None
     def default_suite(*a, **k): return None
@@ -246,7 +251,7 @@ class RiskManager:
             try:
                 if isinstance(msg, str):
                     msg = json.loads(msg)
-                decision = self.process_order(msg)
+                self.process_order(msg)
                 # small health ping each batch
                 self._heartbeat("ok")
             except Exception as e:

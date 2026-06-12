@@ -24,12 +24,13 @@ Usage:
 """
 
 from __future__ import annotations
-import os
+
+import argparse
 import glob
 import json
-import argparse
+import os
 import warnings
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -37,7 +38,6 @@ import pandas as pd
 # local imports
 from chunker import chunk_any
 from embed import EmbeddingConfig, create_embedder, embed_chunks
-
 
 # =========================================================
 # Helpers

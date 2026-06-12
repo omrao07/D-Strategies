@@ -1,9 +1,9 @@
 # tests/test_monte_carlo.py
 import importlib
 import math
+
 import numpy as np
-import pytest # type: ignore
-from typing import Any, Dict, Tuple, Optional
+import pytest  # type: ignore
 
 """
 Expected public APIs (any one is fine)
@@ -84,7 +84,7 @@ def bs_call_price(S0, K, r, sigma, T):
         return max(S0 - K, 0.0) * math.exp(-r*T)
     d1 = (math.log(S0 / K) + (r + 0.5 * sigma**2) * T) / (sigma * math.sqrt(T))
     d2 = d1 - sigma * math.sqrt(T)
-    from math import erf, sqrt
+    from math import erf
     N = lambda x: 0.5 * (1 + erf(x / math.sqrt(2)))
     return S0 * N(d1) - K * math.exp(-r * T) * N(d2)
 

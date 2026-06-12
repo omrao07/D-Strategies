@@ -43,7 +43,7 @@ from __future__ import annotations
 import math
 import statistics
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Iterable, Any
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 try:
     import yaml  # optional for load_config, not required at runtime
@@ -315,7 +315,7 @@ class ProposalMixer:
                 continue
             score = float(getattr(prop, "score", 0.0) or 0.0)
             conf = float(getattr(prop, "confidence", 0.5) or 0.5)
-            contrib = score * conf
+            score * conf
             for o in getattr(prop, "orders"):
                 side = (getattr(o, "side", "") or "").upper()
                 sym = getattr(o, "symbol", "")

@@ -10,6 +10,7 @@ Policy-driven selector for models/strategies:
  - Cooldowns & min-hold to reduce thrash
  - Optional Redis emit; JSON snapshot for dashboards
 
+
 Typical usage
 -------------
 sw = EnsembleSwitcher(
@@ -41,7 +42,7 @@ import math
 import os
 import random
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 try:
@@ -269,7 +270,7 @@ class EnsembleSwitcher:
 
     def _eligible(self, ctx: Dict[str, Any], now: float) -> List[str]:
         out = []
-        regime_tags = set([t.lower() for t in ctx.get("regime", [])])
+        set([t.lower() for t in ctx.get("regime", [])])
         for n, cand in self.c.items():
             if not cand.enabled:
                 continue

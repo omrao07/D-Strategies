@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Protocol
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 # ---------------------------------------------------------------------
 # Core interfaces
@@ -338,7 +338,7 @@ class SignalDrivenStrategy:
 # ---------------------------------------------------------------------
 
 if __name__ == "__main__":  # pragma: no cover
-    import random, time as _t
+    import random
     sym = "DEMO"
     reg = SignalRegistry()
     reg.add(sym, "ema_mean_rev", EMA(span=20, vol_span=20), weight=1.0)

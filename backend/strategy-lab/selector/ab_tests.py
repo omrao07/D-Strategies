@@ -49,14 +49,20 @@ print(runner.snapshot())
 from __future__ import annotations
 
 import json
-import math
 import time
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Tuple
 
 try:
     # Local imports when used inside this repo
-    from agents.execution_agent import ExecutionAgent, OrderId, Side, OrderType, RiskReject, Fill # type: ignore
+    from agents.execution_agent import (  # type: ignore
+        ExecutionAgent,
+        Fill,
+        OrderId,
+        OrderType,
+        RiskReject,
+        Side,
+    )
 except Exception:  # pragma: no cover
     # Minimal shims for linting if imported standalone
     ExecutionAgent = object  # type: ignore

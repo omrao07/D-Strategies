@@ -37,11 +37,11 @@ print("Sharpe:", round(report["metrics"]["sharpe"], 3),
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Tuple, Optional
+import json
 import math
 import statistics
-import json
+from dataclasses import dataclass
+from typing import Callable, Dict, List, Optional, Tuple
 
 Row = Dict[str, float]  # expects keys: ts, open, high, low, close, volume
 FactorFn = Callable[[str, int, List[Row], Dict], float]

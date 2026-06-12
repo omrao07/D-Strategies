@@ -56,11 +56,11 @@ pip install yfinance pandas numpy matplotlib statsmodels
 """
 
 import argparse
-import os
 import math
+import os
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Dict, Tuple, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import pandas as pd

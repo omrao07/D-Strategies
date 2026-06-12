@@ -1,10 +1,9 @@
 # backend/market/timebars.py
 from __future__ import annotations
 
-import math
 import time
-from dataclasses import dataclass, asdict
-from typing import Callable, Dict, List, Optional, Tuple
+from dataclasses import asdict, dataclass
+from typing import Callable, Dict, List, Optional
 
 # ---------------- Common types ----------------
 

@@ -1,9 +1,13 @@
 # backend/execution/twap.py
 from __future__ import annotations
 
-import math, time, uuid, random
+import math
+import random
+import time
+import uuid
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Any, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
+
 
 # -------- helpers ------------------------------------------------------------
 def now_ms() -> int: return int(time.time() * 1000)

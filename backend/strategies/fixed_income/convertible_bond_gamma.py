@@ -22,7 +22,10 @@ outdir/delta_hedged_pnl.csv     daily delta-hedged P&L simulation
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
@@ -63,7 +66,6 @@ def run(cfg):
         sub_cb = converts[converts["ticker"] == ticker].set_index("date").sort_index()
         price_col = f"stock_price_{ticker}"
         listed_iv_col = f"listed_iv_pct_{ticker}"
-        hvol_col = f"historical_vol_pct_{ticker}"
 
         for date in sub_cb.index:
             cb_row = sub_cb.loc[date]
@@ -118,8 +120,8 @@ def run(cfg):
             # Gamma P&L: 0.5 * gamma * S^2 * (Δ ln S)^2 per day
             dS = stock_ret * stock.reindex(stock_ret.index)
             gamma_pnl = 0.5 * gamma_series * (dS ** 2)
-            delta_pnl = delta_series * dS
-            hedge_ratio = sub["delta"].reindex(stock_ret.index).ffill().shift(1).fillna(0)
+            delta_series * dS
+            sub["delta"].reindex(stock_ret.index).ffill().shift(1).fillna(0)
             hedged_ret = gamma_pnl.fillna(0)  # simplified: long gamma, short delta continuously
             hedged_pnl.append(hedged_ret.rename(ticker))
 

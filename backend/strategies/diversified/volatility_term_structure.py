@@ -1,7 +1,10 @@
 # backend/strategies/diversified/volatility_term_structure.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
@@ -215,7 +218,7 @@ class VolatilityTermStructure(Strategy):
         # Use "OPT_CALL" for POINT not containing "PUT", else "OPT_PUT" (simplification).
         right = "OPT_PUT" if "PUT" in POINT else "OPT_CALL"
         k_pct = K_PCT
-        fee_bps = _fees_bps(FEES_OPT_HK, "CAL") * 1e-4
+        _fees_bps(FEES_OPT_HK, "CAL") * 1e-4
 
         # rough premium proxy (iv * sqrt(T) * spot * d_approx). In paper mode, just set contracts by budget/1000.
         contracts = max(1.0, math.floor(USD_BUDGET / 1000.0))
@@ -273,7 +276,7 @@ class VolatilityTermStructure(Strategy):
         if r.get(_poskey(self.ctx.name, tag)) is not None: return
         if not (abs(edge_bps) >= ENTRY_VOL_BPS and abs(z) >= ENTRY_Z): return
 
-        fee_bps = _fees_bps(FEES_FUT_HK, "FUT") * 1e-4
+        _fees_bps(FEES_FUT_HK, "FUT") * 1e-4
         # contract notional ≈ price * FUT_MULT
         notional = f1 * FUT_MULT
         qty = max(1.0, math.floor(USD_BUDGET / max(1.0, notional)))

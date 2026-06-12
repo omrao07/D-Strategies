@@ -55,8 +55,8 @@ import re
 import signal
 import sys
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
 
 # --------- Optional deps / glue ----------
 try:
@@ -70,7 +70,7 @@ except Exception:
     yaml = None  # type: ignore
 
 try:
-    from backend.bus.streams import consume_stream, publish_stream, hset # type: ignore
+    from backend.bus.streams import consume_stream, hset, publish_stream  # type: ignore
 except Exception:
     # minimal fallbacks for probe mode
     def consume_stream(stream: str, start_id: str = "$", block_ms: int = 1000, count: int = 100):
@@ -434,8 +434,8 @@ class AlertsEngine:
         if self._email_cfg:
             try:
                 import smtplib
-                from email.mime.text import MIMEText
                 from email.mime.multipart import MIMEMultipart
+                from email.mime.text import MIMEText
 
                 host = self._email_cfg.get("host", "smtp.gmail.com")
                 port = int(self._email_cfg.get("port", 587))

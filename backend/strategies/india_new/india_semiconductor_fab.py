@@ -26,11 +26,12 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 EMS_TICKERS = ["dixon", "kaynes", "syrma", "amber", "pgel", "ideaforge"]
 PHASE_WEIGHTS = {"announced": 0.2, "approved": 0.5, "construction": 0.8, "production": 1.0}
@@ -87,7 +88,7 @@ def run(cfg):
 
     # Signal generation on monthly import data
     signal_records = []
-    all_dates = imports.index.union(pd.DatetimeIndex([r["date"] for r in fab_timeline]))
+    imports.index.union(pd.DatetimeIndex([r["date"] for r in fab_timeline]))
     for date in sorted(imports.index):
         pipeline_score = score_fab_pipeline(fab, date)
         imp_sub = float(imports.loc[date, "import_substitution_pct"]) if "import_substitution_pct" in imports.columns and date in imports.index else np.nan

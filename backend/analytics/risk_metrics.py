@@ -13,9 +13,11 @@ Usage:
 """
 
 from __future__ import annotations
-import numpy as np
+
 from collections import defaultdict, deque
-from typing import Dict, Deque, Tuple
+from typing import Deque, Dict
+
+import numpy as np
 
 
 class RiskMetrics:

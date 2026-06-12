@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 import traceback
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, Optional, Callable, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, Optional, Tuple
 
 # ------------------------------------------------------------
 # Optional Redis hook (safe fallback if not present)

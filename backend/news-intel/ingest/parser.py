@@ -19,14 +19,14 @@ Public entrypoints
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional
 import datetime as dt
 import hashlib
 import html
 import json
 import re
 import unicodedata
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional
 
 # Optional helpers
 try:

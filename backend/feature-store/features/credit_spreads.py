@@ -28,18 +28,22 @@ feast materialize <start> <end>
 
 from datetime import timedelta
 
-from feast import Entity, FeatureView, Field # type: ignore
-from feast.types import Float32, Int64, String# type: ignore
-from feast.infra.offline_stores.file_source import FileSource# type: ignore
-from feast.on_demand_feature_view import on_demand_feature_view# type: ignore
-from feast import RequestSource# type: ignore
+from feast import (  # type: ignore
+    Entity,
+    FeatureView,
+    Field,
+    RequestSource,  # type: ignore
+)
+from feast.infra.offline_stores.file_source import FileSource  # type: ignore
+from feast.on_demand_feature_view import on_demand_feature_view  # type: ignore
+from feast.types import Float32, Int64, String  # type: ignore
 
 # ---------------------------------------------------------------------
 # Entities (use your project entities if available)
 # ---------------------------------------------------------------------
 try:
     # Prefer entities defined in your repository
-    from feature_store.entities import credit_issuer, credit_index  # type: ignore
+    from feature_store.entities import credit_index, credit_issuer  # type: ignore
 except Exception:
     # Fallback minimal entities if imports not available
     credit_issuer = Entity(

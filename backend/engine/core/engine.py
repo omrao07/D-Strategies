@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import List
 
-from backend.engine.core.types import Event, EngineResult, hash_state
+from backend.engine.core.types import EngineResult, Event, hash_state
 
 
 class Engine:

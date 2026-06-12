@@ -24,10 +24,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy.optimize import brentq
 
 
 def compute_clo_equity_irr(loan_spread_bps: float, aaa_spread_bps: float, bb_spread_bps: float,
@@ -39,11 +41,11 @@ def compute_clo_equity_irr(loan_spread_bps: float, aaa_spread_bps: float, bb_spr
     Levered return = (loan spread - weighted funding cost - expected loss) * leverage / equity_pct
     """
     equity_pct = 1.0 / (1 + leverage)  # typically ~10% equity
-    debt_pct = 1 - equity_pct
+    1 - equity_pct
 
     # Weighted average liability spread (simplified: 80% AAA, 20% BB)
     weighted_liab_spread = 0.8 * aaa_spread_bps + 0.2 * bb_spread_bps
-    total_funding_cost = sofr + weighted_liab_spread / 10000
+    sofr + weighted_liab_spread / 10000
 
     # Expected loss
     expected_loss = default_rate * (1 - recovery)
@@ -62,7 +64,6 @@ def run(cfg):
     loans = loans.set_index("date").sort_index()
 
     signal_records = []
-    all_daily = []
 
     for clo_id in clo["clo_id"].unique():
         sub = clo[clo["clo_id"] == clo_id].set_index("date").sort_index()
@@ -80,7 +81,7 @@ def run(cfg):
             reported_irr = float(row.get("equity_irr_pct", np.nan))
 
             implied_irr = compute_clo_equity_irr(loan_spread, aaa_spread, bb_spread, sofr, default_rate, recovery)
-            irr_gap = implied_irr - reported_irr if not np.isnan(reported_irr) else 0
+            implied_irr - reported_irr if not np.isnan(reported_irr) else 0
 
             # Arb: implied IRR > market loan spread → CLO equity cheaper than direct lending
             market_loan_irr = (loan_spread / 10000 - default_rate * (1 - recovery)) * 100

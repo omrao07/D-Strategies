@@ -30,16 +30,16 @@ import redis
 log = logging.getLogger(__name__)
 
 from backend.bus.streams import (
-    consume_stream,
-    publish_stream,
-    publish_pubsub,
-    STREAM_ORDERS,
     CHAN_ORDERS,
+    STREAM_ORDERS,
+    consume_stream,
+    publish_pubsub,
+    publish_stream,
 )
 
 # Optional: policy compliance from region router
 try:
-    from backend.engine.region_router import infer_region, check_compliance
+    from backend.engine.region_router import check_compliance, infer_region
     HAS_POLICY = True
 except Exception:
     HAS_POLICY = False

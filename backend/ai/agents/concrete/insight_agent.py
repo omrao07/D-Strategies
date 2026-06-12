@@ -1,7 +1,6 @@
 # backend/ai/agents/concrete/insight_agent.py
 from __future__ import annotations
 
-import math
 import random
 import time
 from dataclasses import dataclass

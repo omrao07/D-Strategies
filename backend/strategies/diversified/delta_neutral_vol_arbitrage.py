@@ -6,7 +6,6 @@ import math
 import os
 import time
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Dict, Optional, Tuple
 
 try:
@@ -239,7 +238,7 @@ class DeltaNeutralVolArbitrage(Strategy):
 
         r_rf = _getf(RATE_KEY) or 0.02
         q_div = _hgetf(DIV_YIELD_HKEY, SYM) or 0.0
-        T = _time_to_maturity_yr(TENOR)
+        _time_to_maturity_yr(TENOR)
         return S, iv, rv, r_rf, q_div
 
     def _evaluate(self) -> None:
@@ -269,7 +268,7 @@ class DeltaNeutralVolArbitrage(Strategy):
             # Recompute instantaneous straddle delta (approx: call_delta - put_delta ≈ 2N(d1)-1; at ATM ≈ 0)
             # For robustness, clamp by gamma * dS notionally; but we’ll just re‑hedge if drift > threshold.
             delta_est = (2.0 * _norm_cdf(d1) - 1.0) * st.n_units  # units ~ contracts; works as relative measure
-            drift = delta_est - st.last_delta
+            delta_est - st.last_delta
 
             # Re‑hedge if absolute delta exceeds threshold of underlying "share" notionally
             if abs(delta_est) >= DELTA_REHEDGE_ABS:

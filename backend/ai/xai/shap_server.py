@@ -25,10 +25,10 @@ Endpoints:
 """
 
 import os
-import json
-import joblib # type: ignore
 from typing import Any, Dict, List
-from fastapi import FastAPI, HTTPException, Security, Header
+
+import joblib  # type: ignore
+from fastapi import FastAPI, HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
 
@@ -42,7 +42,7 @@ def _require_key(x_engine_key: str | None = Security(_api_key_header)) -> None:
 
 # optional: SHAP
 try:
-    import shap # type: ignore
+    import shap  # type: ignore
     _has_shap = True
 except Exception:
     _has_shap = False

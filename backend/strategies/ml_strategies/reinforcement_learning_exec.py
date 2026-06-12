@@ -22,12 +22,14 @@ outdir/training_curve.csv   episode, avg_reward
 outdir/summary.json
 """
 
-import argparse, json, os
-import numpy as np
-import pandas as pd
+import argparse
+import json
+import os
 import random
 from collections import defaultdict
 
+import numpy as np
+import pandas as pd
 
 # State space discretization
 TIME_BINS = 5       # 0-20%, 20-40%, 40-60%, 60-80%, 80-100% of trading day
@@ -88,7 +90,7 @@ def simulate_execution(episode_data: pd.DataFrame, policy: dict,
             action = max(q_vals, key=q_vals.get)
 
         # Simulate execution
-        mid = row["mid"]
+        row["mid"]
         if action == "aggressive":
             exec_price = row["ask"]
             exec_qty = min(inventory, float(row.get("ask_size", order_size * 0.1)))
@@ -196,7 +198,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"RL Execution | Episodes: {cfg.n_episodes} | Q-table: {len(Q)} states | Avg reward: {f'{summary['avg_reward_last_100']:.2f}' if summary['avg_reward_last_100'] else 'N/A'} | Written to {cfg.outdir}")
+    print(f"RL Execution | Episodes: {cfg.n_episodes} | Q-table: {len(Q)} states | Avg reward: {format(summary['avg_reward_last_100'], '.2f') if summary['avg_reward_last_100'] else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

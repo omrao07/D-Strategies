@@ -1,9 +1,16 @@
 # backend/regulatory/mifid_reporter.py
 from __future__ import annotations
 
-import os, csv, json, time, uuid, asyncio, datetime, re
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple
+import asyncio
+import csv
+import datetime
+import json
+import os
+import re
+import time
+import uuid
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 # -------- Optional deps (graceful) -------------------------------------------
 HAVE_REDIS = True
@@ -228,7 +235,7 @@ class CsvBatchWriter:
 
     def write(self, row: Dict[str, Any]) -> str:
         if not self._f or self._rows_in_file >= self.batch_rows:
-            path = self._open_new()
+            self._open_new()
         assert self._writer is not None
         self._writer.writerow({k: row.get(k,"") for k in RTS22_ORDER})
         self._rows_in_file += 1
@@ -282,7 +289,7 @@ class MifidReporter:
                         if errs:
                             self._write_error(row, errs)
                         else:
-                            path = self.writer.write(row)
+                            self.writer.write(row)
                             # You can kick an SFTP uploader to pick files from OUT_DIR
         finally:
             self.writer.close()

@@ -1,10 +1,11 @@
 # backend/ai/agents/rl/reward_shaping.py
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict, field
-from typing import Dict, Optional, List
 import math
 import time
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+
 
 # -------------------- helpers --------------------
 def now_ms() -> int: return int(time.time() * 1000)

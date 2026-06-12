@@ -8,9 +8,10 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from typing import Any, Callable, Dict, Optional
+from typing import Callable, Optional
 
 from backend.engine.strategy_base import Strategy
+
 from .signal_aggregator import SignalAggregator
 
 log = logging.getLogger(__name__)

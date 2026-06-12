@@ -25,10 +25,9 @@ import math
 import re
 import warnings
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
-
 
 # ============================== Model Types ==============================
 
@@ -112,7 +111,7 @@ class CosineReranker(BaseReranker):
     def score(self, query: str, candidates: Sequence[Candidate]) -> List[float]:
         texts = [c.text for c in candidates]
         qv = np.asarray(self.embedder.encode([query])[0], dtype="float32")
-        D = qv.shape[0]
+        qv.shape[0]
         cv = np.asarray(self.embedder.encode(texts), dtype="float32")
         if self.normalize_embeddings:
             qv = _l2norm(qv[None, :])[0]

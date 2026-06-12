@@ -42,13 +42,9 @@ python macro_inflation.py --input data/... --output data/... --write
 """
 
 from __future__ import annotations
-import io
+
 import os
-import sys
-import math
-import typing as T
-from dataclasses import dataclass, asdict
-from datetime import datetime
+from dataclasses import dataclass
 
 import pandas as pd
 

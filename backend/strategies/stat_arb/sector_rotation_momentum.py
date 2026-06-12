@@ -41,14 +41,11 @@
 import argparse
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 # ----------------------------- Config -----------------------------
 
@@ -303,7 +300,7 @@ def main():
     monthly_rets = equity_df["monthly_return"].dropna()
     sharpe = float(monthly_rets.mean() / max(monthly_rets.std(), 1e-9) * np.sqrt(12)) if len(monthly_rets) > 1 else 0.0
 
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Rebalance months: {len(rebalance_df)}")
     print(f"Final portfolio value: ${final_val:,.0f}")
     print(f"Total return: {total_ret:.2f}%")

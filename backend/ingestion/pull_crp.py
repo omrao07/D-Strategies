@@ -13,9 +13,9 @@ Outputs:
 """
 
 import os
-import pandas as pd
-import numpy as np
 from datetime import date
+
+import pandas as pd
 
 CURATED_DIR = "data/adamodar/curated"
 OUT_PATH = os.path.join(CURATED_DIR, "crp.csv")
@@ -38,7 +38,7 @@ def load_ratings(path: str) -> pd.DataFrame:
 
 def compute_crp(cds: pd.DataFrame, ratings: pd.DataFrame, us_ticker="US_5Y", vol_adj: float = 1.5) -> pd.DataFrame:
     """Compute CRP for each country."""
-    today = str(date.today())
+    str(date.today())
     df = cds.copy()
     df = df[df["tenor"].str.upper()=="5Y"]  # focus on 5Y tenor
 

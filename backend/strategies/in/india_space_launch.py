@@ -60,13 +60,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -151,7 +150,6 @@ def beta_credible_interval(succ: int, fail: int, a: float=1.0, b: float=1.0, q: 
     var = (A*B) / (((A+B)**2) * (A+B+1)) if (A+B)>2 else np.nan
     if var == var and var > 0:
         sd = np.sqrt(var)
-        from math import erf, sqrt
         # inverse CDF approx via Beasley-Springer/Moro would be overkill; use ±1.645 for ~90%
         zlo, zhi = -1.6449, +1.6449
         if q != (0.05, 0.95):

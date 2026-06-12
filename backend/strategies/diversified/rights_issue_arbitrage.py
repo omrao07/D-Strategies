@@ -1,7 +1,11 @@
 # backend/strategies/diversified/rights_issue_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time, uuid
+import json
+import math
+import os
+import time
+import uuid
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
@@ -213,7 +217,7 @@ class RightsIssueArbitrage(Strategy):
         ratio_num = float(meta.get("ratio_num", 1.0))
         ratio_den = float(meta.get("ratio_den", 5.0))
         sub_px    = float(meta.get("sub_price", 0.0))
-        ex_ms     = int(meta.get("ex_ms", 0) or 0)
+        int(meta.get("ex_ms", 0) or 0)
         allot_ms  = int(meta.get("allot_ms", 0) or 0)
 
         if ratio_den <= 0 or sub_px <= 0: return
@@ -237,8 +241,8 @@ class RightsIssueArbitrage(Strategy):
         r_bid, r_ask, r_fee_bps = rights
 
         # Theoretical values
-        terp = _terp(p_cum, r_ratio, sub_px)
-        right_theo = _right_theo(p_cum, r_ratio, sub_px)
+        _terp(p_cum, r_ratio, sub_px)
+        _right_theo(p_cum, r_ratio, sub_px)
 
         # Executable package value (sell/buy at quotes with fees)
         eq_fee = _fees_bps_eq() * 1e-4
@@ -246,7 +250,7 @@ class RightsIssueArbitrage(Strategy):
 
         # We compare: cum vs (ex + right)
         package_buy  = p_ex * (1 + eq_fee) + r_ask * (1 + r_fee)  # cost to buy synthetic cum
-        package_sell = p_ex * (1 - eq_fee) + r_bid * (1 - r_fee)
+        p_ex * (1 - eq_fee) + r_bid * (1 - r_fee)
 
         # Net edge (bps of cum) when **cum is rich vs package** (so we sell cum, buy package)
         edge_unit = (p_cum * (1 - eq_fee)) - package_buy

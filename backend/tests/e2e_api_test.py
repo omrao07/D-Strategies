@@ -23,7 +23,7 @@ import os
 import time
 from typing import Any, Dict, Optional
 
-import pytest # type: ignore
+import pytest  # type: ignore
 import requests
 
 # ----------------------------

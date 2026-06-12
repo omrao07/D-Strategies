@@ -11,20 +11,16 @@
 from __future__ import annotations
 
 import os
-import sys
-import time
-import shlex
-import signal
-import threading
+import pathlib
 import subprocess as sp
-from dataclasses import dataclass
-from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
-
-import unittest
+import sys
 import tempfile
 import textwrap
-import pathlib
-
+import threading
+import time
+import unittest
+from dataclasses import dataclass
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 # =========================
 # Reference implementation

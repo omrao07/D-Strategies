@@ -3,8 +3,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple, Any, List
-
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---------------------------- Config ----------------------------
 
@@ -130,7 +129,7 @@ class VenueCostAnalyzer:
     def _fee_bps(self, venue: str, side: str, send_px: float) -> float:
         f: VenueFees = self.cfg.fees.get(venue, VenueFees())
         # Convert cents if set; cents per share / send_px -> bps
-        maker_bps = f.maker_rebate_bps or (_to_bps((f.maker_rebate_cents / 100.0) / max(send_px, 1e-9)))
+        f.maker_rebate_bps or (_to_bps((f.maker_rebate_cents / 100.0) / max(send_px, 1e-9)))
         taker_bps = f.taker_fee_bps or (_to_bps((f.taker_fee_cents / 100.0) / max(send_px, 1e-9)))
         # We don't know passivity here; treat as taker by default; strategies can override by passing “passive=True”.
         # Caller may adjust by using on_fill(..., mid_at_fill, ...), comparing to touch to infer passive/active.
@@ -210,17 +209,16 @@ class VenueCostAnalyzer:
         vs.slip_bps = self._ewma(vs.slip_bps, slip, self.cfg.alpha_slip)
 
         # explicit fee/rebate estimate in bps
-        fee_bps = 0.0
         if bench_mid and bench_mid > 0:
             f: VenueFees = self.cfg.fees.get(venue, VenueFees())
-            maker_bps = f.maker_rebate_bps or _to_bps((f.maker_rebate_cents / 100.0) / bench_mid)
-            taker_bps = f.taker_fee_bps or _to_bps((f.taker_fee_cents / 100.0) / bench_mid)
+            f.maker_rebate_bps or _to_bps((f.maker_rebate_cents / 100.0) / bench_mid)
+            f.taker_fee_bps or _to_bps((f.taker_fee_cents / 100.0) / bench_mid)
             if passive is True:
-                fee_bps = -maker_bps  # rebate reduces cost (negative = good)
+                pass  # rebate reduces cost (negative = good)
             elif passive is False:
-                fee_bps = taker_bps
+                pass
             else:
-                fee_bps = taker_bps  # conservative default
+                pass  # conservative default
         # We don’t store fee_bps directly; it’s folded into cost at query time via weights.
 
         # Mark-outs (adverse selection proxy)

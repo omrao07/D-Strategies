@@ -1,9 +1,11 @@
 # engines/stat_arb/backtest/pnl.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Literal, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Literal
 
 BPS = 1e-4
 TRADING_DAYS = 252

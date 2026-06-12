@@ -1,15 +1,14 @@
 # backend/engine/risk_manager.py
 from __future__ import annotations
 
+import math
 import os
 import time
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Tuple, DefaultDict
 from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, DefaultDict, Dict, Optional, Tuple
 
-import math
-
-from backend.bus.streams import consume_stream, publish_stream, hget, hset # type: ignore
+from backend.bus.streams import consume_stream, hget, hset, publish_stream  # type: ignore
 
 # --------- Streams / Keys ---------
 ORDERS_IN  = os.getenv("RISK_INCOMING_STREAM", "orders.incoming")
@@ -124,7 +123,7 @@ class RiskManager:
         sym  = str(order.get("symbol", "")).upper()
         side = str(order.get("side", "")).lower()
         qty  = float(order.get("qty", 0.0) or 0.0)
-        typ  = str(order.get("typ", "market")).lower()
+        str(order.get("typ", "market")).lower()
         strat= str(order.get("strategy", "")).lower()
         limit= order.get("limit_price")
         mark = order.get("mark_price")

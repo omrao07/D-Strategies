@@ -22,13 +22,12 @@ Optional deps:
 
 from __future__ import annotations
 
-import os
-import sys
-import json
-import glob
 import argparse
+import glob
+import json
+import sys
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Optional
 
 import pandas as pd
 

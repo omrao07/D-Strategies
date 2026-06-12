@@ -1,9 +1,12 @@
 # backend/graph/knowledge_graph.py
 from __future__ import annotations
 
-import os, io, json, time, math, threading
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple, Iterable, Callable, Set
+import json
+import os
+import threading
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Set
 
 # ---------- Optional deps (graceful) -----------------------------------------
 try:
@@ -417,7 +420,8 @@ class StreamIngestor:
 
 # ---------- Convenience: tiny CLI -------------------------------------------
 def _cli():
-    import argparse, asyncio
+    import argparse
+    import asyncio
     ap = argparse.ArgumentParser("knowledge_graph")
     ap.add_argument("--rebuild", action="store_true", help="Drop, reload snapshot + events.")
     ap.add_argument("--snapshot", action="store_true", help="Write snapshot now.")

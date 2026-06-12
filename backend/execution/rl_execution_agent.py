@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class RLExecutionAgent:

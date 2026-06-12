@@ -57,7 +57,7 @@ except Exception:
     pq = None  # type: ignore
 
 try:
-    from shapely.geometry import shape, Point, LineString  # type: ignore
+    from shapely.geometry import LineString, Point, shape  # type: ignore
     from shapely.ops import nearest_points  # type: ignore
 except Exception:
     shape = Point = LineString = nearest_points = None  # type: ignore
@@ -374,7 +374,6 @@ def build_daily_index(store: ShipStore, params: IndexParams = IndexParams()) -> 
                     in_port_prev = False
                     low_speed_streak = 0
                     stop_start_ms: Optional[int] = None
-                    last_ping = None
                     near_for_queue_prev = False
 
                     for ping in seq:
@@ -415,7 +414,6 @@ def build_daily_index(store: ShipStore, params: IndexParams = IndexParams()) -> 
 
                         in_port_prev = inside
                         near_for_queue_prev = near_for_queue
-                        last_ping = ping
 
                     # finalize lingering stop at day end
                     if stop_start_ms is not None and low_speed_streak >= params.min_pings_for_dwell:

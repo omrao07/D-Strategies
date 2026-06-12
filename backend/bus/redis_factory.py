@@ -7,7 +7,6 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-
 _REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 _REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 _REDIS_SSL = os.getenv("REDIS_SSL", "").lower() in ("1", "true", "yes")

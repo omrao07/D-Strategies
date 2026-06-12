@@ -19,8 +19,8 @@ except ImportError:
 
 from backend.bus.streams import (
     consume_stream,
-    publish_stream,
     hset,
+    publish_stream,
 )
 
 # ---------- Environment / Defaults ----------

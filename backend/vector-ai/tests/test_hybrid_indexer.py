@@ -18,18 +18,21 @@ Requires:
     whoosh
 """
 
-import pytest
-import numpy as np
-import pandas as pd
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
+import pytest
+
 try:
-    import faiss # type: ignore
+    import faiss  # type: ignore
 except Exception:
     faiss = None
 
 try:
-    from analytics_engine.vector_ai.index_builder.hybrid_indexer import HybridIndexer # type: ignore
+    from analytics_engine.vector_ai.index_builder.hybrid_indexer import (
+        HybridIndexer,  # type: ignore
+    )
 except Exception:
     HybridIndexer = None
 

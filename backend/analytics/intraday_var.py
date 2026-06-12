@@ -1,9 +1,13 @@
 # backend/risk/intraday_var.py
 from __future__ import annotations
 
-import os, json, time, math
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Tuple, Iterable
+import asyncio
+import json
+import math
+import os
+import time
+from dataclasses import asdict, dataclass
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # -------- optional deps (all graceful) ---------------------------------------
 try:
@@ -108,7 +112,7 @@ def var_ewma_parametric(returns: Iterable[float], alpha: float = 0.99, lam: floa
     sigma = math.sqrt(max(v, 0.0) + 1e-18)
     # z score
     try:
-        from scipy.stats import norm, skew, kurtosis
+        from scipy.stats import kurtosis, norm, skew
         z = float(norm.ppf(alpha))
         if cornish:
             z = _cornish_fisher_z(z, float(skew(a)), float(kurtosis(a, fisher=False)))
@@ -291,7 +295,7 @@ class IntradayVarWorker:
 
             except Exception as e:
                 await self._publish_err({"error": str(e)}) # type: ignore
-                await _sleep(0.5) # type: ignore
+                await asyncio.sleep(0.5)
 
     async def _publish(self, snap: VarSnapshot):
         if not self.r:
@@ -354,7 +358,8 @@ def _demo():
     print("BACKTEST:", asdict(bt))
 
 if __name__ == "__main__":
-    import argparse, asyncio
+    import argparse
+    import asyncio
     ap = argparse.ArgumentParser("intraday_var")
     ap.add_argument("--demo", action="store_true", help="run a synthetic path demo")
     ap.add_argument("--worker", action="store_true", help="run the Redis stream worker")

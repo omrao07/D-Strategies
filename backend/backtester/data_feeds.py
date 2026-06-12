@@ -10,12 +10,9 @@ Implementations:
 """
 from __future__ import annotations
 
-import csv
 import datetime
-import glob
 import logging
-import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Union
 
@@ -271,7 +268,6 @@ class SyntheticFeed(DataFeed):
         rng = np.random.default_rng(self.seed)
         dates = pd.bdate_range(self.start, self.end)
         T, N = len(dates), len(self.symbols)
-        dt = 1.0 / 252.0
 
         # Cholesky decomposition for correlated returns
         try:

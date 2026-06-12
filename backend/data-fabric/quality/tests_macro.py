@@ -23,12 +23,11 @@ Optional deps: pyarrow fsspec s3fs gcsfs duckdb great-expectations
 
 from __future__ import annotations
 
-import sys
-import glob
-import json
 import argparse
+import json
+import sys
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 import pandas as pd
 

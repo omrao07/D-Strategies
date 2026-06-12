@@ -1,11 +1,10 @@
 # tests/test_regime_map.py
 import importlib
-import math
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Tuple
 
 import numpy as np
-import pytest # type: ignore
+import pytest  # type: ignore
 
 """
 Expected public API (any one is fine)
@@ -182,7 +181,7 @@ def test_transition_matrix_and_durations_if_supported(api, data):
 def test_change_points_or_switch_indices_if_supported(api, data):
     if not api.has("change_points"):
         pytest.skip("No change_points()")
-    X, y = data["X"], data["y"]
+    X, _y = data["X"], data["y"]
     api.call("fit", X)
     cps = api.call("change_points", X)
     assert isinstance(cps, (list, np.ndarray))

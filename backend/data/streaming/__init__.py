@@ -1,4 +1,4 @@
 # backend/data/streaming/__init__.py
-from .bar_aggregator import BarAggregator, Bar
+from .bar_aggregator import Bar, BarAggregator
 
 __all__ = ["BarAggregator", "Bar"]

@@ -1,14 +1,12 @@
 # backend/execution/execution_policy.py
 from __future__ import annotations
 
-import math
-import time
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 # --- Optional helpers (safe fallbacks) ---------------------------------
 try:
-    from backend.ai.agents.core.toolbelt import load_yaml, now_ms, percentile, ewma
+    from backend.ai.agents.core.toolbelt import ewma, load_yaml, now_ms, percentile
 except Exception:
     import time as _t
     def load_yaml(path: str) -> Dict[str, Any]:
@@ -189,7 +187,6 @@ class ExecutionPolicy:
         if oi.limit_price is not None:
             return float(oi.limit_price), max_slip
 
-        px = mc.last
         # If we have quotes, bias limit toward best for post-only/passive where possible
         if algo.upper() in ("VWAP","TWAP","ADAPTIVEVWAP"):
             if oi.side.lower() == "buy" and mc.bid:  # try to sit near bid

@@ -7,7 +7,8 @@ Pure numpy/stdlib — XGBoost and sklearn are optional imports.
 from __future__ import annotations
 
 import logging
-from typing import Any, List, Optional
+from typing import Optional
+
 import numpy as np
 
 logger = logging.getLogger("ai.ml.models")

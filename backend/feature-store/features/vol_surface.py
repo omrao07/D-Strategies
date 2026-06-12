@@ -23,11 +23,15 @@ feast materialize 2023-01-01 2025-01-01
 
 from datetime import timedelta
 
-from feast import Entity, FeatureView, Field # type: ignore
-from feast.types import Float32, String # type: ignore
-from feast.infra.offline_stores.file_source import FileSource # type: ignore
-from feast.on_demand_feature_view import on_demand_feature_view # type: ignore
-from feast import RequestSource # type: ignore
+from feast import (  # type: ignore
+    Entity,
+    FeatureView,
+    Field,
+    RequestSource,  # type: ignore
+)
+from feast.infra.offline_stores.file_source import FileSource  # type: ignore
+from feast.on_demand_feature_view import on_demand_feature_view  # type: ignore
+from feast.types import Float32  # type: ignore
 
 # ---------------------------------------------------------------------
 # Entity (reuse your project entity if one exists)

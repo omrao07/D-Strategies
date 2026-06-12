@@ -11,7 +11,7 @@ import sys
 import time
 from dataclasses import dataclass
 from multiprocessing import Process
-from typing import Any, Dict, Optional
+from typing import Optional
 
 # ---- logging -------------------------------------------------------------
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -110,9 +110,12 @@ def run_strategy(args: argparse.Namespace) -> None:
     strat.run(stream=stream)
 
 def run_pipeline_once(args: argparse.Namespace) -> None:
-    from backend.pipelines import ( # type: ignore
-        make_news_pipeline, make_tick_cache_pipeline, make_capture_pipeline,
-        make_train_predictor_pipeline, make_backtest_pipeline,
+    from backend.pipelines import (  # type: ignore
+        make_backtest_pipeline,
+        make_capture_pipeline,
+        make_news_pipeline,
+        make_tick_cache_pipeline,
+        make_train_predictor_pipeline,
     )
     if args.which == "news":
         pipe = make_news_pipeline(limit=args.limit, with_sentiment=not args.no_sentiment)
@@ -134,8 +137,10 @@ def run_pipeline_once(args: argparse.Namespace) -> None:
     print(json.dumps(ctx.vars, indent=2, default=str))
 
 def run_pipeline_loop(args: argparse.Namespace) -> None:
-    from backend.pipelines import ( # type: ignore
-        make_news_pipeline, make_tick_cache_pipeline, make_capture_pipeline,
+    from backend.pipelines import (  # type: ignore
+        make_capture_pipeline,
+        make_news_pipeline,
+        make_tick_cache_pipeline,
     )
     if args.which == "news":
         pipe = make_news_pipeline(limit=args.limit, with_sentiment=not args.no_sentiment)
@@ -193,7 +198,7 @@ def run_supervisor(args: argparse.Namespace) -> None:
         time.sleep(1.0)
 
 def run_reconciler(args: argparse.Namespace) -> None:
-    from backend.execution.reconciler import Reconciler # type: ignore
+    from backend.execution.reconciler import Reconciler  # type: ignore
     rec = Reconciler(
         db_path=args.db,
         use_sqlite=not args.no_sqlite,
@@ -217,7 +222,7 @@ def run_reconciler(args: argparse.Namespace) -> None:
 
 def run_latency_dump(_args: argparse.Namespace) -> None:
     try:
-        from backend.utils.latency_adapter import all_stats # type: ignore
+        from backend.utils.latency_adapter import all_stats  # type: ignore
     except Exception:
         raise SystemExit("latency_adapter not found")
     print(json.dumps(all_stats(), indent=2))

@@ -23,11 +23,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 UPI_ACCELERATING_THRESHOLD = 5.0   # % acceleration (current_mom - prev_mom) in pp
 UPI_GROWTH_HIGH = 30.0              # YoY growth rate considered strong

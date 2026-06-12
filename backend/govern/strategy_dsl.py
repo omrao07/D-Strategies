@@ -1,10 +1,13 @@
 # backend/engine/strategy_dsl.py
 from __future__ import annotations
 
-import ast, math, time, json, threading
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, DefaultDict
+import ast
+import json
+import math
+import time
 from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 # ---------- Optional YAML (graceful) ----------
 HAVE_YAML = True
@@ -430,7 +433,8 @@ if __name__ == "__main__":
     d.load(EXAMPLE_YAML)
 
     # fake ticks
-    import random, time
+    import random
+    import time
     px = 100.0
     for i in range(300):
         px += random.uniform(-0.5, 0.7)

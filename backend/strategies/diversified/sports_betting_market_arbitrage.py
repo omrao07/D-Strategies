@@ -1,7 +1,10 @@
 # backend/strategies/diversified/sports_betting_market_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -225,7 +228,7 @@ class SportsBettingMarketArb(Strategy):
         s1 = min(s1, float(leg1[3].get("max_stake", s1)))
         s2 = min(s2, float(leg2[3].get("max_stake", s2)))
         # If limits bind, rescale to equalized returns using actual s1,s2
-        inv_sum = (1.0/leg1[2]) + (1.0/leg2[2])
+        (1.0/leg1[2]) + (1.0/leg2[2])
         total_used = max(MIN_STAKE, s1 + s2)
         # Recompute expected profit per outcome using chosen stakes
         prof1 = s1*leg1[2] - total_used

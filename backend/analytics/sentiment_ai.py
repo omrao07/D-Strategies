@@ -1,14 +1,14 @@
 # backend/analytics/sentiment_ai.py
 from __future__ import annotations
 
-import re
 import functools
+import re
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List
 
 # optional type import (doesn't hard-depend)
 try:
-    from backend.ingestion.news.news_base import NewsEvent # type: ignore
+    from backend.ingestion.news.news_base import NewsEvent  # type: ignore
 except Exception:
     class NewsEvent:  # minimal stub
         def __init__(self, headline: str, summary: str = "", **kw):

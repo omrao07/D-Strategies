@@ -4,9 +4,8 @@ from __future__ import annotations
 import enum
 import json
 import time
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, Optional, List
-
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, Optional
 
 # ----------------------------- helpers ---------------------------------
 

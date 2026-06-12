@@ -20,10 +20,12 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-
 
 SEQ_LEN = 20
 HIDDEN_SIZE = 16
@@ -196,7 +198,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"LSTM | Avg Acc: {f'{summary['avg_rolling_accuracy']:.3f}' if summary['avg_rolling_accuracy'] else 'N/A'} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"LSTM | Avg Acc: {format(summary['avg_rolling_accuracy'], '.3f') if summary['avg_rolling_accuracy'] else 'N/A'} | Sharpe: {format(sharpe, '.2f') if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

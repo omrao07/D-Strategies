@@ -6,7 +6,8 @@ Requires torch. Falls back to bootstrap resampling without it.
 from __future__ import annotations
 
 import logging
-from typing import Optional, Tuple
+from typing import Optional
+
 import numpy as np
 
 logger = logging.getLogger("ai.ml.generative")

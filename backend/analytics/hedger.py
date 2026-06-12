@@ -24,12 +24,12 @@ Typical wiring:
   python -m backend.strategies.hedger
 """
 
-import os
-import json
-import time
 import asyncio
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Callable
+import json
+import os
+import time
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ---------- Optional Redis (graceful if missing) ----------
 USE_REDIS = True
@@ -44,16 +44,19 @@ def _now_ms() -> int: return int(time.time() * 1000)
 
 # If you already have backend.bus.streams, use it; else minimal fallbacks.
 try:
-    from backend.bus.streams import publish_stream as _publish_stream
     from backend.bus.streams import consume_stream as _consume_stream
+    from backend.bus.streams import publish_stream as _publish_stream
 except Exception:
     _publish_stream = None
     _consume_stream = None
 
 # ---------- Hedge recipes ----------
 try:
-    from backend.analytics.hedge_recipes import ( # type: ignore
-        HedgeKitchen, ChainSnapshot, OptionQuote, dummy_accessor
+    from backend.analytics.hedge_recipes import (  # type: ignore
+        ChainSnapshot,
+        HedgeKitchen,
+        OptionQuote,
+        dummy_accessor,
     )
 except Exception:
     HedgeKitchen = None  # type: ignore
@@ -441,7 +444,8 @@ async def _demo_once():
     for it in intents: print(" -", json.dumps(it))
 
 def _main():
-    import argparse, asyncio as aio
+    import argparse
+    import asyncio as aio
     ap = argparse.ArgumentParser("hedger")
     ap.add_argument("--demo", action="store_true", help="run one-shot demo without Redis")
     args = ap.parse_args()

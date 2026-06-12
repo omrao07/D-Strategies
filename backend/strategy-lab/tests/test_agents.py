@@ -1,8 +1,8 @@
 # tests/test_agents.py
-import math
+import importlib
 import time
 import types
-import importlib
+
 import pytest
 
 # --------------------------- helpers ---------------------------
@@ -146,7 +146,9 @@ def test_data_loader_align_and_iter():
     loader = dl.MarketDataLoader()
 
     # build two tiny in-memory series via temp files
-    import tempfile, os, csv
+    import csv
+    import os
+    import tempfile
     with tempfile.TemporaryDirectory() as d:
         p1 = os.path.join(d, "AAA.csv")
         p2 = os.path.join(d, "BBB.csv")
@@ -178,8 +180,9 @@ def test_eq_ls_sim_runs():
     class DS: pass
     t0 = 1_700_000_000
     def mk(n, start):
+        import random
         x = start; rows=[]
-        import random; random.seed(7)
+        random.seed(7)
         for i in range(n):
             x *= (1 + (0.01 if (i%10==0) else -0.005))  # mild pattern
             rows.append({"ts": t0 + i*86400, "open": x, "high": x, "low": x, "close": x, "volume": 1})

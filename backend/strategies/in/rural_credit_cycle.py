@@ -98,13 +98,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -667,7 +666,7 @@ def main():
     RAIN_AGG, REG_RAIN   = load_rain(args.rainfall, freq=freq) if args.rainfall else (pd.DataFrame(), None)
     MACRO = load_macro(args.macro, freq=freq) if args.macro else pd.DataFrame()
     RATES = load_rates(args.rates, freq=freq) if args.rates else pd.DataFrame()
-    EVENTS= load_events(args.events, freq=freq) if args.events else pd.DataFrame()
+    load_events(args.events, freq=freq) if args.events else pd.DataFrame()
 
     # Date filters
     if args.start:

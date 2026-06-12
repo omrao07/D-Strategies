@@ -1,9 +1,16 @@
 # backend/ops/shadow_runner.py
 from __future__ import annotations
 
-import os, time, math, json, asyncio, importlib, csv
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Callable
+import asyncio
+import importlib
+import json
+import os
+import time
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+# Duck-typed strategy object (any class exposing an `.order(...)` method).
+Strategy = Any
 
 # ---------- Optional deps (graceful) -----------------------------------------
 HAVE_REDIS = True

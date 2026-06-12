@@ -44,7 +44,6 @@ import os
 import warnings
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -221,7 +220,7 @@ def main():
         "signal_logic": "YoY>consensus+10ppts=LONG, YoY<consensus-10ppts=SHORT",
     }
 
-    print(f"\n[SUMMARY]")
+    print("\n[SUMMARY]")
     print(f"  Date range     : {summary['date_range_start']} → {summary['date_range_end']}")
     print(f"  Tickers        : {summary['n_tickers']}")
     print(f"  Long signals   : {n_long}  |  Short signals: {n_short}")

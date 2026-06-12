@@ -31,16 +31,20 @@ Strategy:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 
 try:
     from backend.commodities.base import (
-        CommodityStrategy, CommoditySignal, CommoditySector,
-        SignalDirection, SignalSource, CommodityRiskParams, ContractSpec,
+        CommoditySector,
+        CommoditySignal,
+        CommodityStrategy,
+        ContractSpec,
+        SignalDirection,
+        SignalSource,
     )
 except Exception:
     CommodityStrategy = object  # type: ignore
@@ -201,7 +205,6 @@ class LNGHenryHubTTFArb(CommodityStrategy):  # type: ignore
         # EU storage adjustment
         eu_storage = float(row.get("eu_storage_pct", 70.0))
         storage_bearish = eu_storage > self.cfg.storage_bearish_pct
-        storage_bullish = eu_storage < self.cfg.storage_bullish_pct
 
         # ── Europe arbitrage signal ──
         if spreads["europe_arb_open"] and not storage_bearish:
@@ -300,7 +303,8 @@ class LNGHenryHubTTFArb(CommodityStrategy):  # type: ignore
 # ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    import argparse, json
+    import argparse
+    import json
     ap = argparse.ArgumentParser(description="LNG Henry Hub–TTF Arbitrage")
     ap.add_argument("--hh",  type=float, default=2.8,  help="Henry Hub spot $/MMBtu")
     ap.add_argument("--ttf", type=float, default=9.5,  help="Dutch TTF spot $/MMBtu")
@@ -313,7 +317,6 @@ if __name__ == "__main__":
     print(json.dumps(spreads, indent=2))
 
     strategy = LNGHenryHubTTFArb(cfg)
-    import datetime
     prices = pd.DataFrame([{
         "hh_price": args.hh, "ttf_price": args.ttf, "jkm_price": args.jkm,
         "eu_storage_pct": args.eu_storage,

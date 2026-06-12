@@ -23,10 +23,11 @@ Usage:
 """
 
 from __future__ import annotations
+
+from typing import Any, Callable, Dict
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Callable, Any, Optional
-
 
 # =============================================================================
 # Technical indicators

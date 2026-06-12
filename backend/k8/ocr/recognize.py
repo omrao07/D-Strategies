@@ -26,21 +26,20 @@ Examples:
 """
 
 from __future__ import annotations
-import os
-import sys
-import csv
-import json
-import glob
+
 import argparse
+import csv
+import glob
+import json
+import os
 from typing import Any, Dict, List, Optional
 
 import yaml
 
 # Local loaders
-from kb.ocr.easyocr_loader import EasyOCRLoader # type: ignore
-from kb.ocr.paddleocr_loader import PaddleOCRLoader # type: ignore
-from kb.ocr.tesseract_loader import TesseractLoader # type: ignore
-
+from kb.ocr.easyocr_loader import EasyOCRLoader  # type: ignore
+from kb.ocr.paddleocr_loader import PaddleOCRLoader  # type: ignore
+from kb.ocr.tesseract_loader import TesseractLoader  # type: ignore
 
 # ------------------------------------------------------------
 # Config helpers

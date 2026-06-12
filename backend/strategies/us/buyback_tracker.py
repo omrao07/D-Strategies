@@ -11,10 +11,13 @@ Simulate and analyze corporate share buyback programs:
 - Exports tidy CSVs and optional plots
 """
 
-import argparse, os
+import argparse
+import os
 from dataclasses import dataclass
 from datetime import datetime
-import numpy as np, pandas as pd
+
+import numpy as np
+import pandas as pd
 import yfinance as yf
 
 try:

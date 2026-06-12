@@ -42,12 +42,8 @@ Outputs (written to outdir/):
 import argparse
 import json
 import os
-import sys
-from datetime import datetime, timedelta
 
-import numpy as np
 import pandas as pd
-
 
 # ---------------------------------------------------------------------------
 # Data loading
@@ -186,7 +182,7 @@ def compute_basis(
                 )
 
         # Identify CTD: minimum net basis per contract
-        contract_groups = [g for _, g in pd.DataFrame(records).groupby("contract") if (pd.DataFrame(records)["date"] == dt).any()]
+        [g for _, g in pd.DataFrame(records).groupby("contract") if (pd.DataFrame(records)["date"] == dt).any()]
         day_records = [r for r in records if r["date"] == dt]
         if day_records:
             day_df = pd.DataFrame(day_records)

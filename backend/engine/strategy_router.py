@@ -36,11 +36,10 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import redis
 import yaml
 
-from backend.engine.strategy_base import Strategy
 from backend.engine.region_router import infer_region  # for optional region filtering
+from backend.engine.strategy_base import Strategy
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 log = logging.getLogger("strategy_router")
@@ -54,6 +53,7 @@ CATALOG_FILE = REPO_ROOT / "backend" / "strategies" / "catalog.yaml"
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 from backend.bus.redis_factory import LazyRedis as _LazyRedis
+
 r = _LazyRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 # In‑memory registry

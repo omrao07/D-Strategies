@@ -1,9 +1,12 @@
 # backend/analytics/index_builder.py
 from __future__ import annotations
 
-import os, json, time, math
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Callable, Any
+import json
+import math
+import os
+import time
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ---------- Optional Redis (graceful fallback) ----------
 USE_REDIS = True
@@ -207,7 +210,7 @@ class IndexBuilder:
     def on_corporate_action(self, ca: CorpAction):
         """Splits adjust holdings & last_prices; cash_div adds to accrued_div for TR."""
         if ca.kind == "split" and ca.ratio and ca.ratio > 0:
-            r = float(ca.ratio)
+            float(ca.ratio)
             # Adjust price inversely; holdings (notional) unchanged because we store in currency
             # If you model *units*, do: units *= r; price /= r. Here: leave last price alone (currency basis).
             pass
@@ -444,7 +447,8 @@ def _demo():
     print("Backfilled", len(rows), "days. Last:", rows[-1])
 
 if __name__ == "__main__":
-    import argparse, asyncio
+    import argparse
+    import asyncio
     ap = argparse.ArgumentParser("index_builder")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--worker", action="store_true")

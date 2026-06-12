@@ -81,13 +81,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -525,7 +524,7 @@ def main():
     var_df = base.rename(columns={fx_main:"fx_ret_pct", dy_col:"dy_bp"}).dropna()
     # Ensure enough obs
     var_model = None
-    irf_out = pd.DataFrame()
+    pd.DataFrame()
     var_info = {}
     if len(var_df) >= max(80, args.window+20):
         model = var_fit(var_df, ["dy_bp","fx_ret_pct"], pmax=args.pmax)

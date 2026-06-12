@@ -34,16 +34,14 @@ python materialize_jobs/backfill_fx.py \
 
 from __future__ import annotations
 
-import os
-import sys
-import time
 import argparse
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Tuple
 
 import pandas as pd
-from feast import FeatureStore # type: ignore
-from feast.feature_view import FeatureView # type: ignore
+from feast import FeatureStore  # type: ignore
+from feast.feature_view import FeatureView  # type: ignore
 
 ISO_FMT = "%Y-%m-%d"
 
@@ -105,7 +103,7 @@ def sanity_check_sources(paths: List[str], sample_cols=("ts",)) -> None:
         if not files:
             continue
         try:
-            df = pd.read_parquet(files[0], columns=list(sample_cols))
+            pd.read_parquet(files[0], columns=list(sample_cols))
             # No hard assert; just confirm we can read something
         except Exception as e:
             print(f"[WARN] sample read failed for {files[0]}: {e}")

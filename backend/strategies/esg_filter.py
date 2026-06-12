@@ -6,8 +6,8 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
+from backend.engine.strategy_base import Strategy
 
 
 @dataclass

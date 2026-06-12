@@ -1,7 +1,10 @@
 # backend/strategies/diversified/spin_off_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
@@ -223,7 +226,7 @@ class SpinOffArbitrage(Strategy):
         fees = _fees_bps() * 1e-4
         # Executable combo cost to buy synthetic REG: buy P_WI and r*S_WI
         combo_buy = p_wip * (1 + fees) + (r_ratio * p_wis) * (1 + fees)
-        combo_sell= p_wip * (1 - fees) + (r_ratio * p_wis) * (1 - fees)
+        p_wip * (1 - fees) + (r_ratio * p_wis) * (1 - fees)
 
         # Edge quoted in bps of p_reg
         edge_unit = (p_reg * (1 - fees)) - combo_buy
@@ -284,7 +287,7 @@ class SpinOffArbitrage(Strategy):
         fees = _fees_bps() * 1e-4
         # To BUY stub synthetically, you BUY P_REG and SELL r*S_WI
         stub_buy  = p_reg * (1 + fees) - (r_ratio * p_wis) * (1 - fees)
-        stub_sell = p_reg * (1 - fees) - (r_ratio * p_wis) * (1 + fees)
+        p_reg * (1 - fees) - (r_ratio * p_wis) * (1 + fees)
 
         # Compare P_WI vs stub
         edge_unit = (p_wip * (1 - fees)) - stub_buy    # positive ⇒ P_WI rich vs stub

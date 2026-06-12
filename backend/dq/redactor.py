@@ -1,9 +1,15 @@
 # backend/safety/redactor.py
 from __future__ import annotations
 
-import os, re, sys, json, hmac, hashlib, time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Callable
+import hashlib
+import hmac
+import json
+import os
+import re
+import sys
+import time
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
 
 # ---------- Optional YAML (graceful) -----------------------------------------
 HAVE_YAML = True
@@ -268,7 +274,7 @@ def _cli():
     p_jsonl.add_argument("--in", dest="inp", required=True)
     p_jsonl.add_argument("--out", dest="outp", required=True)
 
-    p_pipe = sub.add_parser("pipe", help="Read stdin, write redacted stdout")
+    sub.add_parser("pipe", help="Read stdin, write redacted stdout")
     args = ap.parse_args()
 
     policy = None

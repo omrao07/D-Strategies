@@ -30,12 +30,11 @@ python -m backend.market.limit_order_book --probe
 from __future__ import annotations
 
 import bisect
-import heapq
 import time
 import uuid
-from dataclasses import dataclass, field, asdict
-from typing import Any, Deque, Dict, List, Optional, Tuple
 from collections import deque
+from dataclasses import asdict, dataclass, field
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
 # Optional bus
 try:
@@ -443,7 +442,7 @@ def _probe():
     print("Iceberg rest:", ice["status"], "hidden:", book.orders[ice["order_id"]].user_data.get("hidden_remainder"))
 
 def main():
-    import argparse, json
+    import argparse
     ap = argparse.ArgumentParser(description="Limit Order Book")
     ap.add_argument("--probe", action="store_true")
     args = ap.parse_args()

@@ -5,8 +5,9 @@ Global settings and configuration loader for the multi-region arbitrage & hedge 
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
 import yaml
+from dotenv import load_dotenv
 
 # --- Load Environment Variables ---
 BASE_DIR = Path(__file__).resolve().parent
@@ -46,6 +47,7 @@ REGISTER_FILE = CONFIG_DIR / "register.yaml"
 
 # --- Load Register YAML ---
 import logging as _logging
+
 _log = _logging.getLogger(__name__)
 
 def load_register_config():

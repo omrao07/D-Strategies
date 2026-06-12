@@ -33,8 +33,8 @@ import statistics as stats
 import threading
 import time
 import tracemalloc
-from dataclasses import dataclass, field, asdict
-from queue import Queue, Empty
+from dataclasses import asdict, dataclass, field
+from queue import Empty, Queue
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 # Optional YAML
@@ -46,21 +46,22 @@ except Exception:
 
 # --- Project imports (guarded) ---
 try:
-    from backend.runtime.manager import Manager, StaticPrices, StaticSignals # type: ignore
+    from backend.runtime.manager import Manager, StaticPrices, StaticSignals  # type: ignore
 except Exception:
     Manager = None          # type: ignore
     StaticPrices = None     # type: ignore
     StaticSignals = None    # type: ignore
 
 try:
-    from backend.sim.policy_sim import PolicySimConfig, PolicySimulator # type: ignore
+    from backend.sim.policy_sim import PolicySimConfig, PolicySimulator  # type: ignore
 except Exception:
     PolicySimConfig = None  # type: ignore
     PolicySimulator = None  # type: ignore
 
 # Prefer the richer timeline runner if present
 try:
-    from backend.sim.scenarios import ScenarioRunner, load_yaml as scen_load_yaml  # type: ignore
+    from backend.sim.scenarios import ScenarioRunner  # type: ignore
+    from backend.sim.scenarios import load_yaml as scen_load_yaml
     _HAVE_SCEN_RUNNER = True
 except Exception:
     _HAVE_SCEN_RUNNER = False
@@ -71,7 +72,16 @@ except Exception:
 
 # Shock Engine (optional)
 try:
-    from backend.sim.shock_models import ShockEngine, JumpDiffusion, HawkesLike, RegimeConditional, VolatilitySpike, LiquidityDrain, CrossAssetPropagator, apply_to_sim # type: ignore
+    from backend.sim.shock_models import (  # type: ignore
+        CrossAssetPropagator,
+        HawkesLike,
+        JumpDiffusion,
+        LiquidityDrain,
+        RegimeConditional,
+        ShockEngine,
+        VolatilitySpike,
+        apply_to_sim,
+    )
     _HAVE_SHOCKS = True
 except Exception:
     _HAVE_SHOCKS = False

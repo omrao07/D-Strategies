@@ -46,7 +46,6 @@ import pandas as pd
 
 try:
     import weaviate
-    from weaviate.util import generate_uuid5 # type: ignore
 except Exception as e:
     raise RuntimeError("Missing weaviate-client. Install: pip install weaviate-client") from e
 

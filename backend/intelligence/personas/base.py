@@ -27,9 +27,8 @@ from __future__ import annotations
 import abc
 import math
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Literal
-
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
 
 # ---------------------- shared primitives ----------------------
 

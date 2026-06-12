@@ -22,7 +22,10 @@ outdir/backtest.csv             risk parity portfolio vs 60/40 P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
@@ -66,7 +69,6 @@ def run(cfg):
     weight_records = []
     signal_records = []
     rp_daily = []
-    eq60_40_daily = []
 
     for i in range(cfg.vol_window, len(ret_wide)):
         date = ret_wide.index[i]
@@ -139,7 +141,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Risk parity | RP Sharpe: {f'{summary['rp_sharpe']:.2f}' if summary['rp_sharpe'] else 'N/A'} vs 60/40: {f'{summary['eq_6040_sharpe']:.2f}' if summary['eq_6040_sharpe'] else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Risk parity | RP Sharpe: {format(summary['rp_sharpe'], '.2f') if summary['rp_sharpe'] else 'N/A'} vs 60/40: {format(summary['eq_6040_sharpe'], '.2f') if summary['eq_6040_sharpe'] else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

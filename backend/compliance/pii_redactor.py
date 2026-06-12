@@ -1,5 +1,6 @@
 # backend/compliance/pii_redactor.py
 from __future__ import annotations
+
 """
 PII Redactor / Tokenizer
 ------------------------
@@ -35,8 +36,12 @@ Environment
     PII_SALT   : default salt when --salt env or not provided
 """
 
-import os, re, json, hmac, hashlib, io, sys
-from typing import Any, Dict, List, Iterable, Optional, Tuple, Union
+import hashlib
+import hmac
+import json
+import os
+import re
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 try:
     import phonenumbers  # type: ignore

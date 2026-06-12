@@ -18,8 +18,10 @@ outdir/arb_signals.csv       date, theoretical_vxx, actual_vxx, spread_pct, sign
 outdir/summary.json
 """
 
-import argparse, json, os
-import numpy as np
+import argparse
+import json
+import os
+
 import pandas as pd
 
 

@@ -50,15 +50,15 @@ uvicorn analytics-engine.vector_ai.api.websocket:app --reload --port 8002
 
 from __future__ import annotations
 
-import os
-import json
 import asyncio
+import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 # Optional deps

@@ -35,10 +35,9 @@ from __future__ import annotations
 import math
 import os
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
-from .adapters import AdapterBase, Order, OrderType, Side, Quote # type: ignore
-
+from .adapters import AdapterBase, Order, OrderType, Quote, Side  # type: ignore
 
 # ----------------------------- dataclasses -----------------------------
 
@@ -97,7 +96,7 @@ def _p_fill_limit(order: Order, q: Quote) -> float:
     """
     if order.type != OrderType.LIMIT or order.limit_price is None:
         return 1.0
-    bid, ask, mid = q.bid, q.ask, q.mid
+    bid, ask, _mid = q.bid, q.ask, q.mid
     hs = _half_spread_from_quote(q, _env_float("COST_SPREAD_BPS", 8.0))
     if bid is None or ask is None:
         return 0.5

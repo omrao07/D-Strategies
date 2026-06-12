@@ -23,10 +23,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 
 def get_season(month: int) -> str:
@@ -55,7 +57,6 @@ def run(cfg):
     storage["season"] = storage.index.month.map(get_season)
 
     vs_col = "vs_5yr_avg_pct" if "vs_5yr_avg_pct" in storage.columns else None
-    vs_bcf_col = "vs_5yr_avg_bcf" if "vs_5yr_avg_bcf" in storage.columns else None
     storage_col = "storage_bcf" if "storage_bcf" in storage.columns else storage.columns[0]
 
     # Compute surplus/deficit if not available

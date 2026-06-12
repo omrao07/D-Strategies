@@ -42,19 +42,18 @@ oracle = RegimeOracle.load(".models/regime_oracle.joblib")
 from __future__ import annotations
 
 import json
-import math
 import warnings
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 try:
-    from sklearn.mixture import GaussianMixture # type: ignore
-    from sklearn.preprocessing import StandardScaler # type: ignore
-    from sklearn.pipeline import Pipeline # type: ignore
+    from sklearn.mixture import GaussianMixture  # type: ignore
+    from sklearn.pipeline import Pipeline  # type: ignore
+    from sklearn.preprocessing import StandardScaler  # type: ignore
 except Exception as e:  # pragma: no cover
     raise SystemExit(
         "regime_oracle requires scikit-learn. Install with: pip install scikit-learn"

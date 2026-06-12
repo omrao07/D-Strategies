@@ -21,10 +21,12 @@ outdir/timed_portfolio.csv             date, timed_return, equal_weight_return
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-
 
 REGIME_WEIGHTS = {
     "bull":     {"value_ret": 0.15, "mom_ret": 0.50, "quality_ret": 0.20, "low_vol_ret": 0.15},

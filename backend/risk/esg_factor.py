@@ -30,10 +30,9 @@ CLI
 from __future__ import annotations
 
 import math
-import os
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Iterable, Tuple
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # Optional deps
 try:
@@ -43,7 +42,7 @@ except Exception:
 
 # Optional bus (best-effort)
 try:
-    from backend.bus.streams import publish_stream, hset
+    from backend.bus.streams import hset, publish_stream
 except Exception:
     publish_stream = None  # type: ignore
     hset = None  # type: ignore
@@ -362,7 +361,8 @@ def _probe():
         print(r.symbol, "comp=", round(r.composite,3), "tilt=", round(r.tilt,3), "excl=", r.exclude, "decile=", r.decile, r.risk_overrides)
 
 def main():
-    import argparse, json
+    import argparse
+    import json
     ap = argparse.ArgumentParser(description="ESG Factor Engine")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--csv", type=str, help="CSV with columns: symbol,sector,region,esg_env,esg_soc,esg_gov,provider_score,carbon_intensity_tco2e_per_musd,controversies,flags,news_sentiment,market_cap,free_float")

@@ -51,16 +51,15 @@ kg.load_edges(df_rel, works_at)
 
 from __future__ import annotations
 
-import json
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 import pandas as pd
 
 # Optional deps guarded
 try:
-    from neo4j import GraphDatabase, Driver, Transaction  # type: ignore
+    from neo4j import Driver, GraphDatabase, Transaction  # type: ignore
 except Exception:
     GraphDatabase = None
     Driver = None

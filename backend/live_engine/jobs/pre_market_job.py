@@ -24,8 +24,15 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 try:
     import redis as _redis_mod
-    from backend.live_engine.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, CAPITAL_BASE
-    from backend.live_engine.config import MAX_DAILY_LOSS_PCT, MAX_DRAWDOWN_PCT
+
+    from backend.live_engine.config import (
+        CAPITAL_BASE,
+        MAX_DAILY_LOSS_PCT,
+        MAX_DRAWDOWN_PCT,
+        REDIS_HOST,
+        REDIS_PASSWORD,
+        REDIS_PORT,
+    )
     _redis_client = _redis_mod.Redis(
         host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, decode_responses=True
     )

@@ -31,19 +31,23 @@ import os
 import signal
 import sys
 import time
-from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, Iterable, List, Optional
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+
+from news_intel.enrich.actor_linker import (  # type: ignore
+    KBEntity,
+    KnowledgeBase,
+    link_actors,
+)
+from news_intel.enrich.topic_tagging import TopicTagger  # type: ignore
+from news_intel.ingest.api_fetcher import ApiFetcher  # type: ignore
 
 # ---- ingest & normalize ----
-from news_intel.ingest.rss_feed import RSSClient # type: ignore
-from news_intel.ingest.api_fetcher import ApiFetcher # type: ignore
-from news_intel.ingest.parser import normalize_article # type: ignore
+from news_intel.ingest.rss_feed import RSSClient  # type: ignore
 
 # ---- enrich ----
-from news_intel.models.ner_model import NERModel # type: ignore
-from news_intel.enrich.actor_linker import KnowledgeBase, KBEntity, extract_mentions, link_actors # type: ignore
-from news_intel.enrich.topic_tagging import TopicTagger # type: ignore
-from news_intel.models.sentiment_model import SentimentModel # type: ignore
+from news_intel.models.ner_model import NERModel  # type: ignore
+from news_intel.models.sentiment_model import SentimentModel  # type: ignore
 from news_intel.models.topic_model import TopicModel  # type: ignore # optional ML multi-label
 
 # ---- optional storage adapter ----

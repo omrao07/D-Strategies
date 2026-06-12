@@ -46,7 +46,6 @@ try:
 except Exception:
     _HAS_YF = False
 
-import numpy as np
 
 try:
     from scipy.optimize import brentq  # type: ignore
@@ -56,7 +55,7 @@ except Exception:
 
 # ---------- bus hook ----------
 try:
-    from backend.bus.streams import publish_stream # type: ignore
+    from backend.bus.streams import publish_stream  # type: ignore
 except Exception:
     def publish_stream(stream: str, payload):
         head = payload if isinstance(payload, dict) else (payload[0] if payload else {})

@@ -17,7 +17,6 @@
 
 from __future__ import annotations
 
-import math
 import time
 import uuid
 from unittest.mock import patch
@@ -26,7 +25,6 @@ import pytest
 
 import backend.api.broker_interface as bi
 from backend.api.broker_interface import (
-    Account,
     Fill,
     Order,
     PaperBroker,
@@ -34,7 +32,6 @@ from backend.api.broker_interface import (
     make_broker,
     new_order,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

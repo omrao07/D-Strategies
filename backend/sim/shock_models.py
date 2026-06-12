@@ -3,12 +3,16 @@ from __future__ import annotations
 
 import math
 import random
-from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence
 
 # Reuse your PolicyShock types
-from backend.risk.policy_sim import PolicyShock, RateShock, EquityShock, FXShock, VolShock # type: ignore
-
+from backend.risk.policy_sim import (  # type: ignore
+    EquityShock,
+    FXShock,
+    PolicyShock,
+    RateShock,
+    VolShock,
+)
 
 # ============================ Utilities ============================
 

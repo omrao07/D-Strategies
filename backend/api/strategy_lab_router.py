@@ -15,12 +15,12 @@ Endpoints:
 from __future__ import annotations
 
 import logging
+import os
 import threading
 import time
 import uuid
 from typing import Any, Dict, List, Optional
 
-import os
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, Field
@@ -200,7 +200,7 @@ def sweep_result(job_id: str):
 def lab_allocations():
     """Return current target weights and notionals from the live allocator."""
     try:
-        from backend.engine.allocator import get_weights, get_notionals, allocate
+        from backend.engine.allocator import get_notionals, get_weights
         weights = get_weights()
         notionals = get_notionals()
         return {

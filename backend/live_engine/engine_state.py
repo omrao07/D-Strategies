@@ -18,7 +18,6 @@ Usage:
 from __future__ import annotations
 
 import logging
-import os
 import threading
 import time
 from typing import Any, Optional
@@ -85,7 +84,8 @@ class EngineState:
     def _init_redis(self) -> None:
         try:
             import redis as _r
-            from backend.live_engine.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+
+            from backend.live_engine.config import REDIS_HOST, REDIS_PASSWORD, REDIS_PORT
             self.redis = _r.Redis(
                 host=REDIS_HOST,
                 port=REDIS_PORT,
@@ -112,7 +112,9 @@ class EngineState:
     def _init_risk_engine(self) -> None:
         try:
             from backend.risk.institutional_risk_engine import (
-                InstitutionalRiskEngine, RiskConfig, get_risk_config_from_redis,
+                InstitutionalRiskEngine,
+                RiskConfig,
+                get_risk_config_from_redis,
             )
             config = get_risk_config_from_redis(self.redis) if self.redis else RiskConfig()
             self.risk_engine = InstitutionalRiskEngine(config=config, redis_client=self.redis)

@@ -11,7 +11,7 @@ Supported backends:
 Backends are loaded lazily and safely.
 """
 
-from typing import Dict, Tuple, List, Optional, Literal
+from typing import Dict, List, Literal, Optional, Tuple
 
 BackendName = Literal["anneal", "qiskit"]
 

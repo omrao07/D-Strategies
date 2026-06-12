@@ -238,7 +238,7 @@ def main():
         "signal_logic": "high_lb_ratio=SHORT_crude, low_lb_ratio=LONG_crude",
     }
 
-    print(f"\n[SUMMARY]")
+    print("\n[SUMMARY]")
     print(f"  Date range       : {summary['date_range_start']} → {summary['date_range_end']}")
     print(f"  Unique vessels   : {summary['unique_vessels']}")
     print(f"  Avg L/B ratio    : {summary['avg_lb_ratio']:.4f}")

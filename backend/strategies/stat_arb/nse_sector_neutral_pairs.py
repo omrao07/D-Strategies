@@ -24,8 +24,11 @@ outdir/backtest.csv              cumulative P&L by sector
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
 from itertools import combinations
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -85,9 +88,9 @@ def run(cfg):
     if cfg.sectors_file and os.path.exists(cfg.sectors_file):
         sec_df = pd.read_csv(cfg.sectors_file)
         sec_df.columns = [c.lower().strip() for c in sec_df.columns]
-        sector_map = dict(zip(sec_df["ticker"].str.upper(), sec_df["sector"].str.upper()))
+        dict(zip(sec_df["ticker"].str.upper(), sec_df["sector"].str.upper()))
     else:
-        sector_map = {tk: sec for sec, tks in NSE_SECTORS.items() for tk in tks}
+        {tk: sec for sec, tks in NSE_SECTORS.items() for tk in tks}
 
     all_pairs = []
     sector_backtests = {}

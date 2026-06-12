@@ -18,7 +18,10 @@ outdir/smb_returns.csv   date, small_return, large_return, smb_return (if return
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 

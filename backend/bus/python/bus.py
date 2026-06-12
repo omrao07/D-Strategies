@@ -10,18 +10,17 @@ import logging
 import os
 from typing import Any, AsyncIterator, Dict, Optional
 
-from utils.retry import aretry
-from utils.serializer import encode_message, decode_message, default_headers
-from utils import tracing
+from consumers.kafka_consumer import KafkaConsumerWrapper  # type: ignore # assuming you implemented
+from consumers.nats_consumer import NATSConsumer  # "
+from consumers.redis_consumer import RedisStreamConsumer  # "
 
 # Import your producers/consumers
 from producers.kafka_producer import KafkaProducerWrapper
 from producers.nats_producer import NATSProducer
 from producers.redis_producer import RedisStreamProducer
-
-from consumers.kafka_consumer import KafkaConsumerWrapper  # type: ignore # assuming you implemented
-from consumers.nats_consumer import NATSConsumer           # "
-from consumers.redis_consumer import RedisStreamConsumer  # "
+from utils import tracing
+from utils.retry import aretry
+from utils.serializer import decode_message, default_headers
 
 logger = logging.getLogger("bus")
 

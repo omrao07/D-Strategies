@@ -24,7 +24,10 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -55,7 +58,6 @@ def run(cfg):
     spot_ret = spot_df[spot_col].pct_change()
 
     vrp_records = []
-    straddle_records = []
     greeks_records = []
     all_pnl = []
 

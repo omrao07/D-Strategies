@@ -28,11 +28,15 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from backend.execution_plus.registry import HUB, RegistryHub, load_adapters_from_yaml # type: ignore
-from backend.execution_plus.cost_model import DefaultCostModel, get_default_model # type: ignore
+from backend.execution_plus.cost_model import DefaultCostModel, get_default_model  # type: ignore
+from backend.execution_plus.registry import (  # type: ignore
+    HUB,
+    RegistryHub,
+    load_adapters_from_yaml,
+)
+
 from backend.execution_plus.arb_router.discovery import Discovery
 from backend.execution_plus.arb_router.router import ArbRouter
-
 
 # ---------------------------------------------------------------------
 # Core builders

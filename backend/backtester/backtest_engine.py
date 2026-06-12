@@ -48,7 +48,7 @@ from __future__ import annotations
 import datetime
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -61,36 +61,37 @@ _EPS = 1e-12
 
 from backend.backtester.data_feeds import Bar, BarBatch, DataFeed, SyntheticFeed
 from backend.backtester.metrics import (
-    AntiOverfitResult, StrategyMetrics, check_anti_overfit,
-    compute_all_metrics, detect_lookahead, detect_regimes, monthly_returns, sharpe,
+    AntiOverfitResult,
+    StrategyMetrics,
+    check_anti_overfit,
+    compute_all_metrics,
+    detect_lookahead,
+    detect_regimes,
+    monthly_returns,
+    sharpe,
 )
 from backend.backtester.vectorized_backtester import (
-    BacktestResult, monte_carlo,
+    monte_carlo,
+)
+from backend.backtester.vectorized_backtester import (
     run_backtest as _vec_run_backtest,
+)
+from backend.backtester.vectorized_backtester import (
     walk_forward as _vec_walk_forward,
 )
 
 # ── New modular components ────────────────────────────────────────────────────
 try:
-    from backend.backtester.events import (
-        EventQueue, EventType, FillEvent, FillType, MarketEvent,
-        OrderEvent, OrderSide, OrderStatus, OrderType as EvtOrderType, RiskEvent,
-        SignalEvent,
-    )
     from backend.backtester.execution_engine import ExecutionEngine, SlippageModel
+    from backend.backtester.intrabar_simulator import BarPathSimulator
     from backend.backtester.portfolio_engine import PortfolioEngine
     from backend.backtester.risk_engine import RiskConfig, RiskEngine
-    from backend.backtester.intrabar_simulator import BarPathSimulator
-    from backend.backtester.anti_overfit_engine import AntiOverfitEngine
-    from backend.backtester.signal_engine import detect_regime as _det_regime
     _FULL = True
 except Exception as _e:
     log.warning("Full component stack unavailable (%s); falling back to legacy mode.", _e)
     _FULL = False
 
 try:
-    from backend.live.risk_gates import RiskGates
-    from backend.live.signal_aggregator import SignalAggregator
     _HAVE_LIVE = True
 except Exception:
     _HAVE_LIVE = False
@@ -361,8 +362,8 @@ class BacktestReport:
     def plot(self, save_path: Optional[str] = None) -> None:
         """Matplotlib equity + drawdown + ranking plot."""
         try:
-            import matplotlib.pyplot as plt
             import matplotlib.gridspec as gs
+            import matplotlib.pyplot as plt
         except ImportError:
             log.warning("pip install matplotlib to use plot()")
             return
@@ -523,7 +524,7 @@ class BacktestEngine:
         filter_fn: Optional[Callable] = None,
     ) -> int:
         try:
-            from backend.engine.registry import auto_register_strategies, HUB
+            from backend.engine.registry import HUB, auto_register_strategies
             auto_register_strategies(strategies_pkg)
             classes = list(HUB.strategies._store.values())
         except Exception as e:
@@ -590,7 +591,7 @@ class BacktestEngine:
     def _run_event_driven(
         self, start: datetime.datetime, end: datetime.datetime, feed: DataFeed
     ) -> BacktestReport:
-        t0 = time.perf_counter()
+        time.perf_counter()
 
         # Reset stateful components
         if _FULL:
@@ -825,7 +826,7 @@ class BacktestEngine:
         if not batches:
             return self._empty_report("stress_test")
 
-        all_syms = sorted({sym for b in batches for sym in b.bars})
+        sorted({sym for b in batches for sym in b.bars})
 
         scenarios = [
             {"name": "baseline",      "vol_mult": 1.0,  "crash_pct": 0.0,   "gap_pct": 0},

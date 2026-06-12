@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import time
 import uuid
-import pathlib
 from dataclasses import asdict, is_dataclass
 from functools import lru_cache
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Union
 
 # ---- Optional deps -----------------------------------------------------------
 try:
@@ -17,7 +17,11 @@ except Exception:
     msgpack = None  # graceful fallback
 
 try:
-    from fastavro import schemaless_writer, schemaless_reader, parse_schema  # type: ignore # pip install fastavro
+    from fastavro import (  # type: ignore # pip install fastavro
+        parse_schema,
+        schemaless_reader,
+        schemaless_writer,
+    )
 except Exception:
     schemaless_writer = None
     schemaless_reader = None

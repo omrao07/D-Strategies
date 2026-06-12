@@ -82,7 +82,7 @@ def detect_columns(cols: List[str], tenor: str) -> Tuple[Optional[str], Optional
     norm_map = {c: _colname_norm(c) for c in cols}
 
     # group by tenor tokens present in colnames (e.g., 2y,5y,10y)
-    tenor_pat = re.compile(r"(?:^|[^0-9])([0-9]{1,2})(?:y|yr|year|years)?$")
+    re.compile(r"(?:^|[^0-9])([0-9]{1,2})(?:y|yr|year|years)?$")
     buckets: Dict[str, List[str]] = {}
     for c, cn in norm_map.items():
         # find tenor token at end (or include raw digits)
@@ -284,7 +284,6 @@ def main():
     for sh in shocks:
         # P&L per 100 notional, DV01-neutral ratio if provided
         # Pure spread change Δs (bps) × (w_IT - w_DE) with DV01 weights; here we just report spread change impact proxy.
-        pnl_spread = -sh  # long spread tightener loses when spread widens; sign is contextual—report Δspread itself and z-shift
         z_new = None
         if latest is not None and np.isfinite(latest["spread_sd_bps"]) and latest["spread_sd_bps"] > 1e-9:
             z_new = float((float(latest["spread_bps"]) + sh - float(latest["spread_mu_bps"])) / float(latest["spread_sd_bps"]))

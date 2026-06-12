@@ -1,9 +1,15 @@
 # backend/bus/queues.py
 from __future__ import annotations
 
-import os, json, time, uuid, heapq, random, threading
-from dataclasses import dataclass, asdict, field
-from typing import Any, Dict, Optional, Tuple, List, Protocol, runtime_checkable
+import heapq
+import json
+import os
+import random
+import threading
+import time
+import uuid
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional, Protocol, Tuple, runtime_checkable
 
 # -------- optional Redis (graceful fallback) ---------------------------------
 HAVE_REDIS = True
@@ -259,7 +265,7 @@ class RedisQueue(QueueBackend):
         pipe = self.r.pipeline()
         for raw in expired: # type: ignore
             try:
-                job = Job.from_json(raw)
+                Job.from_json(raw)
             except Exception:
                 pipe.zrem(self.k_leases, raw)
                 pipe.lrem(self.k_inflight, 0, raw)

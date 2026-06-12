@@ -1,14 +1,15 @@
 # backend/utils/latency.py
 from __future__ import annotations
 
-import os
-import time
-import math
 import json
+import math
+import os
 import threading
+import time
 from contextlib import contextmanager
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional, List
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
+
 
 # ----------------------- Optional Redis backend -----------------------
 def _get_redis():

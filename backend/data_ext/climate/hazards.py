@@ -39,13 +39,13 @@ normalization:
 
 from __future__ import annotations
 
+import logging
 import os
 import time
-import logging
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from backend.config.feature_flags import is_enabled
 from backend.bus import streams
+from backend.config.feature_flags import is_enabled
 
 try:
     import yaml  # type: ignore
@@ -53,8 +53,8 @@ except Exception:  # pragma: no cover
     yaml = None
 
 # Providers
-from .sources.noaa import fetch as fetch_noaa
 from .sources.ecmwf import fetch as fetch_ecmwf
+from .sources.noaa import fetch as fetch_noaa
 
 log = logging.getLogger(__name__)
 if not log.handlers:

@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Dict, Optional, Tuple, Any, List, Literal
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 Side = Literal["buy", "sell"]
 
@@ -208,7 +208,6 @@ class PnLXray:
         else:
             # reducing / closing or flipping → realize against FIFO lots
             remaining = abs(signed_q)
-            side_sign = 1 if signed_q < 0 else -1  # if sell reducing a long, side_sign=+1 for realized calc
             new_lots: List[Tuple[float, float]] = []
             for lot_q, lot_px in ps.lots:
                 if remaining <= 0:

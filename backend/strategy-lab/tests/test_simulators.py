@@ -1,11 +1,10 @@
 # tests/test_simulators.py
-import os
 import csv
-import time
-import math
-import json
-import tempfile
 import importlib
+import json
+import os
+import tempfile
+
 import pytest
 
 # --------------------------- helpers ---------------------------
@@ -160,8 +159,9 @@ def test_eq_ls_sim_quantiles_costs_and_metrics():
     class DS: pass
     t0 = 1_700_000_000
     def mk(n, start):
+        import random
         x = start; rows=[]
-        import random; random.seed(11)
+        random.seed(11)
         for i in range(n):
             x *= (1 + (0.01 if (i%7==0) else -0.004))
             rows.append({"ts": t0 + i*86400, "open":x, "high":x, "low":x, "close":x, "volume":1})

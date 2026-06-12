@@ -1,7 +1,10 @@
 # backend/strategies/diversified/synthetic_forward_arbitrage.py
 from __future__ import annotations
 
-import json, math, os, time
+import json
+import math
+import os
+import time
 from dataclasses import dataclass
 from typing import Dict, Optional
 
@@ -227,8 +230,8 @@ class SyntheticForwardArbitrage(Strategy):
         if not (abs(edge_bps) >= ENTRY_BPS and abs(z) >= ENTRY_Z): return
 
         # Fees (bps guard)
-        fee_spot = _fees_bps(venue_spot) * 1e-4
-        fee_fwd  = _fees_bps(venue_fwd)  * 1e-4
+        _fees_bps(venue_spot) * 1e-4
+        _fees_bps(venue_fwd)  * 1e-4
 
         # Size: use USD_NOTIONAL; futures/fwd qty by contract notional, spot qty by dollar
         # Approx futures contract notional ≈ Fmkt * contract_mult

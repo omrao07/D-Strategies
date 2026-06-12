@@ -33,24 +33,19 @@ Usage
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import sys
-import json
-import math
 import time
-import glob
-import hashlib
-import typing as T
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
 # Optional I/O engines
 try:
-    import pyarrow as pa
-    import pyarrow.parquet as pq
     HAVE_PARQUET = True
 except Exception:
     HAVE_PARQUET = False
@@ -392,7 +387,6 @@ def main(argv: list[str] | None = None) -> int:
     if cfg.load_duckdb:
         # If the window spans multiple days, you can call load per day in a loop.
         try:
-            uniq_dates = set()
             for r in results:
                 if r.get("rows", 0) > 0:
                     # derive current date(s) from start..end

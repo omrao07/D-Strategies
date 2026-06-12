@@ -11,15 +11,13 @@ Requirements:
 from __future__ import annotations
 
 import time
-from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 from oandapyV20 import API
 from oandapyV20.endpoints.accounts import AccountSummary
-from oandapyV20.endpoints.orders import OrderCreate, OrderCancel
+from oandapyV20.endpoints.orders import OrderCancel, OrderCreate
 from oandapyV20.endpoints.positions import OpenPositions
-from oandapyV20.endpoints.trades import TradeDetails
-
 
 # ============================
 # Types

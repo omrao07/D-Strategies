@@ -1,13 +1,13 @@
 # backend/api/ws_greeks.py
 from __future__ import annotations
 
-import os
 import json
+import os
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends, HTTPException
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
 # ---------- Optional Redis ----------

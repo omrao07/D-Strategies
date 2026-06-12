@@ -28,13 +28,12 @@ Safety
 from __future__ import annotations
 
 import hashlib
-import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 # Import the Strategy protocol to satisfy the coordinator
 try:
-    from security.mpc_signing.coordinator import Strategy # type: ignore
+    from security.mpc_signing.coordinator import Strategy  # type: ignore
 except Exception:  # fallback if path differs during local tests
     class Strategy:  # type: ignore
         async def keygen_request(self, pid: str) -> Dict[str, Any]: ...

@@ -1,13 +1,14 @@
 # engines/futures_macro/execution/allocator.py
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Optional
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, Optional, Iterable
 
 # Re-use the contract spec from your PnL engine
-from engines.futures_macro.backtest.pnl import ContractSpec # type: ignore
-
+from engines.futures_macro.backtest.pnl import ContractSpec  # type: ignore
 
 # ---------------------------------------------------------------------
 # Config

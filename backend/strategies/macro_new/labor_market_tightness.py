@@ -23,11 +23,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 SECTOR_MAP = {
     "tight_hot": {"XLF": 1, "XLE": 0.5, "XLK": -0.5, "TLT": -1},        # Rate hikes → financials up, tech/bonds down
@@ -135,7 +136,7 @@ def run(cfg):
     }
     with open(os.path.join(cfg.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"Labor tightness | Regime: {summary['current_regime']} | Tightness: {f'{summary['latest_tightness_ratio']:.2f}' if summary['latest_tightness_ratio'] else 'N/A'} | Sharpe: {f'{sharpe:.2f}' if sharpe else 'N/A'} | Written to {cfg.outdir}")
+    print(f"Labor tightness | Regime: {summary['current_regime']} | Tightness: {format(summary['latest_tightness_ratio'], '.2f') if summary['latest_tightness_ratio'] else 'N/A'} | Sharpe: {format(sharpe, '.2f') if sharpe else 'N/A'} | Written to {cfg.outdir}")
 
 
 def main():

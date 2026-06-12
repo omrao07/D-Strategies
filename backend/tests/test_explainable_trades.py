@@ -1,8 +1,9 @@
 # tests/test_explainable_trades.py
 import importlib
 import math
-from typing import Any, Dict, List, Optional
-import pytest # type: ignore
+from typing import Any, Dict
+
+import pytest  # type: ignore
 
 """
 What this validates

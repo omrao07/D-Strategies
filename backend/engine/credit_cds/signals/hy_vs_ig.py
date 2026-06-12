@@ -1,9 +1,11 @@
 # engines/credit/hy_vs_ig.py
 from __future__ import annotations
-import numpy as np
-import pandas as pd
+
 from dataclasses import dataclass
 from typing import Dict
+
+import numpy as np
+import pandas as pd
 
 TRADING_DAYS = 252
 

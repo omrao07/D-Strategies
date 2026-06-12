@@ -18,7 +18,6 @@ Stdlib-only, optional PyYAML support if installed.
 from __future__ import annotations
 
 import csv
-import io
 import json
 import os
 from typing import Any, Dict, Iterable, List, Optional

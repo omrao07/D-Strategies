@@ -23,15 +23,11 @@ Run:
 
 from __future__ import annotations
 
-import math
 from typing import Any, Dict, List, Optional
 
 import numpy as np
-import pytest
-
-from search.retriever import VectorRetriever
 from search.filters import Filter
-
+from search.retriever import VectorRetriever
 
 # ---------------------------- Test Utilities ----------------------------
 

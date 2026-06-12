@@ -94,13 +94,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -595,7 +594,7 @@ def main():
     REL_AGG, REL_REG = load_reliability(args.reliability, freq=freq) if args.reliability else (pd.DataFrame(), None)
     LOSS    = load_losses(args.losses, freq=freq) if args.losses else pd.DataFrame()
     VIIRS_AGG, VIIRS_REG = load_viirs(args.nightlights, freq=freq) if args.nightlights else (pd.DataFrame(), None)
-    EVTS    = load_events(args.events, freq=freq) if args.events else pd.DataFrame()
+    load_events(args.events, freq=freq) if args.events else pd.DataFrame()
 
     # Date filters
     if args.start:
@@ -697,9 +696,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-import argparse
-import json
-import numpy as np
-import pandas as pd
-from dataclasses import dataclass, asdict
-from pathlib import Path        

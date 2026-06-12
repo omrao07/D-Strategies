@@ -66,9 +66,9 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -306,7 +306,6 @@ def dv01_indices(bonds2: pd.DataFrame) -> pd.DataFrame:
         w = g["dv01w"].sum()
         if w <= 0 or not np.isfinite(w):
             avg = np.nan
-            chg = np.nan
         else:
             avg = float(np.nansum(g["spread_bp"] * g["dv01w"]) / w)
             # daily change vs previous day within same tier/bucket

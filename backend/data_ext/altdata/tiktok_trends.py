@@ -1,5 +1,6 @@
 # backend/altdata/tiktok_trends.py
 from __future__ import annotations
+
 """
 TikTok Trends (Alt-Data)
 ------------------------
@@ -43,10 +44,15 @@ CLI:
 NOTE: This module does not scrape TikTok. Point your own collector to produce a CSV/JSON feed.
 """
 
-import csv, json, math, os, re, time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+import csv
+import json
+import math
+import os
+import re
+import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # -------- Optional deps (graceful) --------
 try:

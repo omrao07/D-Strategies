@@ -1,15 +1,14 @@
 # backend/risk/adversary.py
 from __future__ import annotations
 
-import math
 import random
 import time
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple, Protocol, runtime_checkable
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 
 # ----------------------------- Soft types ------------------------------------
 try:
-    from backend.execution.pricer import Quote # type: ignore
+    from backend.execution.pricer import Quote  # type: ignore
 except Exception:
     @dataclass
     class Quote:

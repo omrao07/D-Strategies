@@ -21,12 +21,9 @@ Natural language → structured queries over your hedge fund system.
   Structured JSON response { "summary": str, "data": ... }
 """
 
-import os
-import re
 import json
-import time
-import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+import os
+from typing import Any, Dict, Optional, Union
 
 # ---------- Optional Redis ----------
 USE_REDIS = True

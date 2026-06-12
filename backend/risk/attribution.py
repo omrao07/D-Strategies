@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -174,7 +174,7 @@ def _weights_from_positions(pos: pd.DataFrame) -> pd.DataFrame:
     Convert raw positions (can be leveraged) to normalized weights per row.
     If all-zero => keep zeros (avoid div by zero).
     """
-    gross = pos.shift(1).abs().sum(axis=1)
+    pos.shift(1).abs().sum(axis=1)
     w = pos.shift(1).div(pos.shift(1).sum(axis=1).replace(0.0, np.nan), axis=0)
     # Fallback: if sums to zero, keep zeros
     return w.fillna(0.0)

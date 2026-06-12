@@ -19,12 +19,11 @@ Notes
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
 import importlib
-import math
 import re
 import unicodedata
+from dataclasses import dataclass
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # --------------------- utils ---------------------
 
@@ -70,7 +69,7 @@ class _HFBackend:
 class _VaderBackend:
     """NLTK VADER; install via: pip install nltk && python -m nltk.downloader vader_lexicon"""
     def __init__(self):
-        nltk = importlib.import_module("nltk")
+        importlib.import_module("nltk")
         sa = importlib.import_module("nltk.sentiment")
         self.sid = sa.vader.SentimentIntensityAnalyzer()
 

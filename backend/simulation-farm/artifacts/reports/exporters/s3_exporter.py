@@ -27,7 +27,7 @@ import mimetypes
 import os
 import pathlib
 from dataclasses import dataclass
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
 # Optional deps
 try:

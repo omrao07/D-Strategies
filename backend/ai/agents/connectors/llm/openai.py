@@ -1,10 +1,10 @@
 # backend/ai/agents/connectors/llm/openai.py
 from __future__ import annotations
 
-import os
 import base64
+import os
 import time
-from typing import List, Dict, Any, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 # ============================================================
 # Environment
@@ -27,7 +27,7 @@ def _init_client() -> None:
     if _client is not None:
         return
     try:
-        from openai import OpenAI # type: ignore
+        from openai import OpenAI  # type: ignore
         _client = OpenAI(api_key=OPENAI_KEY)
         _backend_ok = True
     except Exception:
@@ -114,8 +114,8 @@ def tts_speak(text: str, *, model: Optional[str] = None, voice: str = "alloy") -
     if not _backend_ok:
         return f"[openai-stub: no TTS]::{text}".encode()
     import tempfile
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
-        out_path = f.name
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False):
+        pass
     resp = _client.audio.speech.create(
         model=model or OPENAI_TTS,
         voice=voice,

@@ -21,10 +21,12 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 
 def compute_accumulation_score(row: pd.Series, prev: pd.Series) -> float:
@@ -68,7 +70,6 @@ def run(cfg):
 
     signal_records = []
     backtest_by_asset = {}
-    corr_records = []
 
     for asset in wallets["asset"].unique():
         sub = wallets[wallets["asset"] == asset].set_index("date").sort_index()
@@ -108,14 +109,12 @@ def run(cfg):
     if backtest_by_asset:
         port = pd.concat(backtest_by_asset.values(), axis=1).mean(axis=1).dropna()
         # Whale signals are leading indicators; estimate 3-day forward return as proxy
-        port_shifted = port.shift(3)
-        autocorr_proxy = port.autocorr(lag=3)
+        port.shift(3)
+        port.autocorr(lag=3)
         cum = (1 + port * 0.01).cumprod()  # 1% per signal unit (notional)
         cum.to_frame("cumulative_notional").to_csv(os.path.join(cfg.outdir, "backtest.csv"))
-        sharpe = None
-        ann_ret = None
     else:
-        sharpe, ann_ret = None, None
+        _sharpe, _ann_ret = None, None
 
     summary = {
         "n_assets": wallets["asset"].nunique(), "n_signals": len(sig_df),

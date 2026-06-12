@@ -16,10 +16,10 @@ from __future__ import annotations
 import json
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from backend.live_engine.config import CAPITAL_BASE, IST, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+from backend.live_engine.config import CAPITAL_BASE, IST, REDIS_HOST, REDIS_PASSWORD, REDIS_PORT
 
 log = logging.getLogger(__name__)
 

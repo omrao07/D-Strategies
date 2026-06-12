@@ -5,11 +5,12 @@ Pure numpy/scipy; no external portfolio libraries needed.
 """
 from __future__ import annotations
 
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import linkage, to_tree
 from scipy.spatial.distance import squareform
-from typing import Dict, List, Optional
 
 
 def _corr_to_dist(corr: np.ndarray) -> np.ndarray:

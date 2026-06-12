@@ -1,10 +1,9 @@
 # tests/test_lineage.py
-import json
 import importlib
-from copy import deepcopy
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
-import pytest # type: ignore
+import json
+from datetime import datetime, timezone
+
+import pytest  # type: ignore
 
 """
 Expected public API (any one is fine)
@@ -197,7 +196,7 @@ def test_as_of_filtering(api, seed):
     if not api.has("upstream"):
         pytest.skip("Need upstream()")
     up_at_t1 = api.call("upstream", agg, as_of=t1)
-    s = json.dumps(up_at_t1).lower()
+    json.dumps(up_at_t1).lower()
     # before aggregate run (t2), upstream may be empty or only planned deps
     # Accept either empty or missing "clean".
     assert isinstance(up_at_t1, (dict, list))

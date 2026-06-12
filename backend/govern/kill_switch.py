@@ -1,8 +1,11 @@
 # backend/risk/kill_switch.py
 from __future__ import annotations
 
-import os, time, json, threading
-from dataclasses import dataclass, asdict
+import json
+import os
+import threading
+import time
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, Optional
 
 # ---------- optional Redis (graceful fallback) ----------
@@ -185,7 +188,7 @@ class KillSwitch:
 
 # ---------- CLI ----------
 def _cli():
-    import argparse, sys
+    import argparse
     ap = argparse.ArgumentParser("kill_switch")
     sub = ap.add_subparsers(dest="cmd", required=True)
 

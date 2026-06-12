@@ -1,6 +1,6 @@
 # backend/security/__init__.py
+from .jwt_issuer import JWTConfig, JWTIssuer
 from .merkle_ledger import append_event, get_entry, verify_chain
-from .jwt_issuer import JWTIssuer, JWTConfig
 
 __all__ = [
     "append_event", "get_entry", "verify_chain",

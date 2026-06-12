@@ -24,15 +24,16 @@ python -m simulation_farm.jobs.replay_job \
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
-from simulation_farm.artifacts.reports.report_generator import ReportGenerator, ReportInputs # type: ignore
-
+from simulation_farm.artifacts.reports.report_generator import (  # type: ignore
+    ReportGenerator,
+    ReportInputs,
+)
 
 # ------------------------- Spec -------------------------
 
@@ -76,7 +77,7 @@ class ReplayJob:
         dd = _compute_drawdown(equity)
         pnl = [0.0] + [equity[i]/equity[i-1]-1 for i in range(1,len(equity))]
 
-        kpis = _basic_kpis(dates, equity, pnl)
+        _basic_kpis(dates, equity, pnl)
 
         # 4) Emit report
         rg = ReportGenerator(
@@ -230,6 +231,7 @@ def _parse_cli():
 
 if __name__ == "__main__":
     spec = _parse_cli()
+    import json
     job = ReplayJob(spec)
     urls = job.run()
-    import json; print(json.dumps(urls, indent=2))
+    print(json.dumps(urls, indent=2))

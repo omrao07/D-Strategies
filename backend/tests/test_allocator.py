@@ -10,10 +10,12 @@
 # or swap the calls in the tests to your module.
 
 from __future__ import annotations
-import numpy as np
+
 import unittest
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
+
+import numpy as np
 
 # -----------------------------
 # Test scaffolding / helpers

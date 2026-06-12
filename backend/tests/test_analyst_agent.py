@@ -1,10 +1,8 @@
 # tests/test_analyst_agent.py
-import sys
-import types
 import importlib
-from datetime import datetime, timedelta
+from datetime import datetime
 
-import pytest # type: ignore
+import pytest  # type: ignore
 
 """
 This test suite exercises a typical AnalystAgent with:

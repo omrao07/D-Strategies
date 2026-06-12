@@ -49,19 +49,18 @@ import json
 import math
 import random
 import time
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
 # ------------- Optional quantum backend (Qiskit) -----------------
 try:
     # Qiskit packages have been modular; we handle common variants.
-    from qiskit import QuantumCircuit  # type: ignore
-    from qiskit_aer.primitives import Estimator as AerEstimator  # type: ignore
     from qiskit.quantum_info import SparsePauliOp  # type: ignore
-    from qiskit_algorithms.optimizers import COBYLA  # type: ignore
+    from qiskit_aer.primitives import Estimator as AerEstimator  # type: ignore
     from qiskit_algorithms.minimum_eigensolvers import QAOA  # type: ignore
+    from qiskit_algorithms.optimizers import COBYLA  # type: ignore
     _HAS_QISKIT = True
 except Exception:
     _HAS_QISKIT = False
@@ -443,7 +442,7 @@ class QuantumOptimizer:
             qaoa = QAOA(estimator=estimator, reps=reps, optimizer=COBYLA(maxiter=150))
             # Build parameters via a trivial ansatz circuit (QAOA handles internally)
             # Solve by minimum_eigensolver
-            res = qaoa.compute_minimum_eigenvalue(operator=H)
+            qaoa.compute_minimum_eigenvalue(operator=H)
             # Sample bitstring from result statevector expectation — approximate by rounding the sign of <Z_i>
             # QAOA result may include optimal parameters only; we estimate <Z_i> ~ expectation values not directly accessible here
             # Practical approach: Derive bitstring by local greedy polish from a random initial using classical energy:

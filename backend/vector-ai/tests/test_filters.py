@@ -7,10 +7,8 @@ Run:
 """
 
 import datetime as dt
-import pytest
 
-from search.filters import Filter, Clause
-
+from search.filters import Filter
 
 # ----------------------------- Constructors -----------------------------
 

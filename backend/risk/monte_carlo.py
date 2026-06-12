@@ -1,10 +1,11 @@
 # backend/risk/monte_carlo.py
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
+from typing import Dict, Iterable, Literal, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass, asdict
-from typing import Dict, Iterable, Optional, Tuple, Literal
 
 ModelKind = Literal["gbm", "t"]  # gbm = geometric Brownian (lognormal), t = studentized returns
 
@@ -276,7 +277,8 @@ def make_mc_from_frames(
 # CLI quick runner
 # ------------------------------------------------------------------------- #
 def _cli():
-    import argparse, json, sys
+    import argparse
+    import json
     ap = argparse.ArgumentParser("monte_carlo")
     ap.add_argument("--csv", help="CSV with columns=assets, rows=prices. If absent, uses toy data.")
     ap.add_argument("--alpha", type=float, default=0.99)

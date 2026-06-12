@@ -20,11 +20,10 @@ Emits:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Callable, Union
-
-import re
 import datetime as dt
+import re
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 JSON = Dict[str, Any]
 
@@ -96,7 +95,7 @@ class Filter:
         for ors in self.should:
             sub = []
             for c in ors:
-                sub.append(_pandas_expr(c)) # type: ignore
+                sub.append(_pandas_expr(c))
             if sub:
                 parts.append("(" + " or ".join(sub) + ")")
         return " and ".join(parts) if parts else ""
@@ -294,6 +293,44 @@ def _escape_like(s: str) -> str:
 
 def _escape_q(s: str) -> str:
     return re.sub(r'([+\-!(){}\[\]^"~*?:\\/])', r'\\\1', s)
+
+
+# -------------------------- pandas .query() rendering -----------------
+
+def _q_field(field: str) -> str:
+    """Field reference for pandas .query(); backtick-quote non-identifier names."""
+    return field if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", field) else f"`{field}`"
+
+
+def _q_lit(v: Any) -> str:
+    """Render a Python literal usable inside a pandas .query() string."""
+    if isinstance(v, (dt.date, dt.datetime)):
+        return repr(v.isoformat())
+    return repr(v)
+
+
+def _pandas_expr(c: Clause) -> str:
+    """Best-effort pandas .query() expression for a single clause."""
+    f, op, v = _q_field(c.field), c.op, c.value
+    if op == "eq":   return f"{f} == {_q_lit(v)}"
+    if op == "ne":   return f"{f} != {_q_lit(v)}"
+    if op == "gt":   return f"{f} > {_q_lit(v)}"
+    if op == "gte":  return f"{f} >= {_q_lit(v)}"
+    if op == "lt":   return f"{f} < {_q_lit(v)}"
+    if op == "lte":  return f"{f} <= {_q_lit(v)}"
+    if op == "in":   return f"{f} in [{', '.join(_q_lit(x) for x in _as_list(v))}]"
+    if op == "nin":  return f"{f} not in [{', '.join(_q_lit(x) for x in _as_list(v))}]"
+    if op == "between":
+        lo, hi = _as_range(v)
+        return f"{_q_lit(lo)} <= {f} <= {_q_lit(hi)}"
+    if op == "exists":
+        return f"{f} == {f}" if bool(v) else f"{f} != {f}"  # notna / isna idiom
+    if op == "contains":
+        return f"{f}.str.contains({_q_lit(str(v))})"
+    if op == "prefix":
+        return f"{f}.str.startswith({_q_lit(str(v))})"
+    return "(False)"  # unknown op: never matches (mirrors _compile_clause)
+
 
 # -------------------------- Clause Evaluation -------------------------
 

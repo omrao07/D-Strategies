@@ -36,12 +36,12 @@ Notes:
   - Real ERP = ERP - expected inflation (approx), or EY - RF_real if TIPS provided.
 """
 
-import os
 import argparse
-from typing import Optional, Dict
-import numpy as np
-import pandas as pd
+import os
 from datetime import date
+from typing import Dict, Optional
+
+import pandas as pd
 
 CURATED_DIR = "data/adamodar/curated"
 OUT_PATH = os.path.join(CURATED_DIR, "erp.csv")

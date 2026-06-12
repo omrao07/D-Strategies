@@ -26,11 +26,12 @@ outdir/backtest.csv           cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 CHINA_EXPOSED = ["aapl", "nke", "qcom", "tsm", "intc", "nvda", "amd", "cat", "de"]
 DOMESTIC_ALT = ["domestic", "onshoring", "reshoring", "usa_mfg"]
@@ -77,7 +78,6 @@ def run(cfg):
                 escalation_score.loc[future_date] += decay
 
         # Event impact
-        price_at = None
         price_30d = None
         for ticker in CHINA_EXPOSED[:3]:
             if ticker in ret_wide.columns:

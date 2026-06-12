@@ -20,12 +20,14 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-
 
 N_COMPONENTS = 5
 ROLLING_WINDOW = 63     # days for rolling PCA
@@ -63,7 +65,7 @@ def run(cfg):
         pca.fit(X)
 
         # Project today's cross-sectional returns onto rolling factors
-        today_scaled = scaler.transform(today_returns.values.reshape(1, -1))  # shape: 1 × dates — wrong
+        scaler.transform(today_returns.values.reshape(1, -1))  # shape: 1 × dates — wrong
         # Correct: PCA is on tickers × dates space; project returns in ticker space
         # Instead: use PCA on dates × tickers (standard)
         X_dt = scaler.fit_transform(window)  # shape: dates × tickers

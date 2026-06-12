@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
-from typing import Iterable, List, Tuple, Optional, Dict
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # -------------------------- Utilities --------------------------
 
@@ -265,7 +265,7 @@ def horizon_scale_es(es_1d: float, horizon_days: float, iid: bool = True) -> flo
 # -------------------------- Example / Smoke --------------------------
 
 if __name__ == "__main__":  # pragma: no cover
-    import random, time
+    import random
     random.seed(7)
 
     # Synthetic returns with slight negative skew
@@ -287,8 +287,8 @@ if __name__ == "__main__":  # pragma: no cover
     es_hat, lo, hi = bootstrap_es_ci(rets, alpha, n_boot=500, ci=0.90, seed=1)
 
     print(f"VaR {int(alpha*100)}%:", round(hv*100, 3), "%")
-    print(f"Hist ES:", round(hes*100, 3), "%  Param ES:", round(pes*100, 3), "%  CF ES:", round(ces*100, 3), "%")
-    print(f"Stressed ES:", round(ses*100, 3), "%   CI90%: [{round(lo*100,3)}, {round(hi*100,3)}]%")
+    print("Hist ES:", round(hes*100, 3), "%  Param ES:", round(pes*100, 3), "%  CF ES:", round(ces*100, 3), "%")
+    print("Stressed ES:", round(ses*100, 3), "%   CI90%: [{round(lo*100,3)}, {round(hi*100,3)}]%")
 
     # Contributions demo (2-asset)
     w = {"A": 0.6, "B": 0.4}

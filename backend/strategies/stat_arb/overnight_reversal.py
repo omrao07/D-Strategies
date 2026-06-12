@@ -38,14 +38,12 @@
 import argparse
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 # ----------------------------- Config -----------------------------
 
@@ -245,7 +243,7 @@ def main():
         json.dump(asdict(cfg), f, indent=2, default=str)
 
     final_val = float(eq_df["portfolio_value"].iloc[-1]) if not eq_df.empty else cfg.capital
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Signal events: {len(signal_df)}")
     if "t_stat" in agg:
         print(f"Mean trade ret: {agg['mean_trade_ret']:.4f}")

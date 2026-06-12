@@ -30,8 +30,8 @@ hits = hy.search("yen carry trade unwind Japan yields", top_k=25, mode="fusion")
 
 from __future__ import annotations
 
-import os
 import json
+import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -55,9 +55,9 @@ except Exception:
 
 # ---------- Sparse (Whoosh) ----------
 try:
-    from whoosh.index import create_in, open_dir # type: ignore
-    from whoosh.fields import Schema, ID, TEXT, STORED # type: ignore
-    from whoosh.qparser import MultifieldParser # type: ignore
+    from whoosh.fields import ID, STORED, TEXT, Schema  # type: ignore
+    from whoosh.index import create_in, open_dir  # type: ignore
+    from whoosh.qparser import MultifieldParser  # type: ignore
 except Exception as e:
     raise RuntimeError("Missing Whoosh. Install: pip install whoosh") from e
 
@@ -112,7 +112,7 @@ class _DenseAdapter:
                 raise RuntimeError("FAISS selected but faiss-cpu not installed")
             if not self.faiss_path.exists():
                 raise RuntimeError(f"FAISS index not found: {self.faiss_path}")
-            import faiss# type: ignore
+            import faiss  # type: ignore
             self.faiss_index = faiss.read_index(str(self.faiss_path))
 
         # Pinecone cloud
@@ -262,7 +262,7 @@ class HybridIndexer:
 
         # Filter out deleted by default
         if self.cfg.deleted_field in df.columns:
-            df = df[df[self.cfg.deleted_field] != True]
+            df = df[not df[self.cfg.deleted_field]]
         if where:
             df = df.query(where)
 

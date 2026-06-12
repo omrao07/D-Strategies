@@ -6,6 +6,7 @@ import json
 import os
 from datetime import date
 from typing import Dict, List, Optional
+
 import redis
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")

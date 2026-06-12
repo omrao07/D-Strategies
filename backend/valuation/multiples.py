@@ -35,13 +35,12 @@ The output includes clean, capped multiples with NaN-safe handling.
 """
 
 from __future__ import annotations
+
 import argparse
-import math
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import pandas as pd
-
 
 # -------------------------
 # Canonical column mapping

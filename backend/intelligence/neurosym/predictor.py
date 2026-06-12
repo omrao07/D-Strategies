@@ -45,7 +45,7 @@ from __future__ import annotations
 import math
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Deque, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Deque, Dict, List, Optional, Tuple
 
 # Optional NumPy (used if available)
 try:

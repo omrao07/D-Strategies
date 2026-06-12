@@ -28,8 +28,8 @@ import json
 import math
 import re
 import unicodedata
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from dataclasses import asdict, dataclass
+from typing import Dict, Iterable, List, Optional, Tuple
 
 # ---------------------------- Data Models ----------------------------
 
@@ -68,7 +68,7 @@ class _Backend:
 class _FinBERT(_Backend):
     name = "finbert"
     def __init__(self):
-        from transformers import pipeline # type: ignore
+        from transformers import pipeline  # type: ignore
         self.pipe = pipeline("sentiment-analysis", model="ProsusAI/finbert")
     def score_sentence(self, text: str) -> Tuple[float, str, Optional[float]]:
         out = self.pipe(text[:512])[0]  # truncate long sentences for speed
@@ -85,7 +85,7 @@ class _FinBERT(_Backend):
 class _Vader(_Backend):
     name = "vader"
     def __init__(self):
-        from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer # type: ignore
+        from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer  # type: ignore
         self.vader = SentimentIntensityAnalyzer()
     def score_sentence(self, text: str) -> Tuple[float, str, Optional[float]]:
         s = self.vader.polarity_scores(text)

@@ -45,14 +45,12 @@
 import argparse
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 # ----------------------------- Config -----------------------------
 
@@ -313,7 +311,7 @@ def main():
     m_rets = equity_df["monthly_return"].dropna()
     sharpe = float(m_rets.mean() / max(m_rets.std(), 1e-9) * np.sqrt(12)) if len(m_rets) > 1 else 0.0
 
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Rebalance dates: {len(rebalance_df)}")
     if not ic_df.empty:
         print(f"Mean IC (composite): {ic_df['IC_composite'].mean():.4f}")

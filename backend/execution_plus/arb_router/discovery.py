@@ -35,23 +35,20 @@ print(res.venues.keys(), res.universe, res.health)
 from __future__ import annotations
 
 import os
-import time
-import math
 import random
+import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 # Optional YAML
 try:
-    import yaml  # type: ignore
     _HAVE_YAML = True
 except Exception:
     _HAVE_YAML = False
 
 # Pull in your registry/adapters
-from backend.execution_plus.registry import HUB, load_adapters_from_yaml # type: ignore
-from backend.execution_plus.adapters import AdapterBase, Quote # type: ignore
-
+from backend.execution_plus.adapters import AdapterBase, Quote  # type: ignore
+from backend.execution_plus.registry import HUB, load_adapters_from_yaml  # type: ignore
 
 # ----------------------------- data models -----------------------------
 

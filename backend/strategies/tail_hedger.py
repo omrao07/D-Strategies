@@ -1,14 +1,14 @@
 # backend/engine/strategies/tail_hedger.py
 from __future__ import annotations
 
-import os
 import math
+import os
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
+from backend.engine.strategy_base import Strategy
 
 KEY_NLV = os.getenv("PORTFOLIO_NLV_KEY", "portfolio:nlv")  # HGET <KEY_NLV> value -> float
 

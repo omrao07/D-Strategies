@@ -22,11 +22,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 CB_WEIGHTS = {
     "FED": 0.40, "ECB": 0.30, "BOJ": 0.20, "PBOC": 0.10,

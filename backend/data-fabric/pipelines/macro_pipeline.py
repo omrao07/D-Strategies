@@ -20,12 +20,10 @@ Env (examples)
 
 from __future__ import annotations
 
+import json
 import os
 import sys
-import json
 import time
-import hashlib
-import typing as T
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -52,12 +50,18 @@ except Exception:
 
 # Our Macro adapter
 try:
-    from data_fabric.alt_adapters.macro_feed import ( # type: ignore
-        FredParams, WorldBankParams, fetch_fred, fetch_worldbank
+    from data_fabric.alt_adapters.macro_feed import (  # type: ignore
+        FredParams,
+        WorldBankParams,
+        fetch_fred,
+        fetch_worldbank,
     )  # type: ignore
 except Exception:
     from alt_adapters.macro_feed import (  # type: ignore
-        FredParams, WorldBankParams, fetch_fred, fetch_worldbank
+        FredParams,
+        WorldBankParams,
+        fetch_fred,
+        fetch_worldbank,
     )
 
 
@@ -378,7 +382,7 @@ def main(argv: list[str] | None = None) -> int:
             res = run_fred(cfg)
         else:
             res = run_worldbank(cfg)
-    except SystemExit as e:
+    except SystemExit:
         raise
     except Exception as e:
         log("pipeline_error", mode=cfg.mode, error=str(e))

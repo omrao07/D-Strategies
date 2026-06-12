@@ -21,8 +21,6 @@ Each `row` is a dict produced by pipeline_runner (has keys like id, url, title, 
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional
 import contextlib
 import gzip
 import io
@@ -30,6 +28,8 @@ import json
 import os
 import sqlite3
 import time
+from dataclasses import dataclass, field
+from typing import Any, Dict, Iterable, List, Optional
 
 # Optional deps
 try:

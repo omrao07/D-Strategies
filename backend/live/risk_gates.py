@@ -18,7 +18,7 @@ from __future__ import annotations
 import time
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Deque, Dict, FrozenSet, Optional
+from typing import Deque, FrozenSet, Optional
 
 
 @dataclass
@@ -169,7 +169,8 @@ class RiskGates:
 
     def to_redis(self, r=None) -> None:
         """Persist gate state snapshot to Redis risk:gates hash."""
-        import json, os
+        import json
+        import os
         if r is None:
             try:
                 import redis as _redis
@@ -202,7 +203,7 @@ class RiskGates:
 
     def from_redis(self, r=None) -> None:
         """Restore gate state snapshot from Redis risk:gates hash."""
-        import json, os
+        import os
         if r is None:
             try:
                 import redis as _redis

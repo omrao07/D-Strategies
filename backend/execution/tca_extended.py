@@ -1,8 +1,12 @@
 # backend/tca/tca_extended.py
 from __future__ import annotations
 
-import csv, json, math, os, statistics, time
-from dataclasses import dataclass, asdict, field
+import csv
+import json
+import os
+import statistics
+import time
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # ---------- optional deps (graceful) ----------

@@ -27,21 +27,17 @@ from __future__ import annotations
 
 import json
 import math
-import os
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 # Optional heavy deps
 try:
-    import pandas as pd  # type: ignore
-    import numpy as np   # type: ignore
     _HAVE_PD = True
 except Exception:
     _HAVE_PD = False
 
 from jinja2 import Environment, FileSystemLoader  # type: ignore
-
 
 # ----------------------- Data containers -----------------------
 
@@ -84,13 +80,13 @@ class ReportInputs:
 def _make_exporter(kind: str, kwargs: Dict):
     kind = kind.lower()
     if kind == "local":
-        from .exporters.local_exporter import LocalExporter # type: ignore
+        from .exporters.local_exporter import LocalExporter  # type: ignore
         return LocalExporter(**kwargs)
     if kind == "s3":
-        from .exporters.s3_exporter import S3Exporter # type: ignore
+        from .exporters.s3_exporter import S3Exporter  # type: ignore
         return S3Exporter(**kwargs)
     if kind == "gcs":
-        from .exporters.gcs_exporter import GCSExporter # type: ignore
+        from .exporters.gcs_exporter import GCSExporter  # type: ignore
         return GCSExporter(**kwargs)
     raise ValueError("Exporter kind must be one of: local, s3, gcs")
 

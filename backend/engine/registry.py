@@ -24,13 +24,12 @@ components across the execution stack.
 
 from __future__ import annotations
 
-import inspect
+import importlib
 import os
 import pkgutil
 import threading
-import importlib
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List, Optional
 
 # Optional: yaml (used only if present)
 try:
@@ -42,11 +41,14 @@ except Exception:
 # Pull in your adapter types
 from .adapters import (
     AdapterBase,
-    AdapterRegistry as BuiltinAdapterRegistry,
     VenueConfig,
+)
+from .adapters import (
+    AdapterRegistry as BuiltinAdapterRegistry,
+)
+from .adapters import (
     load_from_path as load_adapter_from_path,
 )
-
 
 # ---------------------------------------------------------------------
 # Generic Registry (thread-safe)
@@ -239,7 +241,7 @@ def load_adapters_from_yaml(yaml_path: str, *, use_yaml_adapters_field: bool = T
                 else:
                     # No class given -> let adapters.load_from_path decide (expects Adapter subclass named Adapter)
                     adapter = load_adapter_from_path(dotted, cfg)
-            except Exception as e:
+            except Exception:
                 # Fall through to built-in registry
                 adapter = None
 

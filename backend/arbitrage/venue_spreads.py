@@ -37,11 +37,10 @@ CLI:
 
 from __future__ import annotations
 
-import math
-import time
 import json
+import time
 from collections import defaultdict, deque
-from typing import Any, Dict, Optional, Tuple, List
+from typing import Any, Dict, Optional
 
 # Optional bus (graceful if missing)
 try:
@@ -225,7 +224,7 @@ def run_loop():
 # ----------------------------- CLI -----------------------------
 
 def main():
-    import argparse, random
+    import argparse
     ap = argparse.ArgumentParser(description="Venue Spreads & Cross-Venue Edge")
     ap.add_argument("--run", action="store_true", help="Run against bus streams (quotes.*)")
     ap.add_argument("--probe", action="store_true", help="Synthetic probe to stdout")

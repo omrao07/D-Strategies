@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -597,7 +597,7 @@ def compute_all_metrics(
     daily_ret = daily_pnl / cap
 
     regimes = detect_regimes(daily_ret)
-    n_regimes = len(set(regimes))
+    len(set(regimes))
 
     bench = benchmark_returns if benchmark_returns is not None else np.zeros(len(daily_ret))
 

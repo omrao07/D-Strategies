@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import os
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, Optional
 
 from backend.bus.streams import publish_stream
@@ -100,7 +100,6 @@ class BarAggregator:
         """
         now = ts or time.time()
         current_bar_ts = self._bar_ts(now)
-        key = f"{symbol}:{current_bar_ts}"
 
         # Check if we have an older open bar that just closed
         completed = None

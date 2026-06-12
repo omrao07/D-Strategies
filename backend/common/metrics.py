@@ -21,10 +21,15 @@ Design notes
 """
 
 from __future__ import annotations
-import time, math, json, os, threading
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Iterable, Tuple, Callable, Any
+
+import json
+import math
+import os
+import threading
+import time
 from contextlib import contextmanager
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, Iterable, List
 
 __all__ = [
     "incr", "add", "gauge_set", "gauge_add",

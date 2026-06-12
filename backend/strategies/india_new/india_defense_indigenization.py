@@ -24,11 +24,13 @@ outdir/backtest.csv         cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 DEFENSE_TICKERS = ["hal", "bel", "beml", "paras", "mtar", "dpsl", "ideaforge", "bhel_defense", "cochin", "grse", "mazagon"]
 BUDGET_GROWTH_HIGH = 12.0  # % YoY — strong defense spending

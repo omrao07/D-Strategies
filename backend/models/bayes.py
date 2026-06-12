@@ -17,14 +17,15 @@ Dependencies: numpy (required), scipy (optional for special funcs & t-quantiles)
 """
 
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Tuple, Optional, Dict, Any
 
 import math
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
+
 import numpy as np
 
 try:
-    from scipy import stats, special
+    from scipy import special, stats
     _HAS_SCIPY = True
 except Exception:
     _HAS_SCIPY = False

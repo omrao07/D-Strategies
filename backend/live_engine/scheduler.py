@@ -21,7 +21,7 @@ import os
 import signal
 import threading
 import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Optional
 
 log = logging.getLogger(__name__)
 
@@ -32,10 +32,10 @@ except ImportError:
     _IST = None
 
 try:
+    from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
     from apscheduler.schedulers.background import BackgroundScheduler
     from apscheduler.triggers.cron import CronTrigger
     from apscheduler.triggers.interval import IntervalTrigger
-    from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
     _HAS_APScheduler = True
 except ImportError:
     _HAS_APScheduler = False
@@ -230,7 +230,9 @@ class LiveEngineScheduler:
             returns = np.array([float(x) for x in raw_returns])
 
             from backend.risk.institutional_risk_engine import (
-                VaREngine, PortfolioRiskEngine, get_risk_config_from_redis, InstitutionalRiskEngine
+                PortfolioRiskEngine,
+                VaREngine,
+                get_risk_config_from_redis,
             )
             var_engine = VaREngine()
             port_engine = PortfolioRiskEngine()
@@ -240,7 +242,6 @@ class LiveEngineScheduler:
             sharpe = port_engine.sharpe_ratio(returns)
             max_dd = port_engine.max_drawdown(np.cumprod(1 + returns))
 
-            import json
             snapshot = {
                 "ts": str(int(time.time())),
                 "var_99_1d": str(round(hist_var, 6)),

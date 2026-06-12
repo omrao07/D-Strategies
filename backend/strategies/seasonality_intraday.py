@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import time
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
-from backend.engine.strategy_base import Strategy
 from backend.bus.streams import hset
+from backend.engine.strategy_base import Strategy
 
 
 class SeasonalityIntraday(Strategy):

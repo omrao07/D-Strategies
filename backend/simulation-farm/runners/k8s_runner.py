@@ -28,13 +28,10 @@ print(status)
 
 from __future__ import annotations
 
-import json
-import os
 import time
 from typing import Any, Dict, Optional
 
-from kubernetes import client, config, utils
-from kubernetes.stream import stream
+from kubernetes import client, config
 
 
 class K8sRunner:

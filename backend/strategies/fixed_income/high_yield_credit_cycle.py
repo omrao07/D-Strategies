@@ -22,11 +22,13 @@ outdir/backtest.csv             cumulative P&L
 outdir/summary.json
 """
 
-import argparse, json, os
+import argparse
+import json
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 HY_PHASES = {
     "tightening_bull": (0, 300),
@@ -64,7 +66,7 @@ def run(cfg):
     def make_signal(row):
         phase = row["phase"]
         trend = row.get("oas_trend", 0) or 0
-        oas = row[oas_col]
+        row[oas_col]
         if phase == "tightening_bull" and trend < 0:
             return "max_risk_on"
         elif phase in ("tightening_bull", "fair_value") and trend < 0:

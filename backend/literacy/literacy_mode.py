@@ -31,14 +31,13 @@ Usage:
 
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 # Optional type import; works without news module too.
 try:
-    from backend.ingestion.news.news_base import NewsEvent # type: ignore
+    from backend.ingestion.news.news_base import NewsEvent  # type: ignore
 except Exception:
     @dataclass
     class NewsEvent:  # minimal stub

@@ -125,13 +125,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 
 # ----------------------------- helpers -----------------------------
 
@@ -388,7 +387,6 @@ def build_panel(quakes: pd.DataFrame, macro: pd.DataFrame, fiscal: pd.DataFrame,
     # scale damages to billions for stability
     Q["shock_damage_bn"] = Q["shock_damage"] / 1e9
     # Build a daily region dataframe from quake events
-    regions = [region_key]
     # Base date span from data
     dt_min = min([x for x in [Q["date"].min() if not Q.empty else None,
                               macro["date"].min() if not macro.empty else None,
@@ -589,8 +587,7 @@ def rebuild_paths(quakes_periodic: pd.DataFrame, panel: pd.DataFrame, freq: str,
     dates = sorted(panel["date"].unique())
     if not dates: return pd.DataFrame()
     idx = pd.Index(dates)
-    period = np.arange(len(idx))
-    rows = []
+    np.arange(len(idx))
     # Aggregate shocks per period
     dmg = panel.set_index("date")["shock_damage_bn"] if "shock_damage_bn" in panel.columns else panel.set_index("date")["shock"]
     dmg = dmg.reindex(idx).fillna(0.0)

@@ -2,9 +2,7 @@
 """VWAP execution algorithm — simple plan() interface."""
 from __future__ import annotations
 
-import math
 from typing import Any, Dict, List, Optional
-
 
 # Default U-shaped volume profile: (time_fraction, cum_volume_fraction)
 _DEFAULT_UCURVE = [

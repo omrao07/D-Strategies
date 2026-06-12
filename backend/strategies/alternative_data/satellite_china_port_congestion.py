@@ -224,7 +224,7 @@ def main():
         "signal_logic": "z>threshold=LONG shipping, z<-threshold=SHORT shipping",
     }
 
-    print(f"\n[SUMMARY]")
+    print("\n[SUMMARY]")
     print(f"  Date range     : {summary['date_range_start']} → {summary['date_range_end']}")
     print(f"  Top ports      : {top_ports}")
     print(f"  Long signals   : {n_long}  |  Short signals: {n_short}")
