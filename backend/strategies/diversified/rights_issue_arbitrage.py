@@ -250,7 +250,6 @@ class RightsIssueArbitrage(Strategy):
 
         # We compare: cum vs (ex + right)
         package_buy  = p_ex * (1 + eq_fee) + r_ask * (1 + r_fee)  # cost to buy synthetic cum
-        p_ex * (1 - eq_fee) + r_bid * (1 - r_fee)
 
         # Net edge (bps of cum) when **cum is rich vs package** (so we sell cum, buy package)
         edge_unit = (p_cum * (1 - eq_fee)) - package_buy

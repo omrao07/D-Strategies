@@ -197,7 +197,6 @@ class AnalystRevisionMomentum(Strategy):
 
         # current total names
         n_open = len(open_names)
-        _fees_bps("EXCH") * 1e-4
 
         for s, z, age, sec in cands:
             if n_open >= MAX_NAMES: break

@@ -315,7 +315,6 @@ class ProposalMixer:
                 continue
             score = float(getattr(prop, "score", 0.0) or 0.0)
             conf = float(getattr(prop, "confidence", 0.5) or 0.5)
-            score * conf
             for o in getattr(prop, "orders"):
                 side = (getattr(o, "side", "") or "").upper()
                 sym = getattr(o, "symbol", "")

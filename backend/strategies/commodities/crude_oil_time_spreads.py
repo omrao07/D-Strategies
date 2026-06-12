@@ -122,8 +122,6 @@ def run(cfg):
 
         # Roll yield vs spot return
         m1_ret = wide[m1_col].pct_change().dropna()
-        roll_yield_daily = wide["roll_yield_ann"].reindex(m1_ret.index) / 100 / 365
-        m1_ret + roll_yield_daily.fillna(0)
 
         fwd5 = m1_ret.rolling(5).sum().shift(-5)
         ry_series = wide["roll_yield_zscore"].reindex(m1_ret.index).ffill().dropna()

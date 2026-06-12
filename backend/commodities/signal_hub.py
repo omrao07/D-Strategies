@@ -240,7 +240,6 @@ class CommoditySignalHub:
             if commodity in ("copper", "iron_ore"):
                 # Nightlights for industrial metals
                 val = self._demo_float(commodity + "_nightlights", 0.3, 0.15)
-                (val - 0.3) / 0.15  # z-score proxy
                 return SatelliteSignal(commodity=commodity, nightlights_score=val,
                                        ndvi_anomaly_zscore=None, region="china_industrial",
                                        timestamp=datetime.datetime.utcnow().isoformat()+"Z")

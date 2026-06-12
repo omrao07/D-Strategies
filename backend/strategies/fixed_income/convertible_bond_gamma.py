@@ -115,13 +115,10 @@ def run(cfg):
                 continue
             stock = eq_wide[price_col].dropna()
             stock_ret = stock.pct_change().dropna()
-            delta_series = sub["delta"].reindex(stock_ret.index).ffill().shift(1)
             gamma_series = sub["gamma"].reindex(stock_ret.index).ffill().shift(1)
             # Gamma P&L: 0.5 * gamma * S^2 * (Δ ln S)^2 per day
             dS = stock_ret * stock.reindex(stock_ret.index)
             gamma_pnl = 0.5 * gamma_series * (dS ** 2)
-            delta_series * dS
-            sub["delta"].reindex(stock_ret.index).ffill().shift(1).fillna(0)
             hedged_ret = gamma_pnl.fillna(0)  # simplified: long gamma, short delta continuously
             hedged_pnl.append(hedged_ret.rename(ticker))
 

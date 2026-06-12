@@ -268,7 +268,6 @@ class DeltaNeutralVolArbitrage(Strategy):
             # Recompute instantaneous straddle delta (approx: call_delta - put_delta ≈ 2N(d1)-1; at ATM ≈ 0)
             # For robustness, clamp by gamma * dS notionally; but we’ll just re‑hedge if drift > threshold.
             delta_est = (2.0 * _norm_cdf(d1) - 1.0) * st.n_units  # units ~ contracts; works as relative measure
-            delta_est - st.last_delta
 
             # Re‑hedge if absolute delta exceeds threshold of underlying "share" notionally
             if abs(delta_est) >= DELTA_REHEDGE_ABS:

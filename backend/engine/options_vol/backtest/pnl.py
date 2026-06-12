@@ -37,7 +37,6 @@ def _bs_price(right: np.ndarray, S, K, r, q, vol, T):
     # right: +1 for call, -1 for put
     d1 = _bs_d1(S, K, r, q, vol, T)
     d2 = d1 - vol * np.sqrt(np.maximum(T, 1e-9))
-    (right > 0).astype(float) * 2.0 - 1.0  # +1 for C, -1 for P
     disc_q = np.exp(-q * T); disc_r = np.exp(-r * T)
     call = disc_q * S * _norm_cdf(d1) - disc_r * K * _norm_cdf(d2)
     put  = disc_r * K * _norm_cdf(-d2) - disc_q * S * _norm_cdf(-d1)
@@ -224,7 +223,6 @@ def compute_options_pnl(
             traded_notional = np.abs(trd_t) * mult_arr * px_t
             fees = np.abs(trd_t) * float(cost.commission_per_contract)
             slip = traded_notional * (float(cost.slippage_bps) * 1e-4)
-            fees + slip
 
             pnl_rows.append({
                 "date": t,

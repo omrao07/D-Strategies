@@ -95,7 +95,6 @@ def run(cfg):
     merged["z_score"] = (merged["basis_error"] - mu) / sigma
 
     entry_bps = ENTRY_BPS / 10000 * merged["spot"].mean()
-    EXIT_BPS / 10000 * merged["spot"].mean()
 
     records = []
     for dt, row in merged.iterrows():

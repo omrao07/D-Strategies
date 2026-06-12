@@ -241,7 +241,6 @@ class POVExecutor:
     def status(self) -> Dict[str, Any]:
         cfg, st = self.cfg, self.state
         remaining = max(0.0, cfg.target_qty - st.filled_qty)
-        cfg.target_participation * max(st.printed_qty, 1.0)
         part_now = (st.filled_qty / st.printed_qty) if st.printed_qty > 0 else 0.0
         return {
             "symbol": cfg.symbol.upper(),

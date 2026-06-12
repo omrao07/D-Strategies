@@ -522,7 +522,6 @@ def run_country_sector_impacts(
             for (blk_ctry, blk_sec, share_cut) in rules_exports:
                 if blk_ctry == exp and (blk_sec == sec or blk_sec=="*"):
                     cut = max(cut, share_cut)
-            vol_after_controls = val * (1.0 - cut)
 
             # Friend/reshoring: portion shifts away
             resh_share = 0.0
@@ -536,10 +535,6 @@ def run_country_sector_impacts(
 
             # Apply Armington volume response to price_chg (ΔQ/Q ≈ ε * (−ΔP/P))
             dQ_Q = params.trade_elasticity * price_chg
-            vol_after = vol_after_controls * (1.0 + dQ_Q)
-            # Reshoring portion: remove from imports → produce domestically with cost differential
-            vol_after * resh_share
-            vol_after * frnd_share
 
             # Domestic production cost premium proxy from country wage/energy vs exporter
             # If costs.csv given, use wage_idx/energy_idx; else assume domestic=110 vs foreign=100

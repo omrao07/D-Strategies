@@ -112,12 +112,7 @@ def roll_ols_beta(Y: pd.Series, X: pd.DataFrame, window: int) -> pd.DataFrame:
     Y_ = Y.astype(float)
     idx = X_.index
     betas = pd.DataFrame(index=idx, columns=X_.columns, dtype=float)
-    # Precompute rolling means
-    mX = X_.rolling(window, min_periods=max(30, window//4)).mean()
-    mY = Y_.rolling(window, min_periods=max(30, window//4)).mean()
-    X_ - mX
-    (Y_ - mY)
-    # Covariances & variances
+    # Covariances & variances (windowed centering done inline in the loop below)
     # Σxx
     for t in X_.columns:
         for s in X_.columns:

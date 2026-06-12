@@ -238,7 +238,6 @@ class ClimateToCommodity(Strategy):
                     self._close_out(tag, st, s)
 
         # entries
-        _fees_bps("EXCH") * 1e-4
         n_open = len(open_tags)
         # sort by |z| desc
         for s, z in sorted(zmap.items(), key=lambda kv: abs(kv[1]), reverse=True):

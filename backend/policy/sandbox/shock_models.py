@@ -244,7 +244,6 @@ class FXGap(ShockModel):
         diff = r1 - r2
         if abs(diff) < 1e-6:
             return []
-        self.scale * diff + self.overshoot_std * _randn()
         # Represent via risk/liquidity proxies (simulator maps to FX via policy differentials anyway)
         return [Shock(key="global", risk_z_jump=0.0, liq_z_jump=0.0, infl_z_jump=0.0, step=t, name=f"{self.name}_{t}")]
 

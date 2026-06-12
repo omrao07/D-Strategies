@@ -213,7 +213,6 @@ class EarningsSurpriseMomentum(Strategy):
 
         # ----- entries (respect caps, confirmations) -----
         n_open = len(open_names)
-        _fees_bps("EXCH") * 1e-4
 
         # Prefer larger |z| and nearer announcements
         cands = sorted(zmap.items(), key=lambda kv: (abs(kv[1]), -1.0/max(1e-6, recency[kv[0]])), reverse=True)

@@ -279,8 +279,6 @@ def backtest_ls(
     W = pd.DataFrame(weights).set_index("date").reindex(dates).ffill().fillna(0.0)
     # Portfolio daily return
     port_ret = (R * W).sum(axis=1)
-    (R.clip(lower=0) * (W.clip(lower=0))).sum(axis=1) + (R * (W>0)).sum(axis=1)*0  # placeholder
-    (R.clip(upper=0) * (W.clip(upper=0))).sum(axis=1) + (R * (W<0)).sum(axis=1)*0
     out = pd.DataFrame({"long_short": port_ret, "long_only": (R*(W>0)).sum(axis=1), "short_only": (R*(W<0)).sum(axis=1)})
     # Basket members per rebalance
     rows = []

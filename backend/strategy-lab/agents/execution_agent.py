@@ -95,7 +95,6 @@ class Position:
             self.qty = new_qty
         else:
             # Closing or flipping
-            min(abs(self.qty), abs(signed_qty)) * (1 if signed_qty > 0 else 1)
             # Realized PnL is (exit - entry) * closed_quantity with sign of original position
             if self.qty > 0:  # closing long => sell fill
                 self.realized_pnl += (fill.price - self.avg_px) * min(abs(self.qty), abs(signed_qty))

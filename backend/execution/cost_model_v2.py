@@ -187,7 +187,6 @@ class CostModelV2:
         """
         Estimate *child* order execution cost in pnl_ccy for the provided market state.
         """
-        abs(ci.qty) * ci.mid_px
         spread = self._spread_cost(ci)
         fees = self._fee_cost(ci)
         impact = self._impact_cost(ci)

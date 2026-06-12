@@ -244,8 +244,6 @@ class StatisticalPairArbitrage(Strategy):
         gross = qty1 * p1 + qty2 * p2
         if gross > USD_NOTIONAL * MAX_LEVER or gross < MIN_TICKET_USD: return
 
-        _fees_bps(VENUE_EQ) * 1e-4  # bps guard
-
         if z > 0:
             # Short SYM1, Long SYM2
             self.order(f"EQ:{s1}", "sell", qty=qty1, order_type="market", venue=VENUE_EQ)

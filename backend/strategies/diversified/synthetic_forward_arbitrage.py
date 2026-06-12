@@ -229,10 +229,6 @@ class SyntheticForwardArbitrage(Strategy):
         if r.get(_poskey(self.ctx.name, tag)) is not None: return
         if not (abs(edge_bps) >= ENTRY_BPS and abs(z) >= ENTRY_Z): return
 
-        # Fees (bps guard)
-        _fees_bps(venue_spot) * 1e-4
-        _fees_bps(venue_fwd)  * 1e-4
-
         # Size: use USD_NOTIONAL; futures/fwd qty by contract notional, spot qty by dollar
         # Approx futures contract notional ≈ Fmkt * contract_mult
         fut_notional = max(1e-6, Fmkt * contract_mult)

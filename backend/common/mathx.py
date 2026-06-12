@@ -55,7 +55,7 @@ def sharpe_ratio(returns: Union[pd.Series, np.ndarray], rf: float = 0.0, freq: i
         freq: periods per year (252 = daily, 12 = monthly)
     """
     r = pd.Series(returns).dropna()
-    r - rf
+    r = r - rf
     mu = r.mean() * freq
     sigma = r.std(ddof=0) * np.sqrt(freq)
     return safe_div(mu, sigma)

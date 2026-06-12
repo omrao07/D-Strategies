@@ -91,10 +91,6 @@ def run(cfg):
         accel = row.get("freight_acceleration", np.nan)
         z = row.get("freight_zscore", np.nan)
 
-        # Commodity-level sub-signals
-        "cement_mt" in freight.columns and not np.isnan(row.get("cement_mt", np.nan)) and \
-                        not np.isnan(freight["cement_mt"].pct_change(12).loc[date] if date in freight.index else np.nan)
-
         if not np.isnan(yoy) and yoy > FREIGHT_GROWTH_STRONG and not np.isnan(accel) and accel > 0:
             signal = "strong_buy_industrial"
         elif not np.isnan(yoy) and yoy > FREIGHT_GROWTH_STRONG:

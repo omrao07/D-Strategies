@@ -243,8 +243,6 @@ class ToxicFlowFilter:
 
     def _depletion(self) -> Tuple[float, float]:
         # returns (buy_touch_depletion, sell_touch_depletion) over book_window
-        now = self._now_ms()
-        now - self.cfg.book_window_ms
         # rough decay so it doesn’t keep growing
         self._touch_depletions_buy *= 0.9
         self._touch_depletions_sell *= 0.9

@@ -145,7 +145,6 @@ def b76_greeks(
 
     sqrt_t = math.sqrt(t)
     d1 = (math.log(f/k) + 0.5*vol*vol*t) / (vol*sqrt_t)
-    d1 - vol*sqrt_t
     disc = math.exp(-r*t)
     is_call = (typ == "call")
 

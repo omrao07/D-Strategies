@@ -242,7 +242,6 @@ class ExpectedShortfall:
         base = ExpectedShortfall.portfolio_historical(returns_by_asset, weights, alpha)
         contrib: Dict[str, float] = {}
         keys = [k for k in weights.keys() if k in returns_by_asset]
-        sum(weights.get(k, 0.0) for k in keys) or 1.0
 
         for k in keys:
             w_up = dict(weights);  w_down = dict(weights)

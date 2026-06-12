@@ -102,7 +102,6 @@ def run(cfg):
         brent = row.get(brent_col, np.nan)
         inr_val = row.get(inr_col, np.nan)
         brent_rising = row.get("brent_mom", 0) > 5
-        row.get("inr_mom", 0) > 1
 
         if not np.isnan(z):
             if z > IMPORT_COST_HIGH and brent_rising:

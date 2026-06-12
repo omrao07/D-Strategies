@@ -344,7 +344,6 @@ def fit_nelson_siegel(curve: ForwardCurve, tau_init: float = 24.0) -> NelsonSieg
         return NelsonSiegelParams(beta0=float(b0), beta1=float(b1), beta2=float(b2),
                                   tau=float(tau), rmse=rmse)
     except Exception:
-        (prices[-1] - prices[0]) / max(mats_months[-1] - mats_months[0], 1)
         return NelsonSiegelParams(beta0=float(prices[-1]), beta1=float(prices[0]-prices[-1]),
                                   beta2=0.0, tau=tau_init, rmse=float("nan"))
 

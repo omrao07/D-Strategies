@@ -353,9 +353,7 @@ class PatentMomentum:
             zf = _z([r["yoy_filings"] for r in recs])
             zc = _z([r["cite_intensity"] for r in recs])
             for i, r in enumerate(recs):
-                self.w_filings * (zf[i] + 0.5 * r["accel_filings"]) + self.w_cites * zc[i]
-                # min-max to 0..100
-                # collect raw list
+                # collect raw z-scores; the blended raw score is built in `raws` below
                 recs[i]["z_filings"] = float(zf[i])
                 recs[i]["z_citations"] = float(zc[i])
             raws = [self.w_filings*(rr["z_filings"] + 0.5*rr["accel_filings"]) + self.w_cites*rr["z_citations"] for rr in recs]

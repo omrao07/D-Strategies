@@ -43,10 +43,8 @@ class AltDataAlpha:
         df = df.dropna()
         features = [c for c in df.columns if c != target_col]
 
-        # Normalize features
-        (df[features] - df[features].mean()) / df[features].std(ddof=0)
-
-        # Rolling correlation weights
+        # Rolling correlation weights (Pearson corr is invariant to feature scaling,
+        # so no separate normalization step is needed here)
         corrs = {}
         for f in features:
             corrs[f] = df[f].corr(df[target_col])

@@ -149,10 +149,8 @@ class RegimeMapper:
         tr_str = T.tr_strong - (H.tr_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
         tr_wk  = T.tr_weak   + (H.tr_buf if prev_reg in ("RANGE_BOUND","RECOVERY") else 0.0)
         corr_hi = T.corr_high + (H.corr_buf if prev_reg in ("CRISIS","LIQUIDITY_CRUNCH") else 0.0)
-        T.corr_low  - (H.corr_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
         liq_lo  = T.liq_low   + (H.liq_buf if prev_reg in ("CRISIS","LIQUIDITY_CRUNCH") else 0.0)
         liq_hi  = T.liq_high  - (H.liq_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
-        T.cred_ok   - (H.cred_buf if prev_reg in ("CALM_TREND","RISK_ON") else 0.0)
         cred_str= T.cred_stress + (H.cred_buf if prev_reg in ("CRISIS","LIQUIDITY_CRUNCH") else 0.0)
 
         notes = []

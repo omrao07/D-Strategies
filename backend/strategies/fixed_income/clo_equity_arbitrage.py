@@ -41,11 +41,9 @@ def compute_clo_equity_irr(loan_spread_bps: float, aaa_spread_bps: float, bb_spr
     Levered return = (loan spread - weighted funding cost - expected loss) * leverage / equity_pct
     """
     equity_pct = 1.0 / (1 + leverage)  # typically ~10% equity
-    1 - equity_pct
 
     # Weighted average liability spread (simplified: 80% AAA, 20% BB)
     weighted_liab_spread = 0.8 * aaa_spread_bps + 0.2 * bb_spread_bps
-    sofr + weighted_liab_spread / 10000
 
     # Expected loss
     expected_loss = default_rate * (1 - recovery)

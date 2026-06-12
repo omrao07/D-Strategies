@@ -129,7 +129,6 @@ class VenueCostAnalyzer:
     def _fee_bps(self, venue: str, side: str, send_px: float) -> float:
         f: VenueFees = self.cfg.fees.get(venue, VenueFees())
         # Convert cents if set; cents per share / send_px -> bps
-        f.maker_rebate_bps or (_to_bps((f.maker_rebate_cents / 100.0) / max(send_px, 1e-9)))
         taker_bps = f.taker_fee_bps or (_to_bps((f.taker_fee_cents / 100.0) / max(send_px, 1e-9)))
         # We don't know passivity here; treat as taker by default; strategies can override by passing “passive=True”.
         # Caller may adjust by using on_fill(..., mid_at_fill, ...), comparing to touch to infer passive/active.
@@ -208,11 +207,8 @@ class VenueCostAnalyzer:
                 slip = _to_bps((bench_mid - px) / bench_mid)
         vs.slip_bps = self._ewma(vs.slip_bps, slip, self.cfg.alpha_slip)
 
-        # explicit fee/rebate estimate in bps
+        # explicit fee/rebate estimate in bps (folded into cost at query time via weights)
         if bench_mid and bench_mid > 0:
-            f: VenueFees = self.cfg.fees.get(venue, VenueFees())
-            f.maker_rebate_bps or _to_bps((f.maker_rebate_cents / 100.0) / bench_mid)
-            f.taker_fee_bps or _to_bps((f.taker_fee_cents / 100.0) / bench_mid)
             if passive is True:
                 pass  # rebate reduces cost (negative = good)
             elif passive is False:

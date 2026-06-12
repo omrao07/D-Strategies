@@ -180,7 +180,6 @@ def test_unconstrained_solution_matches_closed_form(api, data):
     one = np.ones_like(mu)
     A = one @ inv @ one
     B = one @ inv @ mu
-    mu  @ inv @ mu
     w_tan = (inv @ (mu - (B/A)*one))
     w_cf = w_tan / np.sum(w_tan)  # budget 1
     # Compare direction (cosine similarity close to 1)

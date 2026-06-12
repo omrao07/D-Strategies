@@ -78,7 +78,6 @@ def run(cfg):
 
     # Signal generation
     entry_threshold_pct = BASIS_ENTRY_BPS / 100
-    BASIS_EXIT_BPS / 100
 
     records = []
     for dt, row in merged.iterrows():

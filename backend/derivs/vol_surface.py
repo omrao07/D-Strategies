@@ -80,7 +80,6 @@ def _sabr_vol(F: float, K: float, T: float, alpha: float, beta: float, rho: floa
     if F == K:
         num = alpha
         den = (F ** (1 - beta))
-        (nu/alpha) * (F ** (1 - beta)) * math.log(F/K if K>0 else 1.0)
         xz = 1.0  # at-the-money limit; avoid 0/0
         term1 = ((1 - beta) ** 2 / 24) * (alpha ** 2) / (F ** (2 - 2*beta))
         term2 = (rho * beta * nu * alpha) / (4 * (F ** (1 - beta)))
